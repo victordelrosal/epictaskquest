@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Epic Task Quest</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables for Deep Dark Purple Theme with Tron Blue Highlights */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #2c003e 0%, #4169e1 100%); /* Deep Purple to Royal Blue */
+            --secondary-gradient: linear-gradient(135deg, #1b0033 0%, #1e90ff 100%); /* Darker Purple to Dodger Blue */
+            --header-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); /* Tron Blue Gradient */
+            /* Enhanced Awesome Deep Dark Purple Gradient with Multiple Color Stops and Transparency */
+            --background-gradient: linear-gradient(
+                135deg,
+                rgba(44, 0, 62, 1) 0%,        /* Deep Purple */
+                rgba(27, 0, 51, 0.9) 25%,     /* Darker Purple */
+                rgba(58, 12, 163, 0.8) 50%,   /* Vivid Purple */
+                rgba(0, 191, 255, 0.7) 75%,   /* Deep Sky Blue */
+                rgba(106, 0, 255, 0.6) 100%   /* Bright Purple */
+            );
+            --card-background: rgba(255, 255, 255, 0.05); /* More transparent for dark theme */
+            --overlay-background: rgba(255, 255, 255, 0.02); /* Slightly more transparent */
+            --text-color: #ffffff; /* White for high contrast */
+            --muted-text: #cccccc; /* Light gray for muted text */
+            --error-color: #ff4d4d;
+            --success-color: #4caf50;
+            --font-primary: 'Montserrat', sans-serif;
+            --font-secondary: 'Roboto', sans-serif;
+            --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --backdrop-filter: blur(8px);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        /* Basic Reset and Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background: var(--background-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.5s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            backdrop-filter: var(--backdrop-filter);
+            padding: 2.5rem;
+            animation: fadeIn 0.6s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Header Component */
+        .header {
+            text-align: center;
+        }
+
+        .header .title {
+            font-family: var(--font-primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: background 0.5s ease;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--muted-text);
+            letter-spacing: 0.5px;
+            margin-top: 0.3rem;
+        }
+
+        /* Stats Component */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stats div {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--overlay-background);
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            flex: 1 1 150px;
+            text-align: center;
+            cursor: default;
+        }
+
+        .stats div:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Progress Bar Component */
+        .progress-container {
+            width: 100%;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            overflow: hidden;
+            height: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-gradient);
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--primary-gradient);
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--muted-text);
+            font-weight: 500;
+        }
+
+        /* Task Form Component */
+        .task-form {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: stretch;
+            background: var(--overlay-background);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: background 0.3s ease;
+        }
+
+        .task-form input[type="text"] {
+            flex: 2;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .task-form input[type="text"]::placeholder {
+            color: #aaa;
+        }
+
+        .task-form input[type="text"]:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 8px var(--primary-gradient);
+        }
+
+        .task-form select {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            outline: none;
+        }
+
+        .task-form select:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 8px var(--secondary-gradient);
+        }
+
+        .task-form button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-gradient);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .task-form button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: var(--secondary-gradient);
+        }
+
+        /* Task Lists Component */
+        .task-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+            background: var(--overlay-background);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: background 0.3s ease;
+        }
+
+        .task-list h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: var(--header-gradient);
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* Task Item Component */
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateZ(0);
+        }
+
+        .task-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .task-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .task-details input[type="checkbox"] {
+            width: 1.5rem;
+            height: 1.5rem;
+            cursor: pointer;
+            accent-color: var(--primary-gradient);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .task-details input[type="checkbox"]:hover {
+            transform: scale(1.2);
+        }
+
+        .task-text {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            cursor: text;
+            transition: color var(--transition-speed) ease;
+            font-family: var(--font-secondary);
+        }
+
+        .task-text:disabled {
+            color: var(--muted-text);
+            cursor: not-allowed;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: var(--muted-text);
+        }
+
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .task-actions select {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            outline: none;
+        }
+
+        .task-actions select:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .task-actions button {
+            background: none;
+            border: none;
+            color: #1e90ff; /* Tron Blue for 3D effect */
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-actions button:hover {
+            color: #ffffff;
+            transform: scale(1.2);
+        }
+
+        /* Scrollbar Styling */
+        .task-list::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 5px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
+        }
+
+        /* Reset Button Component */
+        .reset-button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-gradient);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .reset-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: var(--secondary-gradient);
+        }
+
+        /* Modal Component */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            margin: auto;
+            padding: 2.5rem;
+            border: none;
+            width: 80%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            position: relative;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: var(--backdrop-filter);
+            animation: slideDown 0.6s ease-out;
+            color: var(--text-color);
+        }
+
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        /* Confirmation Modal Component */
+        .confirm-modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1500;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .confirm-modal-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            margin: auto;
+            padding: 2.5rem;
+            border: none;
+            width: 80%;
+            max-width: 400px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            position: relative;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: var(--backdrop-filter);
+            animation: slideDown 0.6s ease-out;
+            color: var(--text-color);
+        }
+
+        .confirm-modal-buttons {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .confirm-modal-buttons button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+            width: 45%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .confirm-modal-buttons .confirm {
+            background: var(--primary-gradient);
+            color: #fff;
+        }
+
+        .confirm-modal-buttons .confirm:hover {
+            background: var(--secondary-gradient);
+            transform: translateY(-3px);
+        }
+
+        .confirm-modal-buttons .cancel {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .confirm-modal-buttons .cancel:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+            }
+
+            .header .title {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .stats {
+                justify-content: space-between;
+            }
+
+            .task-form {
+                flex-direction: column;
+            }
+
+            .task-form input[type="text"],
+            .task-form select,
+            .task-form button {
+                width: 100%;
+            }
+
+            .task-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-actions select,
+            .task-actions button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .header .title {
+                font-size: 1.75rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .stats div {
+                font-size: 0.95rem;
+            }
+
+            .task-form input[type="text"],
+            .task-form select,
+            .task-form button {
+                padding: 0.6rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-details {
+                width: 100%;
+                margin-bottom: 0.75rem;
+            }
+
+            .task-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .task-actions select,
+            .task-actions button {
+                font-size: 0.9rem;
+                padding: 0.5rem;
+            }
+
+            .progress-text {
+                font-size: 0.85rem;
+            }
+
+            .confirm-modal-content,
+            .modal-content {
+                padding: 2rem;
+            }
+
+            .confirm-modal-buttons button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                width: 45%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Component -->
+        <div class="header">
+            <h1 class="title">🏆 Epic Task Quest</h1>
+            <p>Transform your tasks into an epic adventure!</p>
+        </div>
+
+        <!-- Stats Component -->
+        <div class="stats">
+            <div><i class="fas fa-check-circle"></i> Completed: <span id="completedTasks">0</span></div>
+            <div><i class="fas fa-star"></i> Points: <span id="totalPoints">0</span></div>
+            <div><i class="fas fa-level-up-alt"></i> Level: <span id="level">1</span></div>
+        </div>
+
+        <!-- Progress Bar Component -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                Progress to Next Level: <span id="progressText">0/100</span>
+            </div>
+        </div>
+
+        <!-- Task Form Component -->
+        <div class="task-form">
+            <input type="text" id="taskInput" placeholder="Enter your quest...">
+            <select id="difficultySelect">
+                <option value="1">⭐ 5 pts</option>
+                <option value="2">⭐⭐ 10 pts</option>
+                <option value="3">⭐⭐⭐ 15 pts</option>
+                <option value="4">⭐⭐⭐⭐ 20 pts</option>
+                <option value="5">⭐⭐⭐⭐⭐ 25 pts</option>
+            </select>
+            <select id="prioritySelect">
+                <option value="1">🔼 High</option>
+                <option value="2">⏵ Medium</option>
+                <option value="3">🔽 Low</option>
+            </select>
+            <button id="addTaskButton"><i class="fas fa-plus"></i> Add Quest</button>
+        </div>
+
+        <!-- Active Tasks List Component -->
+        <div class="task-list" id="activeTasksList">
+            <h3>Active Tasks</h3>
+            <!-- Active tasks will be dynamically added here -->
+        </div>
+
+        <!-- Completed Tasks List Component -->
+        <div class="task-list" id="completedTasksList">
+            <h3>Completed Tasks</h3>
+            <!-- Completed tasks will be dynamically added here -->
+        </div>
+
+        <!-- Reset Progress Button Component -->
+        <button class="reset-button" id="resetButton"><i class="fas fa-redo-alt"></i> Reset Progress</button>
+    </div>
+
+    <!-- Confirmation Modal Component -->
+    <div id="confirmModal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <p id="confirmMessage">Are you sure you want to reset all progress? ☢️ This action is irreversible!</p>
+            <div class="confirm-modal-buttons">
+                <button class="confirm" id="confirmYes"><i class="fas fa-check"></i> Yes</button>
+                <button class="cancel" id="confirmNo"><i class="fas fa-times"></i> No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs and Initialization -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyASqKkvoIp6qvX2Dvze5s6nfKBghQ41axQ",
+            authDomain: "epic-task-quest.firebaseapp.com",
+            projectId: "epic-task-quest",
+            storageBucket: "epic-task-quest.firebasestorage.app",
+            messagingSenderId: "421446505180",
+            appId: "1:421446505180:web:ac2270f8c0b92d16529a19",
+            measurementId: "G-35SX22QFBS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        console.log("Firebase initialized successfully.");
+
+        // Initialize Global Variables
+        let tasks = [];
+        let totalPoints = 0;
+        let level = 1;
+        let completedTasks = 0;
+        const pointsToNextLevel = 100;
+
+        // DOM Elements
+        const taskInput = document.getElementById('taskInput');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const prioritySelect = document.getElementById('prioritySelect');
+        const addTaskButton = document.getElementById('addTaskButton');
+        const activeTasksList = document.getElementById('activeTasksList');
+        const completedTasksList = document.getElementById('completedTasksList');
+        const completedTasksSpan = document.getElementById('completedTasks');
+        const totalPointsSpan = document.getElementById('totalPoints');
+        const levelSpan = document.getElementById('level');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resetButton = document.getElementById('resetButton');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        // ===========================
+        // Utility Functions
+        // ===========================
+
+        // Get points based on difficulty
+        function getPoints(difficulty) {
+            const pointsMap = {
+                1: 5,
+                2: 10,
+                3: 15,
+                4: 20,
+                5: 25
+            };
+            return pointsMap[difficulty] || 5;
+        }
+
+        // Update stats display
+        function updateStats() {
+            completedTasksSpan.textContent = completedTasks;
+            totalPointsSpan.textContent = totalPoints;
+            levelSpan.textContent = level;
+
+            const progress = totalPoints % pointsToNextLevel;
+            const progressPercentage = (progress / pointsToNextLevel) * 100;
+            progressFill.style.width = `${progressPercentage}%`;
+            progressText.textContent = `${progress}/${pointsToNextLevel}`;
+        }
+
+        // Update theme based on level (optional)
+        function updateTheme() {
+            // Example: Change primary color based on level
+            const primaryColors = [
+                '#2c003e', '#4169e1', '#1e90ff', '#4B0082', '#6A5ACD', '#483D8B', '#000080'
+            ];
+            const color = primaryColors[(level - 1) % primaryColors.length];
+            document.documentElement.style.setProperty('--primary-gradient', `linear-gradient(135deg, ${color} 0%, #4169e1 100%)`);
+            document.documentElement.style.setProperty('--secondary-gradient', `linear-gradient(135deg, ${color} 0%, #1e90ff 100%)`);
+            // Keep the background gradient as the enhanced one
+        }
+
+        // ===========================
+        // Firestore Operations
+        // ===========================
+
+        // Load tasks from Firestore
+        async function loadTasks() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "tasks"));
+                tasks = [];
+                completedTasks = 0;
+                totalPoints = 0;
+
+                querySnapshot.forEach((docSnap) => {
+                    const task = { id: docSnap.id, ...docSnap.data() };
+                    tasks.push(task);
+                    if (task.completed) {
+                        completedTasks++;
+                        totalPoints += getPoints(task.difficulty);
+                    }
+                });
+
+                level = Math.floor(totalPoints / pointsToNextLevel) + 1;
+                updateStats();
+                updateTheme();
+                renderTasks();
+                console.log("Tasks loaded successfully from Firestore.");
+            } catch (error) {
+                console.error("Error loading tasks: ", error);
+            }
+        }
+
+        // Add a new task to Firestore
+        async function addTask() {
+            const text = taskInput.value.trim();
+            const difficulty = parseInt(difficultySelect.value);
+            const priority = parseInt(prioritySelect.value);
+
+            if (text === "") {
+                alert("Please enter a task.");
+                return;
+            }
+
+            const task = {
+                text,
+                difficulty,
+                priority,
+                completed: false,
+                timestamp: serverTimestamp()
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "tasks"), task);
+                console.log("Task added with ID: ", docRef.id);
+                task.id = docRef.id;
+                tasks.unshift(task);
+                renderTasks();
+                animateTaskAddition(docRef.id);
+                taskInput.value = "";
+            } catch (error) {
+                console.error("Error adding task: ", error);
+            }
+        }
+
+        // Toggle task completion
+        async function toggleTaskCompletion(taskId, completed) {
+            try {
+                const taskDoc = doc(db, "tasks", taskId);
+                await updateDoc(taskDoc, { completed: completed });
+                console.log(`Task ${taskId} marked as ${completed ? 'completed' : 'active'}.`);
+                loadTasks(); // Reload tasks to update stats
+            } catch (error) {
+                console.error("Error updating task: ", error);
+            }
+        }
+
+        // Edit task text
+        async function editTaskText(taskId, newText) {
+            if (newText.trim() === "") {
+                alert("Task text cannot be empty.");
+                loadTasks(); // Reload to reset changes
+                return;
+            }
+
+            try {
+                const taskDoc = doc(db, "tasks", taskId);
+                await updateDoc(taskDoc, { text: newText });
+                console.log(`Task ${taskId} text updated.`);
+                loadTasks(); // Reload tasks to reflect changes
+            } catch (error) {
+                console.error("Error editing task: ", error);
+            }
+        }
+
+        // Update task priority
+        async function updateTaskPriority(taskId, newPriority) {
+            try {
+                const taskDoc = doc(db, "tasks", taskId);
+                await updateDoc(taskDoc, { priority: newPriority });
+                console.log(`Task ${taskId} priority updated to ${newPriority}.`);
+                loadTasks(); // Reload tasks to update UI
+            } catch (error) {
+                console.error("Error updating task priority: ", error);
+            }
+        }
+
+        // Update task difficulty
+        async function updateTaskDifficulty(taskId, newDifficulty) {
+            try {
+                const taskDoc = doc(db, "tasks", taskId);
+                await updateDoc(taskDoc, { difficulty: newDifficulty });
+                console.log(`Task ${taskId} difficulty updated to ${newDifficulty}.`);
+                loadTasks(); // Reload tasks to update UI
+            } catch (error) {
+                console.error("Error updating task difficulty: ", error);
+            }
+        }
+
+        // Delete a task
+        async function deleteTask(taskId) {
+            try {
+                await deleteDoc(doc(db, "tasks", taskId));
+                console.log(`Task ${taskId} deleted.`);
+                animateTaskDeletion(taskId);
+                loadTasks(); // Reload tasks to update list and stats
+            } catch (error) {
+                console.error("Error deleting task: ", error);
+            }
+        }
+
+        // Reset all progress
+        async function resetProgress() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "tasks"));
+                const batch = writeBatch(db);
+
+                querySnapshot.forEach((docSnap) => {
+                    batch.delete(doc(db, "tasks", docSnap.id));
+                });
+
+                await batch.commit();
+                console.log("All tasks deleted successfully.");
+                loadTasks(); // Reload tasks to reflect changes
+            } catch (error) {
+                console.error("Error resetting progress: ", error);
+            }
+        }
+
+        // ===========================
+        // Render Tasks to the DOM
+        // ===========================
+
+        function renderTasks() {
+            // Clear existing tasks
+            activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
+            completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
+
+            // Separate active and completed tasks
+            const activeTasks = tasks.filter(task => !task.completed);
+            const completedTasksArr = tasks.filter(task => task.completed);
+
+            // Sort active tasks by priority (High -> Low)
+            activeTasks.sort((a, b) => a.priority - b.priority);
+
+            // Render Active Tasks
+            activeTasks.forEach(task => {
+                const taskItem = createTaskElement(task, false);
+                activeTasksList.appendChild(taskItem);
+            });
+
+            // Render Completed Tasks
+            completedTasksArr.forEach(task => {
+                const taskItem = createTaskElement(task, true);
+                completedTasksList.appendChild(taskItem);
+            });
+        }
+
+        // Create a task element
+        function createTaskElement(task, isCompleted) {
+            const taskItem = document.createElement('div');
+            taskItem.classList.add('task-item');
+            taskItem.setAttribute('data-id', task.id);
+            taskItem.setAttribute('data-priority', task.priority);
+
+            // Task Details
+            const taskDetails = document.createElement('div');
+            taskDetails.classList.add('task-details');
+
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = isCompleted;
+            checkbox.disabled = isCompleted; // Disable checkbox for completed tasks
+            checkbox.addEventListener('change', () => {
+                toggleTaskCompletion(task.id, checkbox.checked);
+            });
+
+            // Task Text
+            const taskText = document.createElement('input');
+            taskText.type = 'text';
+            taskText.value = task.text;
+            taskText.classList.add('task-text');
+            if (isCompleted) {
+                taskText.classList.add('completed');
+            }
+            taskText.disabled = isCompleted;
+            taskText.addEventListener('blur', () => {
+                editTaskText(task.id, taskText.value);
+            });
+
+            taskDetails.appendChild(checkbox);
+            taskDetails.appendChild(taskText);
+
+            // Task Actions
+            const taskActions = document.createElement('div');
+            taskActions.classList.add('task-actions');
+
+            // Difficulty Select
+            const difficultySelect = document.createElement('select');
+            [1, 2, 3, 4, 5].forEach(num => {
+                const option = document.createElement('option');
+                option.value = num;
+                option.textContent = `${'⭐'.repeat(num)} ${getPoints(num)} pts`;
+                if (num === task.difficulty) option.selected = true;
+                difficultySelect.appendChild(option);
+            });
+            difficultySelect.disabled = isCompleted;
+            difficultySelect.addEventListener('change', () => {
+                updateTaskDifficulty(task.id, parseInt(difficultySelect.value));
+            });
+
+            // Priority Select
+            const prioritySelect = document.createElement('select');
+            const priorities = [
+                { value: 1, text: '🔼 High' },
+                { value: 2, text: '⏵ Medium' },
+                { value: 3, text: '🔽 Low' }
+            ];
+            priorities.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.value;
+                option.textContent = p.text;
+                if (p.value === task.priority) option.selected = true;
+                prioritySelect.appendChild(option);
+            });
+            prioritySelect.disabled = isCompleted;
+            prioritySelect.addEventListener('change', () => {
+                updateTaskPriority(task.id, parseInt(prioritySelect.value));
+            });
+
+            // Delete Button
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteButton.title = 'Delete Task';
+            deleteButton.addEventListener('click', () => {
+                deleteTask(task.id);
+            });
+
+            // Append actions
+            taskActions.appendChild(difficultySelect);
+            taskActions.appendChild(prioritySelect);
+            if (!isCompleted) {
+                taskActions.appendChild(deleteButton);
+            }
+
+            // Apply completed styles
+            if (isCompleted) {
+                taskText.classList.add('completed');
+            }
+
+            // Append to task item
+            taskItem.appendChild(taskDetails);
+            taskItem.appendChild(taskActions);
+
+            return taskItem;
+        }
+
+        // ===========================
+        // Event Listeners
+        // ===========================
+
+        // Add Task Button Click
+        addTaskButton.addEventListener('click', addTask);
+
+        // Add Task on Enter Key Press
+        taskInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // Reset Button Click
+        resetButton.addEventListener('click', () => {
+            // Show confirmation modal
+            confirmModal.style.display = 'block';
+        });
+
+        // Confirm Yes Button
+        confirmYes.addEventListener('click', () => {
+            resetProgress();
+            confirmModal.style.display = 'none';
+        });
+
+        // Confirm No Button
+        confirmNo.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+        });
+
+        // Close Modal when clicking outside the content
+        window.addEventListener('click', (event) => {
+            if (event.target === confirmModal) {
+                confirmModal.style.display = 'none';
+            }
+        });
+
+        // ===========================
+        // Initialize App
+        // ===========================
+
+        // Load tasks when the page loads
+        window.addEventListener('DOMContentLoaded', loadTasks);
+
+        // ===========================
+        // Animation Functions
+        // ===========================
+
+        // Animate task addition
+        function animateTaskAddition(taskId) {
+            const taskElement = document.querySelector(`.task-item[data-id="${taskId}"]`);
+            if (taskElement) {
+                taskElement.style.transform = 'scale(0.9)';
+                taskElement.style.opacity = '0';
+                setTimeout(() => {
+                    taskElement.style.transition = `transform 0.3s ease, opacity 0.3s ease`;
+                    taskElement.style.transform = 'scale(1)';
+                    taskElement.style.opacity = '1';
+                }, 100);
+            }
+        }
+
+        // Animate task deletion
+        function animateTaskDeletion(taskId) {
+            const taskElement = document.querySelector(`.task-item[data-id="${taskId}"]`);
+            if (taskElement) {
+                taskElement.style.transform = 'scale(0.9)';
+                taskElement.style.opacity = '0';
+                setTimeout(() => {
+                    taskElement.remove();
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html>
