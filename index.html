@@ -4,12 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Epic Task Quest</title>
-    <!-- Add favicon -->
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="trophy.png">
+    
+    <!-- Optional: Define the startup image and theme color -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FFD700"> <!-- Gold color matching the icon -->
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         /* CSS Variables for Deep Dark Purple Theme with Tron Blue Highlights */
         :root {
@@ -104,8 +116,7 @@
             align-items: flex-start; /* Changed from center to flex-start */
             padding: 20px;
             position: relative;
-            /* Removed overflow: hidden; to enable scrolling */
-            overflow: visible;
+            overflow: visible; /* Removed overflow: hidden; to enable scrolling */
         }
 
         .container {
@@ -668,9 +679,6 @@
             animation: pulse var(--animation-duration-pulse) ease;
         }
 
-        /* Counting Animation for Points and Completed Tasks */
-        /* Handled via JavaScript */
-
         /* Shine Animation for Level Up */
         @keyframes shine {
             0% {
@@ -721,28 +729,6 @@
                 transform: translateY(100vh) rotate(720deg);
                 opacity: 0;
             }
-        }
-
-        /* Confetti Styles */
-        .confetti-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2000;
-            overflow: hidden;
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: var(--bright-text);
-            opacity: 0.9;
-            animation: confetti var(--animation-duration-confetti) linear forwards;
-            border-radius: 50%; /* Make confetti circular */
         }
 
         /* Optional: Smooth Number Transition */
@@ -1151,7 +1137,7 @@
                 <option value="3">⭐⭐⭐ 15 pts</option>
                 <option value="4">⭐⭐⭐⭐ 20 pts</option>
                 <option value="5">⭐⭐⭐⭐⭐ 25 pts</option>
-                <option value="6">Custom pts</option>
+                <option value="6">⭐⭐⭐⭐⭐⭐ Custom</option>
             </select>
             <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add Quest</button>
@@ -1681,7 +1667,7 @@
             customPointsInput.type = 'number';
             customPointsInput.min = '1';
             customPointsInput.max = '100';
-            customPointsInput.placeholder = 'Custom points';
+            customPointsInput.placeholder = 'Enter points';
             customPointsInput.className = 'custom-points';
             customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
             customPointsInput.value = task.customPoints || '';
