@@ -637,20 +637,9 @@
             width: 10px;
             height: 10px;
             background-color: var(--bright-text);
-            opacity: 0.7;
-            animation: confetti 1.5s linear forwards;
-        }
-
-        /* Confetti Animation */
-        @keyframes confetti {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
+            opacity: 0.9;
+            animation: confetti var(--animation-duration-confetti) linear forwards;
+            border-radius: 50%; /* Make confetti circular */
         }
 
         /* Animations */
@@ -719,6 +708,40 @@
             animation: scaleUp 1s forwards;
             z-index: 1001;
             font-weight: bold;
+        }
+
+        /* Confetti Animation */
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Confetti Styles */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--bright-text);
+            opacity: 0.9;
+            animation: confetti var(--animation-duration-confetti) linear forwards;
+            border-radius: 50%; /* Make confetti circular */
         }
 
         /* Optional: Smooth Number Transition */
@@ -1055,8 +1078,9 @@
             width: 10px;
             height: 10px;
             background-color: var(--bright-text);
-            opacity: 0.7;
+            opacity: 0.9;
             animation: confetti var(--animation-duration-confetti) linear forwards;
+            border-radius: 50%; /* Make confetti circular */
         }
 
         /* Optional: Smooth Number Transition */
@@ -1853,8 +1877,8 @@
         // ===========================
 
         function triggerConfetti() {
-            const confettiColors = ['#FFC700', '#FF0000', '#2E3192', '#41BBC7', '#73D2DE', '#FF6B6B'];
-            const numberOfConfetti = 100;
+            const confettiColors = ['#FFD700', '#FFC300', '#FFEA00', '#FFF700', '#FFDD00', '#FFC100', '#FFB700']; // Various shades of gold
+            const numberOfConfetti = 200; // Increased number for more generous effect
 
             for (let i = 0; i < numberOfConfetti; i++) {
                 const confetti = document.createElement('div');
@@ -1863,8 +1887,10 @@
                 confetti.style.left = `${Math.random() * 100}%`;
                 confetti.style.top = `${Math.random() * -100}px`;
                 confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                confetti.style.width = `${Math.random() * 8 + 2}px`;
-                confetti.style.height = `${Math.random() * 8 + 2}px`;
+                const size = Math.random() * 8 + 4; // Sizes between 4px and 12px
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.opacity = Math.random() * 0.5 + 0.5; // Opacity between 0.5 and 1
                 confettiContainer.appendChild(confetti);
 
                 // Remove confetti after animation
