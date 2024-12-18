@@ -84,7 +84,7 @@
             /* Animation Durations */
             --animation-duration-pulse: 0.6s;
             --animation-duration-shine: 1s;
-            --animation-duration-flash: 0.5s;
+            --animation-duration-confetti: 1.5s;
         }
 
         /* Basic Reset and Styling */
@@ -103,6 +103,8 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden; /* Prevent scrollbars from confetti */
         }
 
         .container {
@@ -377,6 +379,7 @@
             transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transform: translateZ(0);
+            position: relative;
         }
 
         .task-item:hover {
@@ -617,7 +620,52 @@
             transform: translateY(-3px);
         }
 
+        /* Confetti Container */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--bright-text);
+            opacity: 0.7;
+            animation: confetti 1.5s linear forwards;
+        }
+
+        /* Confetti Animation */
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         /* Animations */
+
+        /* Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Slide Down */
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
 
         /* Pulse Animation for Completed Tasks */
         @keyframes pulse {
@@ -631,10 +679,7 @@
         }
 
         /* Counting Animation for Points and Completed Tasks */
-        @keyframes countUp {
-            from { content: '0'; }
-            to { content: var(--target-number); }
-        }
+        /* Handled via JavaScript */
 
         /* Shine Animation for Level Up */
         @keyframes shine {
@@ -939,10 +984,7 @@
         }
 
         /* Counting Animation for Points and Completed Tasks */
-        @keyframes countUp {
-            from { content: '0'; }
-            to { content: var(--target-number); }
-        }
+        /* Handled via JavaScript */
 
         /* Shine Animation for Level Up */
         @keyframes shine {
@@ -984,6 +1026,39 @@
             font-weight: bold;
         }
 
+        /* Confetti Animation */
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Confetti Styles */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--bright-text);
+            opacity: 0.7;
+            animation: confetti var(--animation-duration-confetti) linear forwards;
+        }
+
         /* Optional: Smooth Number Transition */
         .number-transition {
             transition: all 0.5s ease;
@@ -991,6 +1066,9 @@
     </style>
 </head>
 <body>
+    <!-- Confetti Container -->
+    <div class="confetti-container" id="confettiContainer"></div>
+
     <!-- Login Container -->
     <div id="loginContainer">
         <h2>🔒 Please Log In</h2>
@@ -1258,6 +1336,7 @@
         const confirmModal = document.getElementById('confirmModal');
         const confirmYes = document.getElementById('confirmYes');
         const confirmNo = document.getElementById('confirmNo');
+        const confettiContainer = document.getElementById('confettiContainer');
 
         // ===========================
         // Utility Functions
@@ -1389,6 +1468,10 @@
                 await updateDoc(taskDoc, { completed: completed });
                 console.log(`Task ${taskId} marked as ${completed ? 'completed' : 'active'}.`);
                 loadTasks(); // Reload tasks to update stats and trigger animations
+
+                if (completed) {
+                    triggerConfetti();
+                }
             } catch (error) {
                 console.error("Error updating task: ", error);
             }
@@ -1762,6 +1845,32 @@
                 setTimeout(() => {
                     taskElement.remove();
                 }, 300);
+            }
+        }
+
+        // ===========================
+        // Confetti Animation
+        // ===========================
+
+        function triggerConfetti() {
+            const confettiColors = ['#FFC700', '#FF0000', '#2E3192', '#41BBC7', '#73D2DE', '#FF6B6B'];
+            const numberOfConfetti = 100;
+
+            for (let i = 0; i < numberOfConfetti; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * -100}px`;
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.width = `${Math.random() * 8 + 2}px`;
+                confetti.style.height = `${Math.random() * 8 + 2}px`;
+                confettiContainer.appendChild(confetti);
+
+                // Remove confetti after animation
+                confetti.addEventListener('animationend', () => {
+                    confetti.remove();
+                });
             }
         }
 
