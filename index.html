@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 Epic Task Quest</title>
+    <title>Epic Task Quest</title>
+    <!-- Add favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
@@ -11,27 +13,70 @@
     <style>
         /* CSS Variables for Deep Dark Purple Theme with Tron Blue Highlights */
         :root {
-            --primary-gradient: linear-gradient(135deg, #2c003e 0%, #4169e1 100%); /* Deep Purple to Royal Blue */
-            --secondary-gradient: linear-gradient(135deg, #1b0033 0%, #1e90ff 100%); /* Darker Purple to Dodger Blue */
-            --header-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); /* Tron Blue Gradient */
-            /* Enhanced Awesome Deep Dark Purple Gradient with Multiple Color Stops and Transparency */
+            /* Our seven approved blue colors */
+            --blue-1: #000036;  /* Darkest */
+            --blue-2: #02066F;
+            --blue-3: #02066F;
+            --blue-4: #210A79;
+            --blue-5: #170484;
+            --blue-6: #050c91;
+            --blue-7: #0000B3;  /* Brightest */
+
+            /* Single background gradient using approved colors */
             --background-gradient: linear-gradient(
-                135deg,
-                rgba(44, 0, 62, 1) 0%,        /* Deep Purple */
-                rgba(27, 0, 51, 0.9) 25%,     /* Darker Purple */
-                rgba(58, 12, 163, 0.8) 50%,   /* Vivid Purple */
-                rgba(0, 191, 255, 0.7) 75%,   /* Deep Sky Blue */
-                rgba(106, 0, 255, 0.6) 100%   /* Bright Purple */
+                to bottom,
+                var(--blue-1) 0%,
+                var(--blue-2) 15%,
+                var(--blue-3) 30%,
+                var(--blue-4) 45%,
+                var(--blue-5) 60%,
+                var(--blue-6) 75%,
+                var(--blue-7) 100%
             );
-            --card-background: rgba(255, 255, 255, 0.05); /* More transparent for dark theme */
-            --overlay-background: rgba(255, 255, 255, 0.02); /* Slightly more transparent */
-            --text-color: #ffffff; /* White for high contrast */
-            --muted-text: #cccccc; /* Light gray for muted text */
+
+            /* Remove unused gradient variables */
+            --background-gradient-odd: none;
+            --background-gradient-even: none;
+
+            /* Update other gradients to use only approved colors */
+            --primary-gradient: linear-gradient(
+                to bottom,
+                var(--blue-1) 0%,
+                var(--blue-4) 50%,
+                var(--blue-7) 100%
+            );
+            
+            --secondary-gradient: linear-gradient(
+                to bottom,
+                var(--blue-1) 0%,
+                var(--blue-3) 50%,
+                var(--blue-7) 100%
+            );
+            
+            --task-form-gradient: linear-gradient(
+                to bottom,
+                rgba(0, 0, 105, 0.95) 0%,    /* Based on #000069 */
+                rgba(27, 2, 177, 0.95) 100%   /* Based on #1b02b1 */
+            );
+
+            /* Keep existing non-blue colors */
+            --text-color: #FFD700;
+            --muted-text: #FFA500;
+            --bright-text: #FFDF00;
+            --header-gradient: linear-gradient(
+                to bottom,
+                #FFD700 0%,
+                #FFA500 100%
+            );
+
+            /* Other non-gradient variables remain unchanged */
+            --card-background: rgba(255, 255, 255, 0.05);
+            --overlay-background: rgba(255, 255, 255, 0.02);
             --error-color: #ff4d4d;
             --success-color: #4caf50;
             --font-primary: 'Montserrat', sans-serif;
             --font-secondary: 'Roboto', sans-serif;
-            --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --box-shadow: 0 8px 32px 0 rgba(0, 0, 105, 0.37);
             --backdrop-filter: blur(8px);
             --border-radius: 12px;
             --transition-speed: 0.3s;
@@ -53,7 +98,6 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            transition: background 0.5s ease;
         }
 
         .container {
@@ -68,11 +112,37 @@
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            position: relative;
+            overflow: visible !important;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 5px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
         }
 
         /* Header Component */
         .header {
             text-align: center;
+            position: relative;
+            padding: 0;
+            margin: 0;
+            background: none;
+            backdrop-filter: none;
+            z-index: 1;
         }
 
         .header .title {
@@ -83,11 +153,14 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             transition: background 0.5s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 9999;
         }
 
         .header p {
             font-size: 1.1rem;
-            color: var(--muted-text);
+            color: #FFFFFF;
             letter-spacing: 0.5px;
             margin-top: 0.3rem;
         }
@@ -98,6 +171,8 @@
             justify-content: space-around;
             flex-wrap: wrap;
             gap: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .stats div {
@@ -113,6 +188,7 @@
             flex: 1 1 150px;
             text-align: center;
             cursor: default;
+            color: var(--bright-text);
         }
 
         .stats div:hover {
@@ -123,6 +199,8 @@
         /* Progress Bar Component */
         .progress-container {
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
 
         .progress-bar {
@@ -138,7 +216,7 @@
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: var(--primary-gradient);
+            background: var(--header-gradient);
             transition: width 0.4s ease;
             box-shadow: 0 0 10px var(--primary-gradient);
         }
@@ -157,11 +235,22 @@
             gap: 0.75rem;
             flex-wrap: wrap;
             align-items: stretch;
-            background: var(--overlay-background);
-            padding: 1rem;
+            background: var(--task-form-gradient);
+            padding: 1.5rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             transition: background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .task-form:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(0, 0, 51, 1) 0%,
+                rgba(25, 25, 112, 1) 100%
+            );
         }
 
         .task-form input[type="text"] {
@@ -177,7 +266,7 @@
         }
 
         .task-form input[type="text"]::placeholder {
-            color: #aaa;
+            color: rgba(255, 215, 0, 0.6);
         }
 
         .task-form input[type="text"]:focus {
@@ -225,14 +314,39 @@
 
         /* Task Lists Component */
         .task-list {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
             background: var(--overlay-background);
             padding: 1rem;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             transition: background 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Add specific styling for completed tasks list only */
+        #completedTasksList {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Keep the scrollbar styling only for completed tasks */
+        #completedTasksList::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #completedTasksList::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        #completedTasksList::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 5px;
+        }
+
+        #completedTasksList::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
         }
 
         .task-list h3 {
@@ -336,7 +450,7 @@
         .task-actions button {
             background: none;
             border: none;
-            color: #1e90ff; /* Tron Blue for 3D effect */
+            color: var(--blue-7); /* Replace #1e90ff with our brightest blue */
             cursor: pointer;
             font-size: 1.3rem;
             transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
@@ -350,25 +464,6 @@
             transform: scale(1.2);
         }
 
-        /* Scrollbar Styling */
-        .task-list::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        .task-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
-        }
-
-        .task-list::-webkit-scrollbar-thumb {
-            background: var(--primary-gradient);
-            border-radius: 5px;
-        }
-
-        .task-list::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-gradient);
-        }
-
         /* Reset Button Component */
         .reset-button {
             width: 100%;
@@ -376,7 +471,7 @@
             border: none;
             border-radius: 8px;
             background: var(--primary-gradient);
-            color: #fff;
+            color: var(--bright-text);
             font-size: 1rem;
             cursor: pointer;
             transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
@@ -630,11 +725,192 @@
                 width: 45%;
             }
         }
+
+        /* Login Container Styling */
+        #loginContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--background-gradient);
+            color: var(--text-color);
+        }
+
+        #loginContainer input[type="email"],
+        #loginContainer input[type="password"] {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border: none;
+            width: 300px;
+            max-width: 80%;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        #loginContainer button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-gradient);
+            color: #fff;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+        }
+
+        #loginContainer button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: var(--secondary-gradient);
+        }
+
+        #loginError {
+            color: var(--error-color);
+            margin-top: 1rem;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        /* Logout Button Styling */
+        #logoutButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--error-color);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.3s ease;
+            z-index: 10000;
+        }
+
+        #logoutButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: rgba(255, 0, 0, 0.8);
+        }
+
+        /* Add these CSS rules in the style section */
+        input[type="number"].custom-points {
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 0.75rem;
+            width: 100px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--bright-text);
+            border: none;
+            border-radius: 8px;
+            transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        input[type="number"].custom-points:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 8px var(--primary-gradient);
+            outline: none;
+        }
+
+        input[type="number"].custom-points::-webkit-inner-spin-button,
+        input[type="number"].custom-points::-webkit-outer-spin-button {
+            height: 30px;
+            opacity: 1;
+        }
+
+        /* Add this to your existing media queries section */
+        @media (max-width: 768px) {
+            /* Reorder container elements using flexbox order */
+            .container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header {
+                order: 1;
+            }
+
+            .task-form {
+                order: 2;
+                margin-top: 1.5rem;
+            }
+
+            .stats {
+                order: 3;
+                margin-top: 1.5rem;
+            }
+
+            .progress-container {
+                order: 4;
+            }
+
+            .task-list {
+                order: 5;
+            }
+
+            #completedTasksList {
+                order: 6;
+            }
+
+            .reset-button {
+                order: 7;
+            }
+        }
+
+        /* Google Login Button Styling */
+        .google-login-btn {
+            background: white;
+            color: #444;
+            width: 300px;
+            border-radius: 8px;
+            border: thin solid #888;
+            box-shadow: 1px 1px 1px grey;
+            white-space: nowrap;
+            padding: 0.75rem 1.5rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .google-login-btn:hover {
+            background-color: #f7f7f7;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header Component -->
+    <!-- Login Container -->
+    <div id="loginContainer">
+        <h2>🔒 Please Log In</h2>
+        <input type="email" id="emailInput" placeholder="Email">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button id="loginButton"><i class="fas fa-sign-in-alt"></i> Log In</button>
+        <button id="googleLoginButton" class="google-login-btn">
+            <i class="fab fa-google"></i> Sign in with Google
+        </button>
+        <p id="loginError">Invalid credentials. Please try again.</p>
+    </div>
+
+    <!-- Main Application Container (Initially Hidden) -->
+    <div class="container" id="appContainer" style="display: none;">
+        <button id="logoutButton"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+        
+        <!-- Header Component (back to original structure) -->
         <div class="header">
             <h1 class="title">🏆 Epic Task Quest</h1>
             <p>Transform your tasks into an epic adventure!</p>
@@ -666,12 +942,9 @@
                 <option value="3">⭐⭐⭐ 15 pts</option>
                 <option value="4">⭐⭐⭐⭐ 20 pts</option>
                 <option value="5">⭐⭐⭐⭐⭐ 25 pts</option>
+                <option value="6">⭐⭐⭐⭐⭐⭐ Custom</option>
             </select>
-            <select id="prioritySelect">
-                <option value="1">🔼 High</option>
-                <option value="2">⏵ Medium</option>
-                <option value="3">🔽 Low</option>
-            </select>
+            <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add Quest</button>
         </div>
 
@@ -708,13 +981,23 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            setPersistence, 
+            browserLocalPersistence,
+            GoogleAuthProvider,
+            signInWithPopup 
+        } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyASqKkvoIp6qvX2Dvze5s6nfKBghQ41axQ",
             authDomain: "epic-task-quest.firebaseapp.com",
             projectId: "epic-task-quest",
-            storageBucket: "epic-task-quest.firebasestorage.app",
+            storageBucket: "epic-task-quest.appspot.com",
             messagingSenderId: "421446505180",
             appId: "1:421446505180:web:ac2270f8c0b92d16529a19",
             measurementId: "G-35SX22QFBS"
@@ -724,10 +1007,129 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
         console.log("Firebase initialized successfully.");
 
+        // ===========================
+        // Authentication Logic
+        // ===========================
+
+        // DOM Elements for Login
+        const loginContainer = document.getElementById('loginContainer');
+        const appContainer = document.getElementById('appContainer');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginButton = document.getElementById('loginButton');
+        const loginError = document.getElementById('loginError');
+        const googleLoginButton = document.getElementById('googleLoginButton');
+
+        // Authorized Email
+        const authorizedEmail = 'victordelrosal@gmail.com';
+
+        // Initialize Google Auth Provider
+        const googleProvider = new GoogleAuthProvider();
+
+        // Set Authentication Persistence to Local
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                console.log("Authentication persistence set to LOCAL.");
+                // Persistence is now set. You can proceed with other operations.
+            })
+            .catch((error) => {
+                console.error("Error setting authentication persistence:", error);
+            });
+
+        // Login Function
+        loginButton.addEventListener('click', () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (email === "" || password === "") {
+                loginError.textContent = "Please enter both email and password.";
+                loginError.style.display = "block";
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    console.log(`User ${user.email} signed in.`);
+                    loginError.style.display = "none";
+                    // The onAuthStateChanged listener will handle the UI toggle
+                })
+                .catch((error) => {
+                    console.error("Error signing in:", error);
+                    loginError.textContent = "Invalid credentials. Please try again.";
+                    loginError.style.display = "block";
+                });
+        });
+
+        // Google Login Function
+        googleLoginButton.addEventListener('click', () => {
+            signInWithPopup(auth, googleProvider)
+                .then((result) => {
+                    // This gives you a Google Access Token
+                    const credential = GoogleAuthProvider.credentialFromResult(result);
+                    const token = credential.accessToken;
+                    // The signed-in user info
+                    const user = result.user;
+                    
+                    // Check if user's email is authorized
+                    if (user.email === authorizedEmail) {
+                        console.log("Google sign-in successful");
+                        loginError.style.display = "none";
+                    } else {
+                        // Unauthorized user
+                        signOut(auth);
+                        loginError.textContent = "Unauthorized email address";
+                        loginError.style.display = "block";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error during Google sign-in:", error);
+                    loginError.textContent = "Google sign-in failed. Please try again.";
+                    loginError.style.display = "block";
+                });
+        });
+
+        // Logout Button
+        const logoutButton = document.getElementById('logoutButton');
+
+        logoutButton.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                console.log("User signed out.");
+            }).catch((error) => {
+                console.error("Error signing out:", error);
+            });
+        });
+
+        // Monitor Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.email === authorizedEmail) {
+                    // Show the main app
+                    loginContainer.style.display = "none";
+                    appContainer.style.display = "flex";
+                    loadTasks(); // Load tasks only after authentication
+                } else {
+                    // Unauthorized user
+                    loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
+                    console.warn(`User ${user.email} is not authorized to view this content.`);
+                    // Optionally, you can sign out the unauthorized user
+                    signOut(auth);
+                }
+            } else {
+                // No user is signed in
+                loginContainer.style.display = "flex";
+                appContainer.style.display = "none";
+            }
+        });
+
+        // ===========================
         // Initialize Global Variables
+        // ===========================
         let tasks = [];
         let totalPoints = 0;
         let level = 1;
@@ -737,7 +1139,7 @@
         // DOM Elements
         const taskInput = document.getElementById('taskInput');
         const difficultySelect = document.getElementById('difficultySelect');
-        const prioritySelect = document.getElementById('prioritySelect');
+        const customPointsInput = document.getElementById('customPoints');
         const addTaskButton = document.getElementById('addTaskButton');
         const activeTasksList = document.getElementById('activeTasksList');
         const completedTasksList = document.getElementById('completedTasksList');
@@ -756,13 +1158,14 @@
         // ===========================
 
         // Get points based on difficulty
-        function getPoints(difficulty) {
+        function getPoints(difficulty, customPoints) {
             const pointsMap = {
                 1: 5,
                 2: 10,
                 3: 15,
                 4: 20,
-                5: 25
+                5: 25,
+                6: customPoints || 30 // Use stored custom points if available
             };
             return pointsMap[difficulty] || 5;
         }
@@ -771,24 +1174,17 @@
         function updateStats() {
             completedTasksSpan.textContent = completedTasks;
             totalPointsSpan.textContent = totalPoints;
+            
+            // Calculate new level
+            const newLevel = Math.floor(totalPoints / pointsToNextLevel) + 1;
+            level = newLevel;
             levelSpan.textContent = level;
 
+            // Update progress bar
             const progress = totalPoints % pointsToNextLevel;
             const progressPercentage = (progress / pointsToNextLevel) * 100;
             progressFill.style.width = `${progressPercentage}%`;
             progressText.textContent = `${progress}/${pointsToNextLevel}`;
-        }
-
-        // Update theme based on level (optional)
-        function updateTheme() {
-            // Example: Change primary color based on level
-            const primaryColors = [
-                '#2c003e', '#4169e1', '#1e90ff', '#4B0082', '#6A5ACD', '#483D8B', '#000080'
-            ];
-            const color = primaryColors[(level - 1) % primaryColors.length];
-            document.documentElement.style.setProperty('--primary-gradient', `linear-gradient(135deg, ${color} 0%, #4169e1 100%)`);
-            document.documentElement.style.setProperty('--secondary-gradient', `linear-gradient(135deg, ${color} 0%, #1e90ff 100%)`);
-            // Keep the background gradient as the enhanced one
         }
 
         // ===========================
@@ -808,13 +1204,12 @@
                     tasks.push(task);
                     if (task.completed) {
                         completedTasks++;
-                        totalPoints += getPoints(task.difficulty);
+                        totalPoints += getPoints(task.difficulty, task.customPoints);
                     }
                 });
 
                 level = Math.floor(totalPoints / pointsToNextLevel) + 1;
                 updateStats();
-                updateTheme();
                 renderTasks();
                 console.log("Tasks loaded successfully from Firestore.");
             } catch (error) {
@@ -826,7 +1221,9 @@
         async function addTask() {
             const text = taskInput.value.trim();
             const difficulty = parseInt(difficultySelect.value);
-            const priority = parseInt(prioritySelect.value);
+            const customPoints = difficulty === 6 ? 
+                (parseInt(document.getElementById('customPoints').value) || 30) : 
+                null;
 
             if (text === "") {
                 alert("Please enter a task.");
@@ -836,7 +1233,7 @@
             const task = {
                 text,
                 difficulty,
-                priority,
+                customPoints,
                 completed: false,
                 timestamp: serverTimestamp()
             };
@@ -848,7 +1245,12 @@
                 tasks.unshift(task);
                 renderTasks();
                 animateTaskAddition(docRef.id);
+                
+                // Reset form
                 taskInput.value = "";
+                difficultySelect.value = "1"; // Reset to default difficulty
+                document.getElementById('customPoints').style.display = 'none';
+                document.getElementById('customPoints').value = '';
             } catch (error) {
                 console.error("Error adding task: ", error);
             }
@@ -881,18 +1283,6 @@
                 loadTasks(); // Reload tasks to reflect changes
             } catch (error) {
                 console.error("Error editing task: ", error);
-            }
-        }
-
-        // Update task priority
-        async function updateTaskPriority(taskId, newPriority) {
-            try {
-                const taskDoc = doc(db, "tasks", taskId);
-                await updateDoc(taskDoc, { priority: newPriority });
-                console.log(`Task ${taskId} priority updated to ${newPriority}.`);
-                loadTasks(); // Reload tasks to update UI
-            } catch (error) {
-                console.error("Error updating task priority: ", error);
             }
         }
 
@@ -939,6 +1329,25 @@
         }
 
         // ===========================
+        // Firestore Update for Custom Points
+        // ===========================
+
+        // Add function to update custom points
+        async function updateTaskCustomPoints(taskId, newCustomPoints) {
+            try {
+                const taskDoc = doc(db, "tasks", taskId);
+                const points = parseInt(newCustomPoints) || 30;
+                await updateDoc(taskDoc, { 
+                    customPoints: points,
+                    difficulty: 6  // Ensure difficulty stays at 6 for custom points
+                });
+                console.log(`Task ${taskId} custom points updated to ${points}.`);
+            } catch (error) {
+                console.error("Error updating task custom points: ", error);
+            }
+        }
+
+        // ===========================
         // Render Tasks to the DOM
         // ===========================
 
@@ -951,8 +1360,19 @@
             const activeTasks = tasks.filter(task => !task.completed);
             const completedTasksArr = tasks.filter(task => task.completed);
 
-            // Sort active tasks by priority (High -> Low)
-            activeTasks.sort((a, b) => a.priority - b.priority);
+            // Sort active tasks by points (highest to lowest)
+            activeTasks.sort((a, b) => {
+                const pointsA = getPoints(a.difficulty, a.customPoints);
+                const pointsB = getPoints(b.difficulty, b.customPoints);
+                return pointsB - pointsA; // Descending order
+            });
+
+            // Sort completed tasks by points (highest to lowest)
+            completedTasksArr.sort((a, b) => {
+                const pointsA = getPoints(a.difficulty, a.customPoints);
+                const pointsB = getPoints(b.difficulty, b.customPoints);
+                return pointsB - pointsA; // Descending order
+            });
 
             // Render Active Tasks
             activeTasks.forEach(task => {
@@ -1009,35 +1429,50 @@
 
             // Difficulty Select
             const difficultySelect = document.createElement('select');
-            [1, 2, 3, 4, 5].forEach(num => {
+            [1, 2, 3, 4, 5, 6].forEach(num => {
                 const option = document.createElement('option');
                 option.value = num;
-                option.textContent = `${'⭐'.repeat(num)} ${getPoints(num)} pts`;
+                if (num === 6) {
+                    option.textContent = `${'⭐'.repeat(num)} Custom ${task.customPoints ? `(${task.customPoints}pts)` : ''}`;
+                } else {
+                    option.textContent = `${'⭐'.repeat(num)} ${getPoints(num)} pts`;
+                }
                 if (num === task.difficulty) option.selected = true;
                 difficultySelect.appendChild(option);
             });
-            difficultySelect.disabled = isCompleted;
-            difficultySelect.addEventListener('change', () => {
-                updateTaskDifficulty(task.id, parseInt(difficultySelect.value));
+
+            // Custom points input
+            const customPointsInput = document.createElement('input');
+            customPointsInput.type = 'number';
+            customPointsInput.min = '1';
+            customPointsInput.max = '100';
+            customPointsInput.placeholder = 'Custom points';
+            customPointsInput.className = 'custom-points';
+            customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
+            customPointsInput.value = task.customPoints || '';
+            customPointsInput.disabled = isCompleted;
+
+            // Add event listener for custom points changes
+            customPointsInput.addEventListener('change', () => {
+                updateTaskCustomPoints(task.id, customPointsInput.value)
+                    .then(() => {
+                        // Only sort after custom points have been set
+                        loadTasks();
+                    });
             });
 
-            // Priority Select
-            const prioritySelect = document.createElement('select');
-            const priorities = [
-                { value: 1, text: '🔼 High' },
-                { value: 2, text: '⏵ Medium' },
-                { value: 3, text: '🔽 Low' }
-            ];
-            priorities.forEach(p => {
-                const option = document.createElement('option');
-                option.value = p.value;
-                option.textContent = p.text;
-                if (p.value === task.priority) option.selected = true;
-                prioritySelect.appendChild(option);
-            });
-            prioritySelect.disabled = isCompleted;
-            prioritySelect.addEventListener('change', () => {
-                updateTaskPriority(task.id, parseInt(prioritySelect.value));
+            difficultySelect.addEventListener('change', () => {
+                const difficulty = parseInt(difficultySelect.value);
+                customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
+                
+                if (difficulty !== 6) {
+                    // Only update difficulty and sort when switching away from custom
+                    updateTaskDifficulty(task.id, difficulty);
+                } else {
+                    // Just update difficulty without sorting when switching to custom
+                    const taskDoc = doc(db, "tasks", task.id);
+                    updateDoc(taskDoc, { difficulty: difficulty });
+                }
             });
 
             // Delete Button
@@ -1050,7 +1485,7 @@
 
             // Append actions
             taskActions.appendChild(difficultySelect);
-            taskActions.appendChild(prioritySelect);
+            taskActions.appendChild(customPointsInput);
             if (!isCompleted) {
                 taskActions.appendChild(deleteButton);
             }
@@ -1074,9 +1509,10 @@
         // Add Task Button Click
         addTaskButton.addEventListener('click', addTask);
 
-        // Add Task on Enter Key Press
-        taskInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+        // Add Task Input Event Listeners
+        taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault(); // Prevent default form submission
                 addTask();
             }
         });
@@ -1109,8 +1545,7 @@
         // Initialize App
         // ===========================
 
-        // Load tasks when the page loads
-        window.addEventListener('DOMContentLoaded', loadTasks);
+        // The loadTasks function is called when the user is authenticated in the onAuthStateChanged listener.
 
         // ===========================
         // Animation Functions
@@ -1141,6 +1576,23 @@
                 }, 300);
             }
         }
+
+        // ===========================
+        // Responsive Task Form Handling
+        // ===========================
+
+        // Add event listener for the main form's difficulty select
+        document.getElementById('difficultySelect').addEventListener('change', (e) => {
+            const customPointsInput = document.getElementById('customPoints');
+            if (e.target.value === '6') {
+                customPointsInput.style.display = 'block';
+                customPointsInput.value = '30'; // Set default value
+                customPointsInput.focus(); // Optional: automatically focus the input
+            } else {
+                customPointsInput.style.display = 'none';
+                customPointsInput.value = ''; // Clear the value when not using custom
+            }
+        });
     </script>
 </body>
 </html>
