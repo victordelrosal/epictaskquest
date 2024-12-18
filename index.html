@@ -101,10 +101,11 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Changed from center to flex-start */
             padding: 20px;
             position: relative;
-            overflow: hidden; /* Prevent scrollbars from confetti */
+            /* Removed overflow: hidden; to enable scrolling */
+            overflow: visible;
         }
 
         .container {
