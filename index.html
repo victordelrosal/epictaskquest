@@ -618,14 +618,67 @@
         }
 
         /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        /* Pulse Animation for Completed Tasks */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .pulse {
+            animation: pulse var(--animation-duration-pulse) ease;
+        }
+
+        /* Counting Animation for Points and Completed Tasks */
+        @keyframes countUp {
+            from { content: '0'; }
+            to { content: var(--target-number); }
+        }
+
+        /* Shine Animation for Level Up */
+        @keyframes shine {
+            0% {
+                box-shadow: 0 0 10px var(--success-color);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--success-color);
+            }
+            100% {
+                box-shadow: 0 0 10px var(--success-color);
+            }
+        }
+
+        .shine {
+            animation: shine var(--animation-duration-shine) ease-in-out;
+        }
+
+        /* Level Up Badge Animation */
+        @keyframes scaleUp {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .level-up-badge {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 1rem;
+            background: var(--success-color);
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            opacity: 0;
+            animation: scaleUp 1s forwards;
+            z-index: 1001;
+            font-weight: bold;
+        }
+
+        /* Optional: Smooth Number Transition */
+        .number-transition {
+            transition: all 0.5s ease;
         }
 
         /* Responsive Design */
@@ -874,10 +927,10 @@
 
         /* Animations */
 
-        /* Pulse Animation for Points Update */
+        /* Pulse Animation for Completed Tasks */
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
+            50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
 
@@ -885,39 +938,36 @@
             animation: pulse var(--animation-duration-pulse) ease;
         }
 
+        /* Counting Animation for Points and Completed Tasks */
+        @keyframes countUp {
+            from { content: '0'; }
+            to { content: var(--target-number); }
+        }
+
         /* Shine Animation for Level Up */
         @keyframes shine {
             0% {
-                background-position: -200px 0;
+                box-shadow: 0 0 10px var(--success-color);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--success-color);
             }
             100% {
-                background-position: calc(200px + 100%) 0;
+                box-shadow: 0 0 10px var(--success-color);
             }
         }
 
         .shine {
-            background: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.1) 25%,
-                rgba(255, 255, 255, 0.3) 37%,
-                rgba(255, 255, 255, 0.1) 63%
-            );
-            background-size: 200px 100%;
-            animation: shine var(--animation-duration-shine) forwards;
+            animation: shine var(--animation-duration-shine) ease-in-out;
         }
 
-        /* Flash Animation for General Updates */
-        @keyframes flash {
-            0% { background-color: var(--overlay-background); }
-            50% { background-color: var(--success-color); }
-            100% { background-color: var(--overlay-background); }
+        /* Level Up Badge Animation */
+        @keyframes scaleUp {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
         }
 
-        .flash {
-            animation: flash var(--animation-duration-flash) ease;
-        }
-
-        /* Optional: Level Up Badge */
         .level-up-badge {
             position: absolute;
             top: -50px;
@@ -929,8 +979,14 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             opacity: 0;
-            transition: opacity 0.5s ease, top 0.5s ease;
+            animation: scaleUp 1s forwards;
             z-index: 1001;
+            font-weight: bold;
+        }
+
+        /* Optional: Smooth Number Transition */
+        .number-transition {
+            transition: all 0.5s ease;
         }
     </style>
 </head>
@@ -951,7 +1007,7 @@
     <div class="container" id="appContainer" style="display: none;">
         <button id="logoutButton"><i class="fas fa-sign-out-alt"></i> Log Out</button>
         
-        <!-- Header Component (back to original structure) -->
+        <!-- Header Component -->
         <div class="header">
             <h1 class="title">🏆 Epic Task Quest</h1>
             <p>Transform your tasks into an epic adventure!</p>
@@ -959,9 +1015,18 @@
 
         <!-- Stats Component -->
         <div class="stats">
-            <div><i class="fas fa-check-circle"></i> Completed: <span id="completedTasks">0</span></div>
-            <div><i class="fas fa-star"></i> Points: <span id="totalPoints">0</span></div>
-            <div><i class="fas fa-level-up-alt"></i> Level: <span id="level">1</span></div>
+            <div>
+                <i class="fas fa-check-circle"></i>
+                Completed: <span id="completedTasks" class="number-transition">0</span>
+            </div>
+            <div>
+                <i class="fas fa-star"></i>
+                Points: <span id="totalPoints" class="number-transition">0</span>
+            </div>
+            <div>
+                <i class="fas fa-level-up-alt"></i>
+                Level: <span id="level" class="number-transition">1</span>
+            </div>
         </div>
 
         <!-- Progress Bar Component -->
@@ -1215,7 +1280,9 @@
         function updateStats() {
             const prevTotalPoints = totalPoints;
             const prevLevel = level;
+            const prevCompletedTasks = completedTasks;
 
+            // Update stats
             completedTasksSpan.textContent = completedTasks;
             totalPointsSpan.textContent = totalPoints;
 
@@ -1230,9 +1297,14 @@
             progressFill.style.width = `${progressPercentage}%`;
             progressText.textContent = `${progress}/${pointsToNextLevel}`;
 
-            // Trigger Points Animation if points increased
-            if (totalPoints !== prevTotalPoints) {
-                animatePointsUpdate(totalPointsSpan);
+            // Trigger Completed Tasks Animation if increased
+            if (completedTasks > prevCompletedTasks) {
+                animateCompletedTasks(completedTasksSpan);
+            }
+
+            // Trigger Points Counting Animation if increased
+            if (totalPoints > prevTotalPoints) {
+                animatePointsCount(totalPointsSpan, prevTotalPoints, totalPoints);
             }
 
             // Trigger Level Up Animation if level increased
@@ -1606,8 +1678,8 @@
         // Animation Functions
         // ===========================
 
-        // Function to animate points update
-        function animatePointsUpdate(element) {
+        // Function to animate Completed Tasks
+        function animateCompletedTasks(element) {
             element.classList.add('pulse');
             element.addEventListener('animationend', function handleAnimationEnd() {
                 element.classList.remove('pulse');
@@ -1615,40 +1687,48 @@
             });
         }
 
-        // Function to animate level up
+        // Function to animate Points Counting
+        function animatePointsCount(element, from, to) {
+            const duration = 1000; // Duration in milliseconds
+            let start = null;
+            const step = timestamp => {
+                if (!start) start = timestamp;
+                const progress = timestamp - start;
+                const current = Math.min(Math.floor(progress / duration * (to - from) + from), to);
+                element.textContent = current;
+                if (progress < duration) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    element.textContent = to;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Function to animate Level Up
         function animateLevelUp(element) {
+            // Add shine effect
             element.classList.add('shine');
             element.addEventListener('animationend', function handleAnimationEnd() {
                 element.classList.remove('shine');
                 element.removeEventListener('animationend', handleAnimationEnd);
             });
 
-            // Show a temporary level-up badge or message
+            // Show Level Up Badge
             showLevelUpBadge(element);
         }
 
-        // Function to show a level-up badge
+        // Function to show Level Up Badge
         function showLevelUpBadge(element) {
-            // Create badge element
             const badge = document.createElement('div');
             badge.classList.add('level-up-badge');
             badge.textContent = '🎉 Level Up!';
             element.parentElement.appendChild(badge);
 
-            // Trigger animation
-            requestAnimationFrame(() => {
-                badge.style.opacity = '1';
-                badge.style.top = '-70px';
-            });
-
             // Remove badge after animation
-            setTimeout(() => {
-                badge.style.opacity = '0';
-                badge.style.top = '-90px';
-                setTimeout(() => {
-                    badge.remove();
-                }, 500);
-            }, 1000);
+            badge.addEventListener('animationend', () => {
+                badge.remove();
+            });
         }
 
         // Animate task addition with optional flash
