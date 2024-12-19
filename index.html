@@ -147,7 +147,7 @@
         .header {
             text-align: center;
             position: relative;
-            padding: 0;
+            padding: 2rem 3rem;
             margin: 0;
             background: none;
             backdrop-filter: none;
@@ -753,13 +753,26 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
-                padding: 2rem;
+                padding: 1rem;
+                padding-top: 0; /* Remove top padding since header has its own */
             }
 
             .header .title {
-                font-size: 2rem;
+                font-size: 1.8rem; /* Slightly reduce font size on mobile */
+                padding: 0 2rem; /* Add horizontal padding */
+                word-break: break-word; /* Allow text to wrap if needed */
             }
 
+            #logoutButton span {
+                display: none; /* Hide button text on mobile */
+            }
+
+            #logoutButton {
+                top: 0.5rem;
+                right: 0.5rem;
+                border-radius: 50%; /* Make it circular on mobile */
+            }
+            
             .header p {
                 font-size: 1.3rem;
             }
@@ -795,7 +808,8 @@
             }
 
             .header {
-                order: 1;
+                padding: 1rem;
+                padding-top: 3rem; /* Add space above title for logout button */
             }
 
             .task-form {
@@ -945,9 +959,13 @@
         /* Logout Button Styling */
         #logoutButton {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 0.5rem 1rem;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            width: auto;
+            min-width: 40px;
+            height: 40px;
+            justify-content: center;            
             border: none;
             border-radius: 8px;
             background: var(--error-color);
@@ -956,7 +974,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 1.3rem;
+            font-size: 0.85rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.3s ease;
             z-index: 10000;
