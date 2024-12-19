@@ -970,23 +970,22 @@
 
         /* Add these CSS rules in the style section */
         input[type="number"].custom-points {
-            font-size: 1.6rem;
-            font-weight: 700;
-            padding: 1.1rem;
-            width: 120px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--bright-text);
-            border: none;
-            border-radius: 8px;
+            font-size: 1.8rem; /* Increase font size */
+            font-weight: bold; /* Make it stand out */
+            padding: 0.5rem 1rem; /* Adjust padding for better spacing */
+            width: 80px; /* Ensure it has enough width to display the number */
+            text-align: center; /* Center the number for better readability */
+            background-color: rgba(255, 255, 255, 0.1); /* Match the theme */
+            color: var(--text-color); /* Consistent with the design */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Optional: a visible border */
+            border-radius: 8px; /* Rounded corners to match the style */
             transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
         }
 
         input[type="number"].custom-points:focus {
-            background-color: rgba(255, 255, 255, 0.15);
-            font-size: 1.6rem;
-            box-shadow: 0 0 8px var(--primary-gradient);
-            outline: none;
+            background-color: rgba(255, 255, 255, 0.2); /* Highlight when focused */
+            box-shadow: 0 0 8px var(--primary-gradient); /* Add a subtle glow effect */
+            outline: none; /* Remove the default outline */
         }
 
         input[type="number"].custom-points::-webkit-inner-spin-button,
