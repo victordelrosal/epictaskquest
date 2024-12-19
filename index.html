@@ -369,95 +369,108 @@
             display: inline-block;
         }
 
-        /* Styling for Task Item */
+        /* Task Item Component */
         .task-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             background-color: rgba(255, 255, 255, 0.05);
             padding: 1rem;
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             margin-bottom: 1rem;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateZ(0);
             position: relative;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
         }
 
-        /* Completion Button Styling */
-        .task-complete {
-            flex-shrink: 0;
+        .task-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .task-complete input[type="checkbox"] {
-            width: 2rem;
-            height: 2rem;
+        .task-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .task-details input[type="checkbox"] {
+            width: 1.5rem;
+            height: 1.5rem;
             cursor: pointer;
             accent-color: var(--primary-gradient);
             transition: transform var(--transition-speed) ease;
         }
 
-        .task-complete input[type="checkbox"]:hover {
+        .task-details input[type="checkbox"]:hover {
             transform: scale(1.2);
         }
 
-        /* Task Details Styling */
-        .task-details {
-            flex-grow: 1;
-            margin-left: 1rem;
-            margin-right: 1rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .task-description {
-            font-size: 1rem;
-            color: var(--text-color);
-            word-wrap: break-word;
-            line-height: 1.5;
-            outline: none;
-            border: none;
+        .task-text {
+            flex: 1;
             background: transparent;
+            border: none;
             color: var(--text-color);
-            font-family: var(--font-secondary);
+            font-size: 1rem;
+            outline: none;
             cursor: text;
             transition: color var(--transition-speed) ease;
+            font-family: var(--font-secondary);
         }
 
-        .task-description:disabled {
+        .task-text:disabled {
             color: var(--muted-text);
             cursor: not-allowed;
         }
 
-        .task-description.completed {
+        .task-text.completed {
             text-decoration: line-through;
             color: var(--muted-text);
         }
 
-        .task-points {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text-color);
-            margin-top: 0.5rem;
-        }
-
-        /* Delete Button Styling */
         .task-actions {
-            flex-shrink: 0;
-            position: absolute;
-            bottom: 0.5rem;
-            right: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
-        .delete-task {
+        .task-actions select {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            outline: none;
+        }
+
+        .task-actions select:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .task-actions button {
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.8); /* Light white */
-            font-size: 1.5rem;
+            color: var(--blue-7); /* Replace #1e90ff with our brightest blue */
             cursor: pointer;
-            transition: color 0.3s ease, transform 0.3s ease;
+            font-size: 1.3rem;
+            transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .delete-task:hover {
+        .task-actions button:hover {
             color: #ffffff;
             transform: scale(1.2);
         }
@@ -711,6 +724,28 @@
             }
         }
 
+        /* Confetti Styles */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--bright-text);
+            opacity: 0.9;
+            animation: confetti var(--animation-duration-confetti) linear forwards;
+            border-radius: 50%; /* Make confetti circular */
+        }
+
         /* Optional: Smooth Number Transition */
         .number-transition {
             transition: all 0.5s ease;
@@ -959,6 +994,101 @@
             height: 30px;
             opacity: 1;
         }
+
+        /* Animations */
+
+        /* Pulse Animation for Completed Tasks */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse var(--animation-duration-pulse) ease;
+        }
+
+        /* Counting Animation for Points and Completed Tasks */
+        /* Handled via JavaScript */
+
+        /* Shine Animation for Level Up */
+        @keyframes shine {
+            0% {
+                box-shadow: 0 0 10px var(--success-color);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--success-color);
+            }
+            100% {
+                box-shadow: 0 0 10px var(--success-color);
+            }
+        }
+
+        .shine {
+            animation: shine var(--animation-duration-shine) ease-in-out;
+        }
+
+        /* Level Up Badge Animation */
+        @keyframes scaleUp {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        .level-up-badge {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 1rem;
+            background: var(--success-color);
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            opacity: 0;
+            animation: scaleUp 1s forwards;
+            z-index: 1001;
+            font-weight: bold;
+        }
+
+        /* Confetti Animation */
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Confetti Styles */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--bright-text);
+            opacity: 0.9;
+            animation: confetti var(--animation-duration-confetti) linear forwards;
+            border-radius: 50%; /* Make confetti circular */
+        }
+
+        /* Optional: Smooth Number Transition */
+        .number-transition {
+            transition: all 0.5s ease;
+        }
     </style>
 </head>
 <body>
@@ -1017,12 +1147,12 @@
         <div class="task-form">
             <input type="text" id="taskInput" placeholder="Enter your quest...">
             <select id="difficultySelect">
-                <option value="1">5 pts</option>
-                <option value="2">10 pts</option>
-                <option value="3">15 pts</option>
-                <option value="4">20 pts</option>
-                <option value="5">25 pts</option>
-                <option value="6">Custom</option>
+                <option value="1">⭐ 5 pts</option>
+                <option value="2">⭐⭐ 10 pts</option>
+                <option value="3">⭐⭐⭐ 15 pts</option>
+                <option value="4">⭐⭐⭐⭐ 20 pts</option>
+                <option value="5">⭐⭐⭐⭐⭐ 25 pts</option>
+                <option value="6">⭐⭐⭐⭐⭐⭐ Custom</option>
             </select>
             <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add Quest</button>
@@ -1498,11 +1628,13 @@
             const taskItem = document.createElement('div');
             taskItem.classList.add('task-item');
             taskItem.setAttribute('data-id', task.id);
+            taskItem.setAttribute('data-priority', task.priority);
 
-            // Completion Button
-            const taskComplete = document.createElement('div');
-            taskComplete.classList.add('task-complete');
+            // Task Details
+            const taskDetails = document.createElement('div');
+            taskDetails.classList.add('task-details');
 
+            // Checkbox
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = isCompleted;
@@ -1511,32 +1643,21 @@
                 toggleTaskCompletion(task.id, checkbox.checked);
             });
 
-            taskComplete.appendChild(checkbox);
-
-            // Task Details
-            const taskDetails = document.createElement('div');
-            taskDetails.classList.add('task-details');
-
-            // Task Description
-            const taskDescription = document.createElement('input');
-            taskDescription.type = 'text';
-            taskDescription.value = task.text;
-            taskDescription.classList.add('task-description');
+            // Task Text
+            const taskText = document.createElement('input');
+            taskText.type = 'text';
+            taskText.value = task.text;
+            taskText.classList.add('task-text');
             if (isCompleted) {
-                taskDescription.classList.add('completed');
+                taskText.classList.add('completed');
             }
-            taskDescription.disabled = isCompleted;
-            taskDescription.addEventListener('blur', () => {
-                editTaskText(task.id, taskDescription.value);
+            taskText.disabled = isCompleted;
+            taskText.addEventListener('blur', () => {
+                editTaskText(task.id, taskText.value);
             });
 
-            // Task Points
-            const taskPoints = document.createElement('div');
-            taskPoints.classList.add('task-points');
-            taskPoints.textContent = getPoints(task.difficulty, task.customPoints);
-
-            taskDetails.appendChild(taskDescription);
-            taskDetails.appendChild(taskPoints);
+            taskDetails.appendChild(checkbox);
+            taskDetails.appendChild(taskText);
 
             // Task Actions
             const taskActions = document.createElement('div');
@@ -1548,9 +1669,9 @@
                 const option = document.createElement('option');
                 option.value = num;
                 if (num === 6) {
-                    option.textContent = `Custom ${task.customPoints ? `(${task.customPoints}pts)` : ''}`;
+                    option.textContent = `${'⭐'.repeat(num)} Custom ${task.customPoints ? `(${task.customPoints}pts)` : ''}`;
                 } else {
-                    option.textContent = `${getPoints(num)} pts`;
+                    option.textContent = `${'⭐'.repeat(num)} ${getPoints(num)} pts`;
                 }
                 if (num === task.difficulty) option.selected = true;
                 difficultySelect.appendChild(option);
@@ -1561,7 +1682,7 @@
             customPointsInput.type = 'number';
             customPointsInput.min = '1';
             customPointsInput.max = '100';
-            customPointsInput.placeholder = 'Enter points';
+            customPointsInput.placeholder = 'Custom points';
             customPointsInput.className = 'custom-points';
             customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
             customPointsInput.value = task.customPoints || '';
@@ -1576,7 +1697,6 @@
                     });
             });
 
-            // Difficulty Select Change Event
             difficultySelect.addEventListener('change', () => {
                 const difficulty = parseInt(difficultySelect.value);
                 customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
@@ -1593,7 +1713,6 @@
 
             // Delete Button
             const deleteButton = document.createElement('button');
-            deleteButton.classList.add('delete-task');
             deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
             deleteButton.title = 'Delete Task';
             deleteButton.addEventListener('click', () => {
@@ -1609,11 +1728,10 @@
 
             // Apply completed styles
             if (isCompleted) {
-                taskDescription.classList.add('completed');
+                taskText.classList.add('completed');
             }
 
             // Append to task item
-            taskItem.appendChild(taskComplete);
             taskItem.appendChild(taskDetails);
             taskItem.appendChild(taskActions);
 
