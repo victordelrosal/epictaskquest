@@ -1623,120 +1623,123 @@
             });
         }
 
-        // Create a task element
-        function createTaskElement(task, isCompleted) {
-            const taskItem = document.createElement('div');
-            taskItem.classList.add('task-item');
-            taskItem.setAttribute('data-id', task.id);
-            taskItem.setAttribute('data-priority', task.priority);
+// Create a task element
+function createTaskElement(task, isCompleted) {
+    const taskItem = document.createElement('div');
+    taskItem.classList.add('task-item');
+    taskItem.setAttribute('data-id', task.id);
+    taskItem.setAttribute('data-priority', task.priority);
 
-            // Task Details
-            const taskDetails = document.createElement('div');
-            taskDetails.classList.add('task-details');
+    // Task Details
+    const taskDetails = document.createElement('div');
+    taskDetails.classList.add('task-details');
 
-            // Checkbox
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = isCompleted;
-            checkbox.disabled = isCompleted; // Disable checkbox for completed tasks
-            checkbox.addEventListener('change', () => {
-                toggleTaskCompletion(task.id, checkbox.checked);
-            });
+    // Checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = isCompleted;
+    checkbox.disabled = isCompleted; // Disable checkbox for completed tasks
+    checkbox.addEventListener('change', () => {
+        toggleTaskCompletion(task.id, checkbox.checked);
+    });
 
-            // Task Text
-            const taskText = document.createElement('input');
-            taskText.type = 'text';
-            taskText.value = task.text;
-            taskText.classList.add('task-text');
-            if (isCompleted) {
-                taskText.classList.add('completed');
-            }
-            taskText.disabled = isCompleted;
-            taskText.addEventListener('blur', () => {
-                editTaskText(task.id, taskText.value);
-            });
+    // Task Text
+    const taskText = document.createElement('input');
+    taskText.type = 'text';
+    taskText.value = task.text;
+    taskText.classList.add('task-text');
+    if (isCompleted) {
+        taskText.classList.add('completed');
+    }
+    taskText.disabled = isCompleted;
+    taskText.addEventListener('blur', () => {
+        editTaskText(task.id, taskText.value);
+    });
 
-            taskDetails.appendChild(checkbox);
-            taskDetails.appendChild(taskText);
+    taskDetails.appendChild(checkbox);
+    taskDetails.appendChild(taskText);
 
-            // Task Actions
-            const taskActions = document.createElement('div');
-            taskActions.classList.add('task-actions');
+    // Task Actions
+    const taskActions = document.createElement('div');
+    taskActions.classList.add('task-actions');
 
-            // Difficulty Select
-            const difficultySelect = document.createElement('select');
-            [1, 2, 3, 4, 5, 6].forEach(num => {
-                const option = document.createElement('option');
-                option.value = num;
-                if (num === 6) {
-                    option.textContent = `${'⭐'.repeat(num)} Custom ${task.customPoints ? `(${task.customPoints}pts)` : ''}`;
-                } else {
-                    option.textContent = `${'⭐'.repeat(num)} ${getPoints(num)} pts`;
-                }
-                if (num === task.difficulty) option.selected = true;
-                difficultySelect.appendChild(option);
-            });
-
-            // Custom points input
-            const customPointsInput = document.createElement('input');
-            customPointsInput.type = 'number';
-            customPointsInput.min = '1';
-            customPointsInput.max = '100';
-            customPointsInput.placeholder = 'Custom points';
-            customPointsInput.className = 'custom-points';
-            customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
-            customPointsInput.value = task.customPoints || '';
-            customPointsInput.disabled = isCompleted;
-
-            // Add event listener for custom points changes
-            customPointsInput.addEventListener('change', () => {
-                updateTaskCustomPoints(task.id, customPointsInput.value)
-                    .then(() => {
-                        // Only sort after custom points have been set
-                        loadTasks();
-                    });
-            });
-
-            difficultySelect.addEventListener('change', () => {
-                const difficulty = parseInt(difficultySelect.value);
-                customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
-                
-                if (difficulty !== 6) {
-                    // Only update difficulty and sort when switching away from custom
-                    updateTaskDifficulty(task.id, difficulty);
-                } else {
-                    // Just update difficulty without sorting when switching to custom
-                    const taskDoc = doc(db, "tasks", task.id);
-                    updateDoc(taskDoc, { difficulty: difficulty });
-                }
-            });
-
-            // Delete Button
-            const deleteButton = document.createElement('button');
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-            deleteButton.title = 'Delete Task';
-            deleteButton.addEventListener('click', () => {
-                deleteTask(task.id);
-            });
-
-            // Append actions
-            taskActions.appendChild(difficultySelect);
-            taskActions.appendChild(customPointsInput);
-            if (!isCompleted) {
-                taskActions.appendChild(deleteButton);
-            }
-
-            // Apply completed styles
-            if (isCompleted) {
-                taskText.classList.add('completed');
-            }
-
-            // Append to task item
-            taskItem.appendChild(taskDetails);
-            taskItem.appendChild(taskActions);
-
-            return taskItem;
+    // Difficulty Select
+    const difficultySelect = document.createElement('select');
+    [1, 2, 3, 4, 5, 6].forEach(num => {
+        const option = document.createElement('option');
+        option.value = num;
+        if (num === 6) {
+            // For Custom difficulty, display "Custom (X pts)" without stars
+            option.textContent = `Custom ${task.customPoints ? `(${task.customPoints}pts)` : ''}`;
+        } else {
+            // For predefined difficulties, display "X pts" without stars
+            option.textContent = `${getPoints(num)} pts`;
         }
+        if (num === task.difficulty) option.selected = true;
+        difficultySelect.appendChild(option);
+    });
+
+    // Custom points input
+    const customPointsInput = document.createElement('input');
+    customPointsInput.type = 'number';
+    customPointsInput.min = '1';
+    customPointsInput.max = '100';
+    customPointsInput.placeholder = 'Enter points';
+    customPointsInput.className = 'custom-points';
+    customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
+    customPointsInput.value = task.customPoints || '';
+    customPointsInput.disabled = isCompleted;
+
+    // Add event listener for custom points changes
+    customPointsInput.addEventListener('change', () => {
+        updateTaskCustomPoints(task.id, customPointsInput.value)
+            .then(() => {
+                // Only sort after custom points have been set
+                loadTasks();
+            });
+    });
+
+    difficultySelect.addEventListener('change', () => {
+        const difficulty = parseInt(difficultySelect.value);
+        customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
+        
+        if (difficulty !== 6) {
+            // Only update difficulty and sort when switching away from custom
+            updateTaskDifficulty(task.id, difficulty);
+        } else {
+            // Just update difficulty without sorting when switching to custom
+            const taskDoc = doc(db, "tasks", task.id);
+            updateDoc(taskDoc, { difficulty: difficulty });
+        }
+    });
+
+    // Delete Button
+    const deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteButton.title = 'Delete Task';
+    deleteButton.addEventListener('click', () => {
+        deleteTask(task.id);
+    });
+
+    // Append actions
+    taskActions.appendChild(difficultySelect);
+    taskActions.appendChild(customPointsInput);
+    if (!isCompleted) {
+        taskActions.appendChild(deleteButton);
+    }
+
+    // Apply completed styles
+    if (isCompleted) {
+        taskText.classList.add('completed');
+    }
+
+    // Append to task item
+    taskItem.appendChild(taskDetails);
+    taskItem.appendChild(taskActions);
+
+    return taskItem;
+}
+
 
         // ===========================
         // Event Listeners
