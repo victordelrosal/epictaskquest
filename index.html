@@ -967,7 +967,7 @@
             justify-content: center;            
             border: none;
             border-radius: 8px;
-            background: var(--error-color);
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
             cursor: pointer;
             display: flex;
@@ -977,6 +977,12 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.3s ease;
             z-index: 10000;
+        }
+
+        #logoutButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         
