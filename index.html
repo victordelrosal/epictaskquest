@@ -988,6 +988,43 @@
             outline: none; /* Remove the default outline */
         }
 
+        /* Custom Points Input Styling */
+        input[type="number"].custom-points,
+        #customPoints {
+            font-size: 1.3rem !important; /* Match the size of other form elements */
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            width: 120px; /* Increased width for better visibility */
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            transition: all var(--transition-speed) ease;
+            margin: 0;
+            height: auto;
+            outline: none;
+        }
+
+        input[type="number"].custom-points:focus,
+        #customPoints:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 8px var(--primary-gradient);
+            outline: none;
+        }
+
+        /* Style the number input spinners */
+        input[type="number"].custom-points::-webkit-inner-spin-button,
+        input[type="number"].custom-points::-webkit-outer-spin-button,
+        #customPoints::-webkit-inner-spin-button,
+        #customPoints::-webkit-outer-spin-button {
+            height: 40px;
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
         input[type="number"].custom-points::-webkit-inner-spin-button,
         input[type="number"].custom-points::-webkit-outer-spin-button {
             height: 30px;
