@@ -1096,13 +1096,9 @@
     <!-- Login Container -->
     <div id="loginContainer">
         <h2>🔒 Please Log In</h2>
-        <input type="email" id="emailInput" placeholder="Email">
-        <input type="password" id="passwordInput" placeholder="Password">
-        <button id="loginButton"><i class="fas fa-sign-in-alt"></i> Log In</button>
         <button id="googleLoginButton" class="google-login-btn">
             <i class="fab fa-google"></i> Sign in with Google
         </button>
-        <p id="loginError">Invalid credentials. Please try again.</p>
     </div>
 
     <!-- Main Application Container (Initially Hidden) -->
@@ -1225,9 +1221,9 @@
         // DOM Elements for Login
         const loginContainer = document.getElementById('loginContainer');
         const appContainer = document.getElementById('appContainer');
-        const emailInput = document.getElementById('emailInput');
+        /*const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
-        const loginButton = document.getElementById('loginButton');
+        const loginButton = document.getElementById('loginButton');*/
         const loginError = document.getElementById('loginError');
         const googleLoginButton = document.getElementById('googleLoginButton');
 
@@ -1248,7 +1244,7 @@
             });
 
         // Login Function
-        loginButton.addEventListener('click', () => {
+        /*loginButton.addEventListener('click', () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
 
@@ -1272,7 +1268,7 @@
                     loginError.style.display = "block";
                 });
         });
-
+*/
         // Google Login Function
         googleLoginButton.addEventListener('click', () => {
             signInWithPopup(auth, googleProvider)
