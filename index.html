@@ -1282,6 +1282,7 @@
             GoogleAuthProvider,
             signInWithPopup 
         } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -1400,21 +1401,20 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 if (user.email === authorizedEmail) {
-                    // Show the main app
                     loginContainer.style.display = "none";
                     appContainer.style.display = "flex";
-                    loadTasks(); // Load tasks only after authentication
+                    setupTasksListener(); // Set up real-time sync
                 } else {
-                    // Unauthorized user
                     loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
                     console.warn(`User ${user.email} is not authorized to view this content.`);
-                    // Optionally, you can sign out the unauthorized user
                     signOut(auth);
                 }
             } else {
-                // No user is signed in
                 loginContainer.style.display = "flex";
                 appContainer.style.display = "none";
+                if (unsubscribeTasks) {
+                    unsubscribeTasks(); // Clean up listener when logged out
+                }
             }
         });
 
@@ -1425,6 +1425,7 @@
         let totalPoints = 0;
         let level = 1;
         let completedTasks = 0;
+        let unsubscribeTasks = null;
         const pointsToNextLevel = 100;
 
         // DOM Elements
@@ -1504,29 +1505,44 @@
         // ===========================
 
         // Load tasks from Firestore
-        async function loadTasks() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "tasks"));
+
+        function setupTasksListener() {
+            if (!auth.currentUser) return;
+        
+            // Unsubscribe from any existing listener
+            if (unsubscribeTasks) {
+                unsubscribeTasks();
+            }
+        
+            // Create a query for the user's tasks
+            const tasksQuery = query(
+                collection(db, "tasks"),
+                where("userId", "==", auth.currentUser.uid),
+                orderBy("timestamp", "desc")
+            );
+        
+            // Set up real-time listener
+            unsubscribeTasks = onSnapshot(tasksQuery, (snapshot) => {
                 tasks = [];
                 completedTasks = 0;
                 totalPoints = 0;
-
-                querySnapshot.forEach((docSnap) => {
-                    const task = { id: docSnap.id, ...docSnap.data() };
+        
+                snapshot.forEach((doc) => {
+                    const task = { id: doc.id, ...doc.data() };
                     tasks.push(task);
                     if (task.completed) {
                         completedTasks++;
                         totalPoints += getPoints(task.difficulty, task.customPoints);
                     }
                 });
-
+        
+                // Update UI
                 level = Math.floor(totalPoints / pointsToNextLevel) + 1;
                 updateStats();
                 renderTasks();
-                console.log("Tasks loaded successfully from Firestore.");
-            } catch (error) {
-                console.error("Error loading tasks: ", error);
-            }
+            }, (error) => {
+                console.error("Error in tasks listener:", error);
+            });
         }
 
         // Add a new task to Firestore
@@ -1536,35 +1552,32 @@
             const customPoints = difficulty === 6 ? 
                 (parseInt(document.getElementById('customPoints').value) || 30) : 
                 null;
-
+        
             if (text === "") {
                 alert("Please enter a task.");
                 return;
             }
-
+        
             const task = {
                 text,
                 difficulty,
                 customPoints,
                 completed: false,
-                timestamp: serverTimestamp()
+                timestamp: serverTimestamp(),
+                userId: auth.currentUser.uid,
+                lastModified: serverTimestamp()
             };
-
+        
             try {
-                const docRef = await addDoc(collection(db, "tasks"), task);
-                console.log("Task added with ID: ", docRef.id);
-                task.id = docRef.id;
-                tasks.unshift(task);
-                renderTasks();
-                animateTaskAddition(docRef.id);
+                await addDoc(collection(db, "tasks"), task);
                 
                 // Reset form
                 taskInput.value = "";
-                difficultySelect.value = "1"; // Reset to default difficulty
+                difficultySelect.value = "1";
                 document.getElementById('customPoints').style.display = 'none';
                 document.getElementById('customPoints').value = '';
             } catch (error) {
-                console.error("Error adding task: ", error);
+                console.error("Error adding task:", error);
             }
         }
 
@@ -1572,15 +1585,16 @@
         async function toggleTaskCompletion(taskId, completed) {
             try {
                 const taskDoc = doc(db, "tasks", taskId);
-                await updateDoc(taskDoc, { completed: completed });
-                console.log(`Task ${taskId} marked as ${completed ? 'completed' : 'active'}.`);
-                loadTasks(); // Reload tasks to update stats and trigger animations
-
+                await updateDoc(taskDoc, { 
+                    completed: completed,
+                    lastModified: serverTimestamp()
+                });
+                
                 if (completed) {
                     triggerConfetti();
                 }
             } catch (error) {
-                console.error("Error updating task: ", error);
+                console.error("Error updating task:", error);
             }
         }
 
@@ -1588,17 +1602,18 @@
         async function editTaskText(taskId, newText) {
             if (newText.trim() === "") {
                 alert("Task text cannot be empty.");
-                loadTasks(); // Reload to reset changes
+                renderTasks();
                 return;
             }
-
+        
             try {
                 const taskDoc = doc(db, "tasks", taskId);
-                await updateDoc(taskDoc, { text: newText });
-                console.log(`Task ${taskId} text updated.`);
-                loadTasks(); // Reload tasks to reflect changes
+                await updateDoc(taskDoc, { 
+                    text: newText,
+                    lastModified: serverTimestamp()
+                });
             } catch (error) {
-                console.error("Error editing task: ", error);
+                console.error("Error editing task:", error);
             }
         }
 
@@ -1606,11 +1621,12 @@
         async function updateTaskDifficulty(taskId, newDifficulty) {
             try {
                 const taskDoc = doc(db, "tasks", taskId);
-                await updateDoc(taskDoc, { difficulty: newDifficulty });
-                console.log(`Task ${taskId} difficulty updated to ${newDifficulty}.`);
-                loadTasks(); // Reload tasks to update UI and trigger animations
+                await updateDoc(taskDoc, { 
+                    difficulty: newDifficulty,
+                    lastModified: serverTimestamp()
+                });
             } catch (error) {
-                console.error("Error updating task difficulty: ", error);
+                console.error("Error updating task difficulty:", error);
             }
         }
 
@@ -1618,29 +1634,33 @@
         async function deleteTask(taskId) {
             try {
                 await deleteDoc(doc(db, "tasks", taskId));
-                console.log(`Task ${taskId} deleted.`);
                 animateTaskDeletion(taskId);
-                loadTasks(); // Reload tasks to update list and stats
             } catch (error) {
-                console.error("Error deleting task: ", error);
+                console.error("Error deleting task:", error);
             }
         }
 
         // Reset all progress
         async function resetProgress() {
+            if (!auth.currentUser) return;
+        
             try {
-                const querySnapshot = await getDocs(collection(db, "tasks"));
+                const userTasksQuery = query(
+                    collection(db, "tasks"),
+                    where("userId", "==", auth.currentUser.uid)
+                );
+                
+                const querySnapshot = await getDocs(userTasksQuery);
                 const batch = writeBatch(db);
-
+        
                 querySnapshot.forEach((docSnap) => {
                     batch.delete(doc(db, "tasks", docSnap.id));
                 });
-
+        
                 await batch.commit();
                 console.log("All tasks deleted successfully.");
-                loadTasks(); // Reload tasks to reflect changes
             } catch (error) {
-                console.error("Error resetting progress: ", error);
+                console.error("Error resetting progress:", error);
             }
         }
 
@@ -1655,12 +1675,11 @@
                 const points = parseInt(newCustomPoints) || 30;
                 await updateDoc(taskDoc, { 
                     customPoints: points,
-                    difficulty: 6  // Ensure difficulty stays at 6 for custom points
+                    difficulty: 6,
+                    lastModified: serverTimestamp()
                 });
-                console.log(`Task ${taskId} custom points updated to ${points}.`);
-                loadTasks(); // Reload tasks to update UI and trigger animations
             } catch (error) {
-                console.error("Error updating task custom points: ", error);
+                console.error("Error updating task custom points:", error);
             }
         }
 
