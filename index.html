@@ -1286,6 +1286,17 @@
             orderBy,
             onSnapshot 
         } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            setPersistence, 
+            browserLocalPersistence,
+            GoogleAuthProvider,
+            signInWithPopup 
+        } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
         
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -1793,26 +1804,18 @@ function createTaskElement(task, isCompleted) {
     customPointsInput.value = task.customPoints || '';
     customPointsInput.disabled = isCompleted;
 
-    // Add event listener for custom points changes
-    customPointsInput.addEventListener('change', () => {
-        updateTaskCustomPoints(task.id, customPointsInput.value)
-            .then(() => {
-                // Only sort after custom points have been set
-                loadTasks();
-            });
-    });
-
     difficultySelect.addEventListener('change', () => {
         const difficulty = parseInt(difficultySelect.value);
         customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
         
         if (difficulty !== 6) {
-            // Only update difficulty and sort when switching away from custom
             updateTaskDifficulty(task.id, difficulty);
         } else {
-            // Just update difficulty without sorting when switching to custom
-            const taskDoc = doc(db, "tasks", task.id);
-            updateDoc(taskDoc, { difficulty: difficulty });
+            const taskDoc = doc(db, "tasks", taskId);
+            updateDoc(taskDoc, { 
+                difficulty: difficulty,
+                lastModified: serverTimestamp()
+            });
         }
     });
 
