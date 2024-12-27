@@ -485,7 +485,7 @@
             color: var(--bright-text);
             font-size: 1.3rem;
             cursor: pointer;
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+            transition: transform var(--transition-speed) ease, box-shadow var (--transition-speed) ease, background 0.5s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1214,13 +1214,28 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
             background: rgba(255, 255, 255, 0.2);
         }
+
+        .search-input {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            width: 200px;
+            transition: width 0.3s ease;
+        }
+
+        .search-input:focus {
+            width: 300px;
+        }
     </style>
 </head>
 <body>
     <!-- Fixed Navbar -->
     <nav class="navbar">
         <div class="navbar-container">
-            <h1 class="navbar-title">epicTasks</h1>
+            <h1 class="navbar-title">🏆 epicTasks</h1>
+            <input type="text" id="taskSearchInput" class="search-input" placeholder="Search tasks...">
             <button id="logoutButton" aria-label="Log Out">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -1495,6 +1510,7 @@
         const confirmYes = document.getElementById('confirmYes');
         const confirmNo = document.getElementById('confirmNo');
         const confettiContainer = document.getElementById('confettiContainer');
+        const taskSearchInput = document.getElementById('taskSearchInput');
 
         // ===========================
         // Utility Functions
@@ -1719,14 +1735,14 @@
         // Render Tasks to the DOM
         // ===========================
 
-        function renderTasks() {
+        function renderTasks(filteredTasks = tasks) {
             // Clear existing tasks
             activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
             completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
 
             // Separate active and completed tasks
-            const activeTasks = tasks.filter(task => !task.completed);
-            const completedTasksArr = tasks.filter(task => task.completed);
+            const activeTasks = filteredTasks.filter(task => !task.completed);
+            const completedTasksArr = filteredTasks.filter(task => task.completed);
 
             // Sort active tasks by points (highest to lowest)
             activeTasks.sort((a, b) => {
@@ -1879,6 +1895,12 @@ function createTaskElement(task, isCompleted) {
 
         // Add Task Button Click
         addTaskButton.addEventListener('click', addTask);
+
+        // Task Search Input Event Listener
+        taskSearchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filterTasks(searchTerm);
+        });
 
         // Add Task Input Event Listeners
         taskInput.addEventListener('keypress', (e) => {
@@ -2053,6 +2075,12 @@ function createTaskElement(task, isCompleted) {
                 customPointsInput.value = ''; // Clear the value when not using custom
             }
         });
+
+        // Filter tasks based on search term
+        function filterTasks(searchTerm) {
+            const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
+            renderTasks(filteredTasks);
+        }
     </script>
 </body>
 </html>
