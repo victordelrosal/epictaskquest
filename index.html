@@ -1528,6 +1528,28 @@
             min-width: 200px;
             position: relative;
         }
+
+        /* Achievement Image Styling */
+        .achievement-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 1rem auto;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            order: 3; /* Place after active tasks but before task form */
+        }
+
+        .achievement-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .achievement-image.visible {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -1566,6 +1588,9 @@
             <h3>Active Tasks</h3>
             <!-- Active tasks will be dynamically added here -->
         </div>
+
+        <!-- Achievement Image Component -->
+        <div id="achievementImage" class="achievement-image"></div>
 
         <!-- Task Form Component -->
         <div class="task-form">
@@ -1816,6 +1841,43 @@
         const wishlistFilter = document.getElementById('wishlistFilter');
         let currentFilter = 'all';
 
+        // Add achievement image URLs array
+        const achievementImages = [
+            'https://i.postimg.cc/d7qYLggG/1k.png',
+            'https://i.postimg.cc/JGkmgNbH/2k.png',
+            'https://i.postimg.cc/Fd65Czzx/3k.png',
+            'https://i.postimg.cc/T5W8zxWv/4k.png',
+            'https://i.postimg.cc/FYbvFhC9/5k.png',
+            'https://i.postimg.cc/pygMDmgW/6k.png',
+            'https://i.postimg.cc/vD1dgr22/7k.png',
+            'https://i.postimg.cc/rD2cLDJn/8k.png',
+            'https://i.postimg.cc/LqNMfNMw/9k.png',
+            'https://i.postimg.cc/cgCGcwxH/10k.png',
+            'https://i.postimg.cc/H8jWC0Rh/11k.png',
+            'https://i.postimg.cc/4Ycdd5yC/12k.png',
+            'https://i.postimg.cc/sB9gPg5w/13k.png',
+            'https://i.postimg.cc/r0VFf2Jc/14k.png',
+            'https://i.postimg.cc/r0fybZn4/15k.png',
+            'https://i.postimg.cc/3WrdBmSp/16k.png',
+            'https://i.postimg.cc/qt8zmLHc/17k.png',
+            'https://i.postimg.cc/gnJLY83d/18k.png',
+            'https://i.postimg.cc/rd6DCH3F/19k.png',
+            'https://i.postimg.cc/Wq4z1cFS/20k.png',
+            'https://i.postimg.cc/yJRT1NfX/21k.png',
+            'https://i.postimg.cc/YjRzqZxV/22k.png',
+            'https://i.postimg.cc/CBVszVXy/23k.png',
+            'https://i.postimg.cc/6TthKtCn/24k.png',
+            'https://i.postimg.cc/LnsBqDCs/25k.png',
+            'https://i.postimg.cc/FkrbVVhD/26k.png',
+            'https://i.postimg.cc/4nDT8gw9/27k.png',
+            'https://i.postimg.cc/cvZGSBp1/28k.png',
+            'https://i.postimg.cc/GHvnV5SS/29k.png',
+            'https://i.postimg.cc/5X3dNFJB/30k.png',
+            'https://i.postimg.cc/2LNq9Cy6/31k.png',
+            'https://i.postimg.cc/dDGZkZNT/32k.png',
+            'https://i.postimg.cc/7fVCX8kH/33k.png'
+        ];
+
         // ===========================
         // Utility Functions
         // ===========================
@@ -1867,6 +1929,17 @@
             // Trigger Level Up Animation if level increased
             if (level > prevLevel) {
                 animateLevelUp(levelSpan);
+            }
+
+            // Handle achievement image display
+            if (level > prevLevel) {
+                const imageIndex = ((level - 1) % achievementImages.length);
+                const achievementContainer = document.getElementById('achievementImage');
+                achievementContainer.innerHTML = `<img src="${achievementImages[imageIndex]}" alt="Level ${level} Achievement">`;
+                achievementContainer.classList.remove('visible');
+                // Force reflow
+                void achievementContainer.offsetWidth;
+                achievementContainer.classList.add('visible');
             }
         }
 
