@@ -14,7 +14,7 @@
         /* CSS Variables for Deep Dark Purple Theme with Tron Blue Highlights */
         :root {
             /* Our seven approved blue colors */
-            --blue-1: #000000;  /* Darkest-black small change*/
+            --blue-1: #000000;  /* Darkest-black small*/
             --blue-2: #000036; /* Very Dark Blue */
             --blue-3: #02066F; /* Dark Blue */
             --blue-4: #170484; /* Dark Blue with Deep Hue */
@@ -320,42 +320,6 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
             background: var(--secondary-gradient);
-        }
-
-        .wishlist-button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            background: var(--primary-gradient);
-            color: #fff;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .wishlist-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-            background: var(--secondary-gradient);
-        }
-
-        .filter-button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .filter-button:hover {
-            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Task Lists Component */
@@ -1443,43 +1407,6 @@
                 width: 150px;
             }
         }
-
-        .wishlist-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: all var(--transition-speed) ease;
-        }
-
-        .wishlist-toggle.active {
-            background: var(--secondary-gradient);
-            transform: scale(1.05);
-        }
-
-        .wishlist-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .filter-button.active {
-            background: var(--secondary-gradient);
-            transform: scale(1.05);
-        }
-
-        /* Category indicator for tasks */
-        .task-category {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            font-size: 1.2rem;
-            opacity: 0.7;
-        }
     </style>
 </head>
 <body>
@@ -1488,7 +1415,6 @@
         <div class="navbar-container">
             <h1 class="navbar-title">🏆</h1>
             <input type="text" id="taskSearchInput" class="search-input" placeholder="Search tasks...">
-            <button id="filterWishlistButton" class="filter-button">🛒 Wishlist</button>
             <button id="logoutButton" aria-label="Log Out">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -1529,10 +1455,6 @@
                 <option value="6">Other</option>
             </select>
             <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
-            <button id="wishlistToggle" class="wishlist-toggle">
-                <span>🛒</span>
-                <span class="wishlist-status">Add to Wishlist</span>
-            </button>
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
         </div>
 
@@ -1768,11 +1690,6 @@
         const confirmNo = document.getElementById('confirmNo');
         const confettiContainer = document.getElementById('confettiContainer');
         const taskSearchInput = document.getElementById('taskSearchInput');
-        const wishlistButton = document.getElementById('wishlistButton');
-        const filterWishlistButton = document.getElementById('filterWishlistButton');
-        const wishlistToggle = document.getElementById('wishlistToggle');
-        let isWishlist = false;
-        let currentFilter = 'all';
 
         // ===========================
         // Utility Functions
@@ -1876,8 +1793,7 @@
                 difficulty,
                 customPoints,
                 completed: false,
-                timestamp: serverTimestamp(),
-                category: isWishlist ? 'wishlist' : 'general'
+                timestamp: serverTimestamp()
             };
 
             try {
@@ -1893,9 +1809,6 @@
                 difficultySelect.value = "1"; // Reset to default difficulty
                 document.getElementById('customPoints').style.display = 'none';
                 document.getElementById('customPoints').value = '';
-                isWishlist = false;
-                wishlistToggle.classList.remove('active');
-                wishlistToggle.querySelector('.wishlist-status').textContent = 'Add to Wishlist';
             } catch (error) {
                 console.error("Error adding task: ", error);
             }
@@ -2043,7 +1956,6 @@ function createTaskElement(task, isCompleted) {
     taskItem.classList.add('task-item');
     taskItem.setAttribute('data-id', task.id);
     taskItem.setAttribute('data-priority', task.priority);
-    taskItem.setAttribute('data-category', task.category);
 
     // Task Details
     const taskDetails = document.createElement('div');
@@ -2148,14 +2060,6 @@ function createTaskElement(task, isCompleted) {
         taskText.classList.add('completed');
     }
 
-    // Add wishlist indicator if it's a wishlist item
-    if (task.category === 'wishlist') {
-        const categoryIndicator = document.createElement('span');
-        categoryIndicator.className = 'task-category';
-        categoryIndicator.textContent = '🛒';
-        taskItem.appendChild(categoryIndicator);
-    }
-
     // Append to task item
     taskItem.appendChild(taskDetails);
     taskItem.appendChild(taskActions);
@@ -2207,27 +2111,6 @@ function createTaskElement(task, isCompleted) {
             if (event.target === confirmModal) {
                 confirmModal.style.display = 'none';
             }
-        });
-
-        // Wishlist Button Click
-        wishlistButton.addEventListener('click', () => {
-            isWishlist = !isWishlist;
-            wishlistButton.classList.toggle('active', isWishlist);
-        });
-
-        // Filter Wishlist Button Click
-        filterWishlistButton.addEventListener('click', () => {
-            currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
-            filterWishlistButton.classList.toggle('active', currentFilter === 'wishlist');
-            filterTasks();
-        });
-
-        // Wishlist Toggle Button Click
-        wishlistToggle.addEventListener('click', () => {
-            isWishlist = !isWishlist;
-            wishlistToggle.classList.toggle('active', isWishlist);
-            wishlistToggle.querySelector('.wishlist-status').textContent = 
-                isWishlist ? 'Wishlist Item ✓' : 'Add to Wishlist';
         });
 
         // ===========================
@@ -2373,27 +2256,8 @@ function createTaskElement(task, isCompleted) {
         });
 
         // Filter tasks based on search term
-        function filterTasks(searchTerm = '') {
-            let filteredTasks = tasks;
-            
-            // Apply search filter
-            if (searchTerm) {
-                filteredTasks = filteredTasks.filter(task => 
-                    task.text.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-            
-            // Apply category filter
-            if (currentFilter === 'wishlist') {
-                filteredTasks = filteredTasks.filter(task => task.category === 'wishlist');
-            }
-            
-            renderTasks(filteredTasks);
-        }
-
-        // Filter tasks by category
-        function filterTasksByCategory(category) {
-            const filteredTasks = tasks.filter(task => task.category === category);
+        function filterTasks(searchTerm) {
+            const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
             renderTasks(filteredTasks);
         }
     </script>
