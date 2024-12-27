@@ -1692,11 +1692,11 @@
         .achievement-image {
             width: 100%;
             max-width: 800px;
-            margin: 1rem auto;
+            margin: 2rem auto;
             text-align: center;
             opacity: 0;
             transition: opacity 0.5s ease;
-            order: 3; /* Place after active tasks but before task form */
+            order: 4; /* Place after active tasks but before completed tasks */
         }
 
         .achievement-image img {
@@ -2128,14 +2128,22 @@
             }
 
             // Handle achievement image display
-            if (level > prevLevel) {
-                const imageIndex = ((level - 1) % achievementImages.length);
+            if (level > prevLevel || !document.querySelector('.achievement-image img')) {
+                let adjustedLevel = level;
+                // If level is 84 or higher, start cycling from beginning
+                if (level >= 84) {
+                    adjustedLevel = ((level - 84) % achievementImages.length) + 1;
+                }
+                const imageIndex = adjustedLevel - 1;
+                
                 const achievementContainer = document.getElementById('achievementImage');
-                achievementContainer.innerHTML = `<img src="${achievementImages[imageIndex]}" alt="Level ${level} Achievement">`;
-                achievementContainer.classList.remove('visible');
-                // Force reflow
-                void achievementContainer.offsetWidth;
-                achievementContainer.classList.add('visible');
+                if (imageIndex >= 0 && imageIndex < achievementImages.length) {
+                    achievementContainer.innerHTML = `<img src="${achievementImages[imageIndex]}" alt="Level ${level} Achievement">`;
+                    achievementContainer.classList.remove('visible');
+                    // Force reflow
+                    void achievementContainer.offsetWidth;
+                    achievementContainer.classList.add('visible');
+                }
             }
         }
 
