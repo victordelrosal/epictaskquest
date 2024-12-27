@@ -382,6 +382,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transform: translateZ(0);
             position: relative;
+            flex-wrap: wrap; /* Allow items to wrap */
         }
 
         .task-item:hover {
@@ -420,6 +421,11 @@
             cursor: text;
             transition: color var(--transition-speed) ease;
             font-family: var(--font-secondary);
+            word-break: break-word; /* Allow words to break */
+            white-space: normal; /* Allow text to wrap */
+            line-height: 1.4; /* Better line height for readability */
+            min-height: 2.8em; /* Accommodate up to 2 lines */
+            max-width: 100%; /* Ensure text doesn't overflow */
         }
 
         .task-text:disabled {
@@ -853,6 +859,44 @@
                 position: absolute;
                 top: 10px;
                 right: 10px;
+            }
+
+            .task-actions {
+                flex-direction: row; /* Keep actions in a single row */
+                justify-content: flex-start; /* Align to the start */
+                gap: 0.5rem; /* Reduce gap between elements */
+                margin-top: 0; /* Remove top margin */
+                flex-wrap: nowrap; /* Prevent wrapping */
+            }
+
+            .task-actions select {
+                width: auto; /* Allow select to shrink */
+                min-width: 80px; /* Minimum width for select */
+                padding: 0.5rem; /* Reduce padding */
+                font-size: 1rem; /* Smaller font size */
+            }
+
+            .task-item {
+                padding: 0.75rem; /* Reduce overall padding */
+            }
+
+            .task-details {
+                margin-bottom: 0.5rem; /* Add space between details and actions */
+                width: 100%; /* Full width for details */
+            }
+
+            /* Custom points input adjustments */
+            input[type="number"].custom-points {
+                width: 60px; /* Smaller width */
+                padding: 0.5rem; /* Reduced padding */
+                font-size: 1rem; /* Smaller font size */
+            }
+
+            /* Delete button adjustments */
+            .task-actions button {
+                padding: 0.5rem; /* Reduced padding */
+                font-size: 1rem; /* Smaller font size */
+                margin: 0; /* Remove margins */
             }
         }
 
@@ -1822,11 +1866,11 @@ function createTaskElement(task, isCompleted) {
         const option = document.createElement('option');
         option.value = num;
         if (num === 6) {
-            // For Custom difficulty, display "Custom (X pts)" without stars
-            option.textContent = `Custom ${task.customPoints ? `(${task.customPoints}pts)` : ''}`;
+            // For Custom difficulty, just show the points
+            option.textContent = `${task.customPoints || 30}`;
         } else {
-            // For predefined difficulties, display "X pts" without stars
-            option.textContent = `${getPoints(num)} pts`;
+            // For predefined difficulties, just show the points
+            option.textContent = `${getPoints(num)}`;
         }
         if (num === task.difficulty) option.selected = true;
         difficultySelect.appendChild(option);
