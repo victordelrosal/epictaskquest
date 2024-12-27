@@ -1576,6 +1576,40 @@
         .achievement-image.visible {
             opacity: 1;
         }
+
+        /* Add new styles for search mode */
+        @media (max-width: 768px) {
+            /* ...existing mobile styles... */
+
+            /* Add new styles for search mode */
+            .container.search-mode #activeTasksList {
+                order: 1; /* Move filtered tasks to top when searching */
+            }
+
+            .container.search-mode .header {
+                order: 2;
+            }
+
+            .container.search-mode .task-form {
+                order: 3;
+            }
+
+            .container.search-mode .stats {
+                order: 4;
+            }
+
+            .container.search-mode .progress-container {
+                order: 5;
+            }
+
+            .container.search-mode #completedTasksList {
+                order: 6;
+            }
+
+            .container.search-mode .reset-button {
+                order: 7;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2370,6 +2404,11 @@
         // Task Search Input Event Listener
         taskSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
+            const container = document.querySelector('.container');
+            
+            // Toggle search-mode class based on whether there's a search term
+            container.classList.toggle('search-mode', searchTerm.length > 0);
+            
             filterTasks(searchTerm);
         });
 
@@ -2410,8 +2449,10 @@
             currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
             wishlistFilter.classList.toggle('active', currentFilter === 'wishlist');
             
-            // Toggle the wishlist-mode class on the container
-            document.querySelector('.container').classList.toggle('wishlist-mode', currentFilter === 'wishlist');
+            const container = document.querySelector('.container');
+            container.classList.toggle('wishlist-mode', currentFilter === 'wishlist');
+            container.classList.remove('search-mode'); // Remove search mode when switching to wishlist
+            taskSearchInput.value = ''; // Clear search input
             
             filterTasks();
         });
