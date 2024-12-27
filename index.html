@@ -107,6 +107,7 @@
             position: relative;
             /* Removed overflow: hidden; to enable scrolling */
             overflow: visible;
+            padding-top: 60px; /* Adjust padding to account for fixed navbar */
         }
 
         .container {
@@ -939,7 +940,7 @@
             align-items: center;
             gap: 0.5rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+            transition: transform var(--transition-speed) ease, box-shadow var (--transition-speed) ease, background 0.5s ease;
         }
 
         #loginContainer button:hover {
@@ -955,7 +956,7 @@
             font-size: 1.3rem;
         }
 
-/* Logout Button Styling */
+        /* Logout Button Styling */
         #logoutButton {
             position: absolute;
             top: 0.5rem;
@@ -985,8 +986,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        
-    /* Logout Button Component */
+        /* Logout Button Component */
         #logoutButton {
             position: absolute;
             top: 20px;
@@ -1172,9 +1172,60 @@
         .number-transition {
             transition: all 0.5s ease;
         }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--primary-gradient);
+            color: #fff;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10000;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .navbar-title {
+            font-family: var(--font-primary);
+            font-size: 1.5rem;
+        }
+
+        #logoutButton {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.3s ease;
+        }
+
+        #logoutButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
+    <!-- Fixed Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <h1 class="navbar-title">epicTasks</h1>
+            <button id="logoutButton" aria-label="Log Out">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </nav>
     <!-- Confetti Container -->
     <div class="confetti-container" id="confettiContainer"></div>
 
