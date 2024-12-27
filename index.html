@@ -1243,20 +1243,29 @@
             padding: 1rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             z-index: 10000;
+            min-height: 60px; /* Ensure consistent height */
+            display: flex; /* Add flex display */
+            align-items: center; /* Center items vertically */
         }
 
         .navbar-container {
             display: flex;
-            justify-content: center; /* Center the content horizontally */
-            align-items: center;
+            justify-content: center;
+            align-items: center; /* Center items vertically */
             max-width: 1200px;
             margin: 0 auto;
-            position: relative; /* Add relative positioning */
+            position: relative;
+            width: 100%; /* Ensure container takes full width */
+            height: 100%; /* Take full height of navbar */
         }
 
         .navbar-title {
             position: absolute;
-            left: 20px; /* Adjust as needed */
+            left: 20px;
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Offset for perfect centering */
+            margin: 0; /* Remove any margin */
+            line-height: 1; /* Ensure consistent height */
         }
 
         .search-input {
@@ -1267,15 +1276,17 @@
             outline: none;
             width: 100px;
             transition: width 0.3s ease;
-        }
-
-        .search-input:focus {
-            width: 150px;
+            margin: 0; /* Remove any margin */
+            height: 36px; /* Consistent height */
         }
 
         #logoutButton {
             position: absolute;
-            right: 20px; /* Adjust as needed */
+            right: 20px;
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Offset for perfect centering */
+            margin: 0; /* Remove any margin */
+            height: 36px; /* Consistent height */
         }
     </style>
 </head>
