@@ -1461,6 +1461,23 @@
             font-size: 1.2rem;
             opacity: 0.7;
         }
+
+        .cart-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: transform 0.2s ease;
+            opacity: 0.5;
+        }
+        
+        .cart-toggle.active {
+            opacity: 1;
+        }
+        
+        .cart-toggle:hover {
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
@@ -2054,6 +2071,39 @@ function createTaskElement(task, isCompleted) {
     // Task Actions
     const taskActions = document.createElement('div');
     taskActions.classList.add('task-actions');
+
+    if (!isCompleted) {  // Only add shopping cart toggle for active tasks
+        // Add shopping cart toggle
+        const cartToggle = document.createElement('button');
+        cartToggle.innerHTML = task.isWishlist ? '🛒' : '☐';
+        cartToggle.title = 'Toggle Shopping List';
+        cartToggle.classList.add('cart-toggle');
+        cartToggle.style.fontSize = '1.3rem';
+        if (task.isWishlist) {
+            cartToggle.classList.add('active');
+        }
+        
+        cartToggle.addEventListener('click', async () => {
+            try {
+                const taskDoc = doc(db, "tasks", task.id);
+                await updateDoc(taskDoc, { 
+                    isWishlist: !task.isWishlist 
+                });
+                cartToggle.innerHTML = !task.isWishlist ? '🛒' : '☐';
+                cartToggle.classList.toggle('active');
+                task.isWishlist = !task.isWishlist;
+
+                // Refresh the task list if we're currently filtering by wishlist
+                if (currentFilter === 'wishlist') {
+                    filterTasks(taskSearchInput.value);
+                }
+            } catch (error) {
+                console.error("Error updating wishlist status:", error);
+            }
+        });
+
+        taskActions.appendChild(cartToggle);
+    }
 
     // Difficulty Select
     const difficultySelect = document.createElement('select');
