@@ -1407,6 +1407,60 @@
                 width: 150px;
             }
         }
+
+        .wishlist-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .wishlist-checkbox-wrapper:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .wishlist-checkbox {
+            width: 1.5rem;
+            height: 1.5rem;
+            cursor: pointer;
+            accent-color: var(--primary-gradient);
+        }
+
+        .navbar-container {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .filter-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .filter-button.active {
+            background: var(--secondary-gradient);
+            transform: scale(1.05);
+        }
+
+        .task-item.wishlist::before {
+            content: '🛒';
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -1415,6 +1469,7 @@
         <div class="navbar-container">
             <h1 class="navbar-title">🏆</h1>
             <input type="text" id="taskSearchInput" class="search-input" placeholder="Search tasks...">
+            <button id="wishlistFilter" class="filter-button">🛒</button>
             <button id="logoutButton" aria-label="Log Out">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -1455,6 +1510,10 @@
                 <option value="6">Other</option>
             </select>
             <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
+            <label class="wishlist-checkbox-wrapper">
+                <input type="checkbox" id="wishlistCheckbox" class="wishlist-checkbox">
+                🛒
+            </label>
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
         </div>
 
@@ -1690,6 +1749,9 @@
         const confirmNo = document.getElementById('confirmNo');
         const confettiContainer = document.getElementById('confettiContainer');
         const taskSearchInput = document.getElementById('taskSearchInput');
+        const wishlistCheckbox = document.getElementById('wishlistCheckbox');
+        const wishlistFilter = document.getElementById('wishlistFilter');
+        let currentFilter = 'all';
 
         // ===========================
         // Utility Functions
@@ -1782,6 +1844,7 @@
             const customPoints = difficulty === 6 ? 
                 (parseInt(document.getElementById('customPoints').value) || 30) : 
                 null;
+            const isWishlist = wishlistCheckbox.checked;
 
             if (text === "") {
                 alert("Please enter a task.");
@@ -1793,7 +1856,8 @@
                 difficulty,
                 customPoints,
                 completed: false,
-                timestamp: serverTimestamp()
+                timestamp: serverTimestamp(),
+                isWishlist: isWishlist
             };
 
             try {
@@ -1809,6 +1873,7 @@
                 difficultySelect.value = "1"; // Reset to default difficulty
                 document.getElementById('customPoints').style.display = 'none';
                 document.getElementById('customPoints').value = '';
+                wishlistCheckbox.checked = false;
             } catch (error) {
                 console.error("Error adding task: ", error);
             }
@@ -2113,6 +2178,13 @@ function createTaskElement(task, isCompleted) {
             }
         });
 
+        // Add this to your existing event listeners section
+        wishlistFilter.addEventListener('click', () => {
+            currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
+            wishlistFilter.classList.toggle('active', currentFilter === 'wishlist');
+            filterTasks();
+        });
+
         // ===========================
         // Initialize App
         // ===========================
@@ -2256,8 +2328,21 @@ function createTaskElement(task, isCompleted) {
         });
 
         // Filter tasks based on search term
-        function filterTasks(searchTerm) {
-            const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
+        function filterTasks(searchTerm = '') {
+            let filteredTasks = tasks;
+            
+            // Apply search filter
+            if (searchTerm) {
+                filteredTasks = filteredTasks.filter(task => 
+                    task.text.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            // Apply wishlist filter
+            if (currentFilter === 'wishlist') {
+                filteredTasks = filteredTasks.filter(task => task.isWishlist);
+            }
+            
             renderTasks(filteredTasks);
         }
     </script>
