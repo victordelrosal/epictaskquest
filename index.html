@@ -1478,6 +1478,36 @@
         .cart-toggle:hover {
             transform: scale(1.2);
         }
+
+        /* Update task list styling for better visibility */
+        #activeTasksList {
+            max-height: 50vh; /* Limit height to half viewport height */
+            overflow-y: auto; /* Enable scrolling if needed */
+            margin-bottom: 2rem; /* Add space before the task form */
+        }
+
+        #activeTasksList:empty {
+            display: none; /* Hide when no tasks are found */
+        }
+
+        /* Style scrollbar for better usability */
+        #activeTasksList::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #activeTasksList::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        #activeTasksList::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 4px;
+        }
+
+        #activeTasksList::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
+        }
     </style>
 </head>
 <body>
@@ -1515,6 +1545,12 @@
             <h1 class="title">epicTasks</h1>
         </div>
 
+        <!-- Active Tasks List Component (Moved up) -->
+        <div class="task-list" id="activeTasksList">
+            <h3>Active Tasks</h3>
+            <!-- Active tasks will be dynamically added here -->
+        </div>
+
         <!-- Task Form Component -->
         <div class="task-form">
             <input type="text" id="taskInput" placeholder="Enter your quest...">
@@ -1532,12 +1568,6 @@
                 🛒
             </label>
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
-        </div>
-
-        <!-- Active Tasks List Component -->
-        <div class="task-list" id="activeTasksList">
-            <h3>Active Tasks</h3>
-            <!-- Active tasks will be dynamically added here -->
         </div>
 
         <!-- Stats Component -->
@@ -2393,7 +2423,25 @@ function createTaskElement(task, isCompleted) {
                 filteredTasks = filteredTasks.filter(task => task.isWishlist);
             }
             
-            renderTasks(filteredTasks);
+            // Clear and update active tasks list first
+            activeTasksList.innerHTML = `<h3>${currentFilter === 'wishlist' ? '🛒 Shopping List' : 'Active Tasks'}</h3>`;
+            
+            // Sort and display active tasks
+            const activeTasks = filteredTasks.filter(task => !task.completed);
+            activeTasks
+                .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
+                .forEach(task => {
+                    const taskItem = createTaskElement(task, false);
+                    activeTasksList.appendChild(taskItem);
+                });
+                
+            // Update completed tasks separately
+            const completedTasksArr = filteredTasks.filter(task => task.completed);
+            completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
+            completedTasksArr.forEach(task => {
+                const taskItem = createTaskElement(task, true);
+                completedTasksList.appendChild(taskItem);
+            });
         }
     </script>
 </body>
