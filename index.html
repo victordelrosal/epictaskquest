@@ -1443,6 +1443,43 @@
                 width: 150px;
             }
         }
+
+        .wishlist-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .wishlist-toggle.active {
+            background: var(--secondary-gradient);
+            transform: scale(1.05);
+        }
+
+        .wishlist-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-button.active {
+            background: var(--secondary-gradient);
+            transform: scale(1.05);
+        }
+
+        /* Category indicator for tasks */
+        .task-category {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -1492,7 +1529,10 @@
                 <option value="6">Other</option>
             </select>
             <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
-            <button id="wishlistButton" class="wishlist-button"><i class="fas fa-shopping-cart"></i> Wishlist</button>
+            <button id="wishlistToggle" class="wishlist-toggle">
+                <span>🛒</span>
+                <span class="wishlist-status">Add to Wishlist</span>
+            </button>
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
         </div>
 
@@ -1730,7 +1770,9 @@
         const taskSearchInput = document.getElementById('taskSearchInput');
         const wishlistButton = document.getElementById('wishlistButton');
         const filterWishlistButton = document.getElementById('filterWishlistButton');
+        const wishlistToggle = document.getElementById('wishlistToggle');
         let isWishlist = false;
+        let currentFilter = 'all';
 
         // ===========================
         // Utility Functions
@@ -1852,7 +1894,8 @@
                 document.getElementById('customPoints').style.display = 'none';
                 document.getElementById('customPoints').value = '';
                 isWishlist = false;
-                wishlistButton.classList.remove('active');
+                wishlistToggle.classList.remove('active');
+                wishlistToggle.querySelector('.wishlist-status').textContent = 'Add to Wishlist';
             } catch (error) {
                 console.error("Error adding task: ", error);
             }
@@ -2105,6 +2148,14 @@ function createTaskElement(task, isCompleted) {
         taskText.classList.add('completed');
     }
 
+    // Add wishlist indicator if it's a wishlist item
+    if (task.category === 'wishlist') {
+        const categoryIndicator = document.createElement('span');
+        categoryIndicator.className = 'task-category';
+        categoryIndicator.textContent = '🛒';
+        taskItem.appendChild(categoryIndicator);
+    }
+
     // Append to task item
     taskItem.appendChild(taskDetails);
     taskItem.appendChild(taskActions);
@@ -2166,7 +2217,17 @@ function createTaskElement(task, isCompleted) {
 
         // Filter Wishlist Button Click
         filterWishlistButton.addEventListener('click', () => {
-            filterTasksByCategory('wishlist');
+            currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
+            filterWishlistButton.classList.toggle('active', currentFilter === 'wishlist');
+            filterTasks();
+        });
+
+        // Wishlist Toggle Button Click
+        wishlistToggle.addEventListener('click', () => {
+            isWishlist = !isWishlist;
+            wishlistToggle.classList.toggle('active', isWishlist);
+            wishlistToggle.querySelector('.wishlist-status').textContent = 
+                isWishlist ? 'Wishlist Item ✓' : 'Add to Wishlist';
         });
 
         // ===========================
@@ -2312,8 +2373,21 @@ function createTaskElement(task, isCompleted) {
         });
 
         // Filter tasks based on search term
-        function filterTasks(searchTerm) {
-            const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
+        function filterTasks(searchTerm = '') {
+            let filteredTasks = tasks;
+            
+            // Apply search filter
+            if (searchTerm) {
+                filteredTasks = filteredTasks.filter(task => 
+                    task.text.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+            
+            // Apply category filter
+            if (currentFilter === 'wishlist') {
+                filteredTasks = filteredTasks.filter(task => task.category === 'wishlist');
+            }
+            
             renderTasks(filteredTasks);
         }
 
