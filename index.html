@@ -925,6 +925,91 @@
                 font-size: 1rem; /* Smaller font size */
                 margin: 0; /* Remove margins */
             }
+
+            /* Hide stats in mobile */
+            .stats {
+                display: none;
+            }
+
+            /* Adjust the order of elements now that stats are hidden */
+            .container {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header {
+                order: 1;
+            }
+
+            #activeTasksList {
+                order: 2; /* Move up since stats are hidden */
+            }
+
+            .task-form {
+                order: 3;
+            }
+
+            .progress-container {
+                order: 4;
+            }
+
+            #completedTasksList {
+                order: 5;
+            }
+
+            .reset-button {
+                order: 6;
+            }
+
+            /* Update search mode ordering */
+            .container.search-mode #activeTasksList {
+                order: 1;
+            }
+
+            .container.search-mode .header {
+                order: 2;
+            }
+
+            .container.search-mode .task-form {
+                order: 3;
+            }
+
+            .container.search-mode .progress-container {
+                order: 4;
+            }
+
+            .container.search-mode #completedTasksList {
+                order: 5;
+            }
+
+            .container.search-mode .reset-button {
+                order: 6;
+            }
+
+            /* Update wishlist mode ordering */
+            .container.wishlist-mode #activeTasksList {
+                order: 1;
+            }
+
+            .container.wishlist-mode .header {
+                order: 2;
+            }
+
+            .container.wishlist-mode .task-form {
+                order: 3;
+            }
+
+            .container.wishlist-mode .progress-container {
+                order: 4;
+            }
+
+            .container.wishlist-mode #completedTasksList {
+                order: 5;
+            }
+
+            .container.wishlist-mode .reset-button {
+                order: 6;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1212,7 +1297,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 0.5rem 1rem;
-            background: var(--success-color);
+            background: var (--success-color);
             color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
