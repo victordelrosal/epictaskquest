@@ -1010,6 +1010,40 @@
             .container.wishlist-mode .reset-button {
                 order: 6;
             }
+
+            /* Add specific mobile styling for active tasks list */
+            #activeTasksList {
+                max-height: 80vh; /* Increase height on mobile */
+                height: calc(100vh - 200px); /* Calculate height dynamically */
+                overflow-y: auto;
+                margin-bottom: 1rem;
+                padding-bottom: 1rem;
+                position: relative;
+            }
+
+            /* Add fade effect at the bottom */
+            #activeTasksList::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 40px;
+                background: linear-gradient(to top, var(--card-background) 0%, transparent 100%);
+                pointer-events: none;
+            }
+
+            /* Adjust container padding for better space usage */
+            .container {
+                padding: 0.5rem;
+                gap: 1rem;
+            }
+
+            /* Make the task form more compact on mobile */
+            .task-form {
+                padding: 1rem;
+                margin-top: 0.5rem;
+            }
         }
 
         @media (max-width: 480px) {
