@@ -322,6 +322,42 @@
             background: var(--secondary-gradient);
         }
 
+        .wishlist-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-gradient);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .wishlist-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            background: var(--secondary-gradient);
+        }
+
+        .filter-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         /* Task Lists Component */
         .task-list {
             background: var(--overlay-background);
@@ -1415,6 +1451,7 @@
         <div class="navbar-container">
             <h1 class="navbar-title">🏆</h1>
             <input type="text" id="taskSearchInput" class="search-input" placeholder="Search tasks...">
+            <button id="filterWishlistButton" class="filter-button">🛒 Wishlist</button>
             <button id="logoutButton" aria-label="Log Out">
                 <i class="fas fa-sign-out-alt"></i>
             </button>
@@ -1455,6 +1492,7 @@
                 <option value="6">Other</option>
             </select>
             <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
+            <button id="wishlistButton" class="wishlist-button"><i class="fas fa-shopping-cart"></i> Wishlist</button>
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
         </div>
 
@@ -1690,6 +1728,9 @@
         const confirmNo = document.getElementById('confirmNo');
         const confettiContainer = document.getElementById('confettiContainer');
         const taskSearchInput = document.getElementById('taskSearchInput');
+        const wishlistButton = document.getElementById('wishlistButton');
+        const filterWishlistButton = document.getElementById('filterWishlistButton');
+        let isWishlist = false;
 
         // ===========================
         // Utility Functions
@@ -1793,7 +1834,8 @@
                 difficulty,
                 customPoints,
                 completed: false,
-                timestamp: serverTimestamp()
+                timestamp: serverTimestamp(),
+                category: isWishlist ? 'wishlist' : 'general'
             };
 
             try {
@@ -1809,6 +1851,8 @@
                 difficultySelect.value = "1"; // Reset to default difficulty
                 document.getElementById('customPoints').style.display = 'none';
                 document.getElementById('customPoints').value = '';
+                isWishlist = false;
+                wishlistButton.classList.remove('active');
             } catch (error) {
                 console.error("Error adding task: ", error);
             }
@@ -1956,6 +2000,7 @@ function createTaskElement(task, isCompleted) {
     taskItem.classList.add('task-item');
     taskItem.setAttribute('data-id', task.id);
     taskItem.setAttribute('data-priority', task.priority);
+    taskItem.setAttribute('data-category', task.category);
 
     // Task Details
     const taskDetails = document.createElement('div');
@@ -2113,6 +2158,17 @@ function createTaskElement(task, isCompleted) {
             }
         });
 
+        // Wishlist Button Click
+        wishlistButton.addEventListener('click', () => {
+            isWishlist = !isWishlist;
+            wishlistButton.classList.toggle('active', isWishlist);
+        });
+
+        // Filter Wishlist Button Click
+        filterWishlistButton.addEventListener('click', () => {
+            filterTasksByCategory('wishlist');
+        });
+
         // ===========================
         // Initialize App
         // ===========================
@@ -2258,6 +2314,12 @@ function createTaskElement(task, isCompleted) {
         // Filter tasks based on search term
         function filterTasks(searchTerm) {
             const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
+            renderTasks(filteredTasks);
+        }
+
+        // Filter tasks by category
+        function filterTasksByCategory(category) {
+            const filteredTasks = tasks.filter(task => task.category === category);
             renderTasks(filteredTasks);
         }
     </script>
