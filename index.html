@@ -1203,33 +1203,16 @@
 
         .navbar-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* Center the content horizontally */
             align-items: center;
             max-width: 1200px;
             margin: 0 auto;
+            position: relative; /* Add relative positioning */
         }
 
         .navbar-title {
-            font-family: var(--font-primary);
-            font-size: 1.5rem;
-        }
-
-        #logoutButton {
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.3s ease;
-        }
-
-        #logoutButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-            background: rgba(255, 255, 255, 0.2);
+            position: absolute;
+            left: 20px; /* Adjust as needed */
         }
 
         .search-input {
@@ -1244,6 +1227,11 @@
 
         .search-input:focus {
             width: 150px;
+        }
+
+        #logoutButton {
+            position: absolute;
+            right: 20px; /* Adjust as needed */
         }
     </style>
 </head>
