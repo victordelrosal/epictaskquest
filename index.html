@@ -1544,10 +1544,58 @@
 
         .navbar-container {
             display: grid;
-            grid-template-columns: auto 1fr auto auto;
+            grid-template-columns: auto 1fr auto;
             gap: 1rem;
             align-items: center;
-            padding: 0 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            height: 60px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quick-add-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-size: 1.3rem;
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-add-button:hover {
+            background: var(--secondary-gradient);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 10px;
+            }
+
+            .navbar-actions {
+                gap: 0.5rem;
+            }
+
+            .quick-add-button,
+            .filter-button,
+            #logoutButton {
+                min-width: 36px;
+                height: 36px;
+                padding: 0.5rem;
+            }
         }
 
         .filter-button {
@@ -1703,10 +1751,13 @@
         <div class="navbar-container">
             <h1 class="navbar-title"></h1>
             <input type="text" id="taskSearchInput" class="search-input" placeholder="Search tasks...">
-            <button id="wishlistFilter" class="filter-button">🛍️</button>
-            <button id="logoutButton" aria-label="Log Out">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
+            <div class="navbar-actions">
+                <button id="quickAddButton" class="quick-add-button" title="Quick Add (99 pts)">✚</button>
+                <button id="wishlistFilter" class="filter-button">🛍️</button>
+                <button id="logoutButton" aria-label="Log Out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
         </div>
     </nav>
     <!-- Confetti Container -->
@@ -2540,6 +2591,22 @@
             taskSearchInput.value = ''; // Clear search input
             
             filterTasks();
+        });
+
+        // Add Quick Add button functionality
+        const quickAddButton = document.getElementById('quickAddButton');
+        
+        quickAddButton.addEventListener('click', () => {
+            // Set difficulty to custom (6)
+            difficultySelect.value = "6";
+            
+            // Show and set custom points input
+            const customPointsInput = document.getElementById('customPoints');
+            customPointsInput.style.display = 'block';
+            customPointsInput.value = '99';
+            
+            // Focus the task input
+            taskInput.focus();
         });
 
         // ===========================
