@@ -815,26 +815,23 @@
             }
 
             .header {
-                padding: 1rem;
-                padding-top: 3rem; /* Add space above title for logout button */
+                order: 1;
+            }
+
+            #activeTasksList {
+                order: 5; /* Default order for active tasks */
             }
 
             .task-form {
                 order: 2;
-                margin-top: 1.5rem;
             }
 
             .stats {
                 order: 3;
-                margin-top: 1.5rem;
             }
 
             .progress-container {
                 order: 4;
-            }
-
-            .task-list {
-                order: 5;
             }
 
             #completedTasksList {
@@ -842,6 +839,35 @@
             }
 
             .reset-button {
+                order: 7;
+            }
+
+            /* Add new styles for wishlist filter mode */
+            .container.wishlist-mode #activeTasksList {
+                order: 1; /* Move filtered tasks to top when in wishlist mode */
+            }
+
+            .container.wishlist-mode .header {
+                order: 2;
+            }
+
+            .container.wishlist-mode .task-form {
+                order: 3;
+            }
+
+            .container.wishlist-mode .stats {
+                order: 4;
+            }
+
+            .container.wishlist-mode .progress-container {
+                order: 5;
+            }
+
+            .container.wishlist-mode #completedTasksList {
+                order: 6;
+            }
+
+            .container.wishlist-mode .reset-button {
                 order: 7;
             }
 
@@ -2383,6 +2409,10 @@
         wishlistFilter.addEventListener('click', () => {
             currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
             wishlistFilter.classList.toggle('active', currentFilter === 'wishlist');
+            
+            // Toggle the wishlist-mode class on the container
+            document.querySelector('.container').classList.toggle('wishlist-mode', currentFilter === 'wishlist');
+            
             filterTasks();
         });
 
