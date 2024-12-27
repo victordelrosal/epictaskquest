@@ -287,7 +287,7 @@
             border: none;
             border-radius: 8px;
             background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
+            color: var (--text-color);
             font-size: 1.5rem;
             font-weight: 400;
             width: auto;
@@ -397,6 +397,7 @@
             gap: 1rem;
             flex: 1;
             min-width: 200px;
+            position: relative;
         }
 
         .task-details input[type="checkbox"] {
@@ -1508,6 +1509,25 @@
         #activeTasksList::-webkit-scrollbar-thumb:hover {
             background: var(--secondary-gradient);
         }
+
+        /* Add styles for task numbering */
+        .task-number {
+            min-width: 2rem;
+            text-align: right;
+            padding-right: 1rem;
+            color: var(--muted-text);
+            font-size: 1rem;
+            user-select: none;
+        }
+
+        .task-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -1894,20 +1914,45 @@
                 return;
             }
 
+            // Get active tasks count
+            const activeTasks = tasks.filter(t => !t.completed).length;
+            
+            // Get custom position from task text if it starts with a number
+            let position = null;
+            const numberMatch = text.match(/^(\d+)[.:\s-]+(.+)/);
+            if (numberMatch) {
+                position = parseInt(numberMatch[1]);
+                // Adjust text to remove the number prefix
+                text = numberMatch[2].trim();
+            }
+
+            // If position is greater than current list size + 1, add to end
+            if (position > activeTasks + 1) {
+                position = activeTasks + 1;
+            }
+
             const task = {
                 text,
                 difficulty,
                 customPoints,
                 completed: false,
                 timestamp: serverTimestamp(),
-                isWishlist: isWishlist
+                isWishlist: isWishlist,
+                position: position || activeTasks + 1
             };
 
             try {
                 const docRef = await addDoc(collection(db, "tasks"), task);
                 console.log("Task added with ID: ", docRef.id);
                 task.id = docRef.id;
-                tasks.unshift(task);
+                
+                // Insert task at the correct position
+                if (position) {
+                    tasks.splice(position - 1, 0, task);
+                } else {
+                    tasks.unshift(task);
+                }
+                
                 renderTasks();
                 animateTaskAddition(docRef.id);
                 
@@ -2046,168 +2091,175 @@
             });
 
             // Render Active Tasks
+            let activeNumber = 1;
             activeTasks.forEach(task => {
-                const taskItem = createTaskElement(task, false);
+                const taskItem = createTaskElement(task, false, activeNumber++);
                 activeTasksList.appendChild(taskItem);
             });
 
             // Render Completed Tasks
+            let completedNumber = 1;
             completedTasksArr.forEach(task => {
-                const taskItem = createTaskElement(task, true);
+                const taskItem = createTaskElement(task, true, completedNumber++);
                 completedTasksList.appendChild(taskItem);
             });
         }
 
-// Create a task element
-function createTaskElement(task, isCompleted) {
-    const taskItem = document.createElement('div');
-    taskItem.classList.add('task-item');
-    taskItem.setAttribute('data-id', task.id);
-    taskItem.setAttribute('data-priority', task.priority);
+        // Create a task element
+        function createTaskElement(task, isCompleted, number) {
+            const taskItem = document.createElement('div');
+            taskItem.classList.add('task-item');
+            taskItem.setAttribute('data-id', task.id);
+            taskItem.setAttribute('data-priority', task.priority);
 
-    // Task Details
-    const taskDetails = document.createElement('div');
-    taskDetails.classList.add('task-details');
+            // Task Details
+            const taskDetails = document.createElement('div');
+            taskDetails.classList.add('task-details');
 
-    // Checkbox
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.checked = isCompleted;
-    checkbox.disabled = isCompleted; // Disable checkbox for completed tasks
-    checkbox.addEventListener('change', () => {
-        toggleTaskCompletion(task.id, checkbox.checked);
-    });
+            // Add task number
+            const taskNumber = document.createElement('span');
+            taskNumber.classList.add('task-number');
+            taskNumber.textContent = `${number}.`;
+            taskDetails.appendChild(taskNumber);
 
-    // Task Text
-    const taskText = document.createElement('input');
-    taskText.type = 'text';
-    taskText.value = task.text;
-    taskText.classList.add('task-text');
-    if (isCompleted) {
-        taskText.classList.add('completed');
-    }
-    taskText.disabled = isCompleted;
-    taskText.addEventListener('blur', () => {
-        editTaskText(task.id, taskText.value);
-    });
-
-    taskDetails.appendChild(checkbox);
-    taskDetails.appendChild(taskText);
-
-    // Task Actions
-    const taskActions = document.createElement('div');
-    taskActions.classList.add('task-actions');
-
-    if (!isCompleted) {  // Only add shopping cart toggle for active tasks
-        // Add shopping cart toggle
-        const cartToggle = document.createElement('button');
-        cartToggle.innerHTML = task.isWishlist ? '🛒' : '☐';
-        cartToggle.title = 'Toggle Shopping List';
-        cartToggle.classList.add('cart-toggle');
-        cartToggle.style.fontSize = '1.3rem';
-        if (task.isWishlist) {
-            cartToggle.classList.add('active');
-        }
-        
-        cartToggle.addEventListener('click', async () => {
-            try {
-                const taskDoc = doc(db, "tasks", task.id);
-                await updateDoc(taskDoc, { 
-                    isWishlist: !task.isWishlist 
-                });
-                cartToggle.innerHTML = !task.isWishlist ? '🛒' : '☐';
-                cartToggle.classList.toggle('active');
-                task.isWishlist = !task.isWishlist;
-
-                // Refresh the task list if we're currently filtering by wishlist
-                if (currentFilter === 'wishlist') {
-                    filterTasks(taskSearchInput.value);
-                }
-            } catch (error) {
-                console.error("Error updating wishlist status:", error);
-            }
-        });
-
-        taskActions.appendChild(cartToggle);
-    }
-
-    // Difficulty Select
-    const difficultySelect = document.createElement('select');
-    [1, 2, 3, 4, 5, 6].forEach(num => {
-        const option = document.createElement('option');
-        option.value = num;
-        if (num === 6) {
-            // For Custom difficulty, just show the points
-            option.textContent = `${task.customPoints || 30}`;
-        } else {
-            // For predefined difficulties, just show the points
-            option.textContent = `${getPoints(num)}`;
-        }
-        if (num === task.difficulty) option.selected = true;
-        difficultySelect.appendChild(option);
-    });
-
-    // Custom points input
-    const customPointsInput = document.createElement('input');
-    customPointsInput.type = 'number';
-    customPointsInput.min = '1';
-    customPointsInput.max = '100';
-    customPointsInput.placeholder = 'Enter points';
-    customPointsInput.className = 'custom-points';
-    customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
-    customPointsInput.value = task.customPoints || '';
-    customPointsInput.disabled = isCompleted;
-
-    // Add event listener for custom points changes
-    customPointsInput.addEventListener('change', () => {
-        updateTaskCustomPoints(task.id, customPointsInput.value)
-            .then(() => {
-                // Only sort after custom points have been set
-                loadTasks();
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = isCompleted;
+            checkbox.disabled = isCompleted; // Disable checkbox for completed tasks
+            checkbox.addEventListener('change', () => {
+                toggleTaskCompletion(task.id, checkbox.checked);
             });
-    });
 
-    difficultySelect.addEventListener('change', () => {
-        const difficulty = parseInt(difficultySelect.value);
-        customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
-        
-        if (difficulty !== 6) {
-            // Only update difficulty and sort when switching away from custom
-            updateTaskDifficulty(task.id, difficulty);
-        } else {
-            // Just update difficulty without sorting when switching to custom
-            const taskDoc = doc(db, "tasks", task.id);
-            updateDoc(taskDoc, { difficulty: difficulty });
+            // Task Text
+            const taskText = document.createElement('input');
+            taskText.type = 'text';
+            taskText.value = task.text;
+            taskText.classList.add('task-text');
+            if (isCompleted) {
+                taskText.classList.add('completed');
+            }
+            taskText.disabled = isCompleted;
+            taskText.addEventListener('blur', () => {
+                editTaskText(task.id, taskText.value);
+            });
+
+            taskDetails.appendChild(checkbox);
+            taskDetails.appendChild(taskText);
+
+            // Task Actions
+            const taskActions = document.createElement('div');
+            taskActions.classList.add('task-actions');
+
+            if (!isCompleted) {  // Only add shopping cart toggle for active tasks
+                // Add shopping cart toggle
+                const cartToggle = document.createElement('button');
+                cartToggle.innerHTML = task.isWishlist ? '🛒' : '☐';
+                cartToggle.title = 'Toggle Shopping List';
+                cartToggle.classList.add('cart-toggle');
+                cartToggle.style.fontSize = '1.3rem';
+                if (task.isWishlist) {
+                    cartToggle.classList.add('active');
+                }
+                
+                cartToggle.addEventListener('click', async () => {
+                    try {
+                        const taskDoc = doc(db, "tasks", task.id);
+                        await updateDoc(taskDoc, { 
+                            isWishlist: !task.isWishlist 
+                        });
+                        cartToggle.innerHTML = !task.isWishlist ? '🛒' : '☐';
+                        cartToggle.classList.toggle('active');
+                        task.isWishlist = !task.isWishlist;
+
+                        // Refresh the task list if we're currently filtering by wishlist
+                        if (currentFilter === 'wishlist') {
+                            filterTasks(taskSearchInput.value);
+                        }
+                    } catch (error) {
+                        console.error("Error updating wishlist status:", error);
+                    }
+                });
+
+                taskActions.appendChild(cartToggle);
+            }
+
+            // Difficulty Select
+            const difficultySelect = document.createElement('select');
+            [1, 2, 3, 4, 5, 6].forEach(num => {
+                const option = document.createElement('option');
+                option.value = num;
+                if (num === 6) {
+                    // For Custom difficulty, just show the points
+                    option.textContent = `${task.customPoints || 30}`;
+                } else {
+                    // For predefined difficulties, just show the points
+                    option.textContent = `${getPoints(num)}`;
+                }
+                if (num === task.difficulty) option.selected = true;
+                difficultySelect.appendChild(option);
+            });
+
+            // Custom points input
+            const customPointsInput = document.createElement('input');
+            customPointsInput.type = 'number';
+            customPointsInput.min = '1';
+            customPointsInput.max = '100';
+            customPointsInput.placeholder = 'Enter points';
+            customPointsInput.className = 'custom-points';
+            customPointsInput.style.display = task.difficulty === 6 ? 'block' : 'none';
+            customPointsInput.value = task.customPoints || '';
+            customPointsInput.disabled = isCompleted;
+
+            // Add event listener for custom points changes
+            customPointsInput.addEventListener('change', () => {
+                updateTaskCustomPoints(task.id, customPointsInput.value)
+                    .then(() => {
+                        // Only sort after custom points have been set
+                        loadTasks();
+                    });
+            });
+
+            difficultySelect.addEventListener('change', () => {
+                const difficulty = parseInt(difficultySelect.value);
+                customPointsInput.style.display = difficulty === 6 ? 'block' : 'none';
+                
+                if (difficulty !== 6) {
+                    // Only update difficulty and sort when switching away from custom
+                    updateTaskDifficulty(task.id, difficulty);
+                } else {
+                    // Just update difficulty without sorting when switching to custom
+                    const taskDoc = doc(db, "tasks", task.id);
+                    updateDoc(taskDoc, { difficulty: difficulty });
+                }
+            });
+
+            // Delete Button
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteButton.title = 'Delete Task';
+            deleteButton.addEventListener('click', () => {
+                deleteTask(task.id);
+            });
+
+            // Append actions
+            taskActions.appendChild(difficultySelect);
+            taskActions.appendChild(customPointsInput);
+            if (!isCompleted) {
+                taskActions.appendChild(deleteButton);
+            }
+
+            // Apply completed styles
+            if (isCompleted) {
+                taskText.classList.add('completed');
+            }
+
+            // Append to task item
+            taskItem.appendChild(taskDetails);
+            taskItem.appendChild(taskActions);
+
+            return taskItem;
         }
-    });
-
-    // Delete Button
-    const deleteButton = document.createElement('button');
-    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-    deleteButton.title = 'Delete Task';
-    deleteButton.addEventListener('click', () => {
-        deleteTask(task.id);
-    });
-
-    // Append actions
-    taskActions.appendChild(difficultySelect);
-    taskActions.appendChild(customPointsInput);
-    if (!isCompleted) {
-        taskActions.appendChild(deleteButton);
-    }
-
-    // Apply completed styles
-    if (isCompleted) {
-        taskText.classList.add('completed');
-    }
-
-    // Append to task item
-    taskItem.appendChild(taskDetails);
-    taskItem.appendChild(taskActions);
-
-    return taskItem;
-}
-
 
         // ===========================
         // Event Listeners
@@ -2426,16 +2478,16 @@ function createTaskElement(task, isCompleted) {
             const activeTasks = filteredTasks.filter(task => !task.completed);
             activeTasks
                 .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
-                .forEach(task => {
-                    const taskItem = createTaskElement(task, false);
+                .forEach((task, index) => {
+                    const taskItem = createTaskElement(task, false, index + 1);
                     activeTasksList.appendChild(taskItem);
                 });
                 
             // Update completed tasks separately
             const completedTasksArr = filteredTasks.filter(task => task.completed);
             completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
-            completedTasksArr.forEach(task => {
-                const taskItem = createTaskElement(task, true);
+            completedTasksArr.forEach((task, index) => {
+                const taskItem = createTaskElement(task, true, index + 1);
                 completedTasksList.appendChild(taskItem);
             });
         }
