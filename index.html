@@ -16,7 +16,7 @@
             /* Our seven approved blue colors */
             --blue-1: #000000;  /* Darkest-black tiny*/
             --blue-2: #000036; /* Very Dark Blue */
-            --blue-3: #02066F; /* Dark Blue small changes */
+            --blue-3: #02066F; /* Dark Blue */
             --blue-4: #170484; /* Dark Blue with Deep Hue */
             --blue-5: #050c91; /* 050c91 */
             --blue-6: #001489; /* Pantone Reflex Blue C Color */
@@ -815,23 +815,26 @@
             }
 
             .header {
-                order: 1;
-            }
-
-            #activeTasksList {
-                order: 5; /* Default order for active tasks */
+                padding: 1rem;
+                padding-top: 3rem; /* Add space above title for logout button */
             }
 
             .task-form {
                 order: 2;
+                margin-top: 1.5rem;
             }
 
             .stats {
                 order: 3;
+                margin-top: 1.5rem;
             }
 
             .progress-container {
                 order: 4;
+            }
+
+            .task-list {
+                order: 5;
             }
 
             #completedTasksList {
@@ -839,35 +842,6 @@
             }
 
             .reset-button {
-                order: 7;
-            }
-
-            /* Add new styles for wishlist filter mode */
-            .container.wishlist-mode #activeTasksList {
-                order: 1; /* Move filtered tasks to top when in wishlist mode */
-            }
-
-            .container.wishlist-mode .header {
-                order: 2;
-            }
-
-            .container.wishlist-mode .task-form {
-                order: 3;
-            }
-
-            .container.wishlist-mode .stats {
-                order: 4;
-            }
-
-            .container.wishlist-mode .progress-container {
-                order: 5;
-            }
-
-            .container.wishlist-mode #completedTasksList {
-                order: 6;
-            }
-
-            .container.wishlist-mode .reset-button {
                 order: 7;
             }
 
@@ -924,125 +898,6 @@
                 padding: 0.5rem; /* Reduced padding */
                 font-size: 1rem; /* Smaller font size */
                 margin: 0; /* Remove margins */
-            }
-
-            /* Hide stats in mobile */
-            .stats {
-                display: none;
-            }
-
-            /* Adjust the order of elements now that stats are hidden */
-            .container {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .header {
-                order: 1;
-            }
-
-            #activeTasksList {
-                order: 2; /* Move up since stats are hidden */
-            }
-
-            .task-form {
-                order: 3;
-            }
-
-            .progress-container {
-                order: 4;
-            }
-
-            #completedTasksList {
-                order: 5;
-            }
-
-            .reset-button {
-                order: 6;
-            }
-
-            /* Update search mode ordering */
-            .container.search-mode #activeTasksList {
-                order: 1;
-            }
-
-            .container.search-mode .header {
-                order: 2;
-            }
-
-            .container.search-mode .task-form {
-                order: 3;
-            }
-
-            .container.search-mode .progress-container {
-                order: 4;
-            }
-
-            .container.search-mode #completedTasksList {
-                order: 5;
-            }
-
-            .container.search-mode .reset-button {
-                order: 6;
-            }
-
-            /* Update wishlist mode ordering */
-            .container.wishlist-mode #activeTasksList {
-                order: 1;
-            }
-
-            .container.wishlist-mode .header {
-                order: 2;
-            }
-
-            .container.wishlist-mode .task-form {
-                order: 3;
-            }
-
-            .container.wishlist-mode .progress-container {
-                order: 4;
-            }
-
-            .container.wishlist-mode #completedTasksList {
-                order: 5;
-            }
-
-            .container.wishlist-mode .reset-button {
-                order: 6;
-            }
-
-            /* Add specific mobile styling for active tasks list */
-            #activeTasksList {
-                max-height: 80vh; /* Increase height on mobile */
-                height: calc(100vh - 200px); /* Calculate height dynamically */
-                overflow-y: auto;
-                margin-bottom: 1rem;
-                padding-bottom: 1rem;
-                position: relative;
-            }
-
-            /* Add fade effect at the bottom */
-            #activeTasksList::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 40px;
-                background: linear-gradient(to top, var(--card-background) 0%, transparent 100%);
-                pointer-events: none;
-            }
-
-            /* Adjust container padding for better space usage */
-            .container {
-                padding: 0.5rem;
-                gap: 1rem;
-            }
-
-            /* Make the task form more compact on mobile */
-            .task-form {
-                padding: 1rem;
-                margin-top: 0.5rem;
             }
         }
 
@@ -1331,7 +1186,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 0.5rem 1rem;
-            background: var (--success-color);
+            background: var(--success-color);
             color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
@@ -1578,58 +1433,10 @@
 
         .navbar-container {
             display: grid;
-            grid-template-columns: auto 1fr auto;
+            grid-template-columns: auto 1fr auto auto;
             gap: 1rem;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            height: 60px;
-        }
-
-        .navbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .quick-add-button {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: all var(--transition-speed) ease;
-            font-size: 1.3rem;
-            min-width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .quick-add-button:hover {
-            background: var(--secondary-gradient);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .navbar-container {
-                padding: 0 10px;
-            }
-
-            .navbar-actions {
-                gap: 0.5rem;
-            }
-
-            .quick-add-button,
-            .filter-button,
-            #logoutButton {
-                min-width: 36px;
-                height: 36px;
-                padding: 0.5rem;
-            }
+            padding: 0 1rem;
         }
 
         .filter-button {
@@ -1703,6 +1510,26 @@
             background: var(--secondary-gradient);
         }
 
+        /* Add styles for hashtag groups */
+        .hashtag-group {
+            border-left: 3px solid var(--blue-7);
+            margin: 1.5rem 0;
+            padding-left: 1rem;
+        }
+
+        .hashtag-header {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Make hashtags in task text stand out */
+        .task-text .hashtag {
+            color: var(--blue-7);
+            font-weight: 500;
+        }
+
         /* Add styles for task numbering */
         .task-number {
             min-width: 2rem;
@@ -1726,11 +1553,11 @@
         .achievement-image {
             width: 100%;
             max-width: 800px;
-            margin: 2rem auto;
+            margin: 1rem auto;
             text-align: center;
             opacity: 0;
             transition: opacity 0.5s ease;
-            order: 4; /* Place after active tasks but before completed tasks */
+            order: 3; /* Place after active tasks but before task form */
         }
 
         .achievement-image img {
@@ -1743,40 +1570,6 @@
         .achievement-image.visible {
             opacity: 1;
         }
-
-        /* Add new styles for search mode */
-        @media (max-width: 768px) {
-            /* ...existing mobile styles... */
-
-            /* Add new styles for search mode */
-            .container.search-mode #activeTasksList {
-                order: 1; /* Move filtered tasks to top when searching */
-            }
-
-            .container.search-mode .header {
-                order: 2;
-            }
-
-            .container.search-mode .task-form {
-                order: 3;
-            }
-
-            .container.search-mode .stats {
-                order: 4;
-            }
-
-            .container.search-mode .progress-container {
-                order: 5;
-            }
-
-            .container.search-mode #completedTasksList {
-                order: 6;
-            }
-
-            .container.search-mode .reset-button {
-                order: 7;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1785,13 +1578,10 @@
         <div class="navbar-container">
             <h1 class="navbar-title"></h1>
             <input type="text" id="taskSearchInput" class="search-input" placeholder="Search tasks...">
-            <div class="navbar-actions">
-                <button id="quickAddButton" class="quick-add-button" title="Quick Add (99 pts)">✚</button>
-                <button id="wishlistFilter" class="filter-button">🛍️</button>
-                <button id="logoutButton" aria-label="Log Out">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
+            <button id="wishlistFilter" class="filter-button">🛍️</button>
+            <button id="logoutButton" aria-label="Log Out">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
         </div>
     </nav>
     <!-- Confetti Container -->
@@ -2162,22 +1952,14 @@
             }
 
             // Handle achievement image display
-            if (level > prevLevel || !document.querySelector('.achievement-image img')) {
-                let adjustedLevel = level;
-                // If level is 84 or higher, start cycling from beginning
-                if (level >= 84) {
-                    adjustedLevel = ((level - 84) % achievementImages.length) + 1;
-                }
-                const imageIndex = adjustedLevel - 1;
-                
+            if (level > prevLevel) {
+                const imageIndex = ((level - 1) % achievementImages.length);
                 const achievementContainer = document.getElementById('achievementImage');
-                if (imageIndex >= 0 && imageIndex < achievementImages.length) {
-                    achievementContainer.innerHTML = `<img src="${achievementImages[imageIndex]}" alt="Level ${level} Achievement">`;
-                    achievementContainer.classList.remove('visible');
-                    // Force reflow
-                    void achievementContainer.offsetWidth;
-                    achievementContainer.classList.add('visible');
-                }
+                achievementContainer.innerHTML = `<img src="${achievementImages[imageIndex]}" alt="Level ${level} Achievement">`;
+                achievementContainer.classList.remove('visible');
+                // Force reflow
+                void achievementContainer.offsetWidth;
+                achievementContainer.classList.add('visible');
             }
         }
 
@@ -2378,6 +2160,48 @@
         // Render Tasks to the DOM
         // ===========================
 
+        // Extract hashtags from text
+        function extractHashtags(text) {
+            const hashtagRegex = /#[\w\u0590-\u05ff]+/g;
+            return text.match(hashtagRegex) || [];
+        }
+
+        // Group tasks by hashtags
+        function groupTasksByHashtags(tasks) {
+            const groups = new Map();
+            const noHashtagGroup = [];
+
+            tasks.forEach(task => {
+                const hashtags = extractHashtags(task.text);
+                if (hashtags.length === 0) {
+                    noHashtagGroup.push(task);
+                } else {
+                    // Add task to each of its hashtag groups
+                    hashtags.forEach(tag => {
+                        if (!groups.has(tag)) {
+                            groups.set(tag, []);
+                        }
+                        groups.set(tag, [...groups.get(tag), task]);
+                    });
+                }
+            });
+
+            // Sort each group by points
+            groups.forEach((tasks, tag) => {
+                tasks.sort((a, b) => {
+                    const pointsA = getPoints(a.difficulty, a.customPoints);
+                    const pointsB = getPoints(b.difficulty, b.customPoints);
+                    return pointsB - pointsA;
+                });
+            });
+
+            // Convert to sorted array of groups
+            const sortedGroups = Array.from(groups.entries())
+                .sort(([tagA], [tagB]) => tagA.localeCompare(tagB));
+
+            return { sortedGroups, noHashtagGroup };
+        }
+
         function renderTasks(filteredTasks = tasks) {
             // Clear existing tasks
             activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
@@ -2387,33 +2211,61 @@
             const activeTasks = filteredTasks.filter(task => !task.completed);
             const completedTasksArr = filteredTasks.filter(task => task.completed);
 
-            // Sort active tasks by points (highest to lowest)
-            activeTasks.sort((a, b) => {
-                const pointsA = getPoints(a.difficulty, a.customPoints);
-                const pointsB = getPoints(b.difficulty, b.customPoints);
-                return pointsB - pointsA; // Descending order
-            });
+            // Group active tasks by hashtags
+            const { sortedGroups, noHashtagGroup } = groupTasksByHashtags(activeTasks);
 
-            // Sort completed tasks by points (highest to lowest)
-            completedTasksArr.sort((a, b) => {
-                const pointsA = getPoints(a.difficulty, a.customPoints);
-                const pointsB = getPoints(b.difficulty, b.customPoints);
-                return pointsB - pointsA; // Descending order
-            });
-
-            // Render Active Tasks
+            // Render hashtag groups
             let activeNumber = 1;
-            activeTasks.forEach(task => {
-                const taskItem = createTaskElement(task, false, activeNumber++);
-                activeTasksList.appendChild(taskItem);
+            sortedGroups.forEach(([tag, tasks]) => {
+                const groupDiv = document.createElement('div');
+                groupDiv.classList.add('hashtag-group');
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.classList.add('hashtag-header');
+                headerDiv.textContent = tag;
+                groupDiv.appendChild(headerDiv);
+
+                tasks.forEach(task => {
+                    const taskItem = createTaskElement(task, false, activeNumber++);
+                    groupDiv.appendChild(taskItem);
+                });
+
+                activeTasksList.appendChild(groupDiv);
             });
 
-            // Render Completed Tasks
+            // Render tasks without hashtags
+            if (noHashtagGroup.length > 0) {
+                const groupDiv = document.createElement('div');
+                groupDiv.classList.add('hashtag-group');
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.classList.add('hashtag-header');
+                headerDiv.textContent = 'Other Tasks';
+                groupDiv.appendChild(headerDiv);
+
+                noHashtagGroup
+                    .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
+                    .forEach(task => {
+                        const taskItem = createTaskElement(task, false, activeNumber++);
+                        groupDiv.appendChild(taskItem);
+                    });
+
+                activeTasksList.appendChild(groupDiv);
+            }
+
+            // Render Completed Tasks (unchanged)
             let completedNumber = 1;
-            completedTasksArr.forEach(task => {
-                const taskItem = createTaskElement(task, true, completedNumber++);
-                completedTasksList.appendChild(taskItem);
-            });
+            completedTasksArr
+                .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
+                .forEach(task => {
+                    const taskItem = createTaskElement(task, true, completedNumber++);
+                    completedTasksList.appendChild(taskItem);
+                });
+        }
+
+        // Update task text to highlight hashtags
+        function highlightHashtags(text) {
+            return text.replace(/(#[\w\u0590-\u05ff]+)/g, '<span class="hashtag">$1</span>');
         }
 
         // Create a task element
@@ -2451,8 +2303,12 @@
                 taskText.classList.add('completed');
             }
             taskText.disabled = isCompleted;
-            taskText.addEventListener('blur', () => {
-                editTaskText(task.id, taskText.value);
+            
+            // Add input event listener to maintain hashtag highlighting
+            taskText.addEventListener('input', () => {
+                const cursorPosition = taskText.selectionStart;
+                taskText.value = taskText.value;
+                taskText.setSelectionRange(cursorPosition, cursorPosition);
             });
 
             taskDetails.appendChild(checkbox);
@@ -2582,11 +2438,6 @@
         // Task Search Input Event Listener
         taskSearchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const container = document.querySelector('.container');
-            
-            // Toggle search-mode class based on whether there's a search term
-            container.classList.toggle('search-mode', searchTerm.length > 0);
-            
             filterTasks(searchTerm);
         });
 
@@ -2626,29 +2477,7 @@
         wishlistFilter.addEventListener('click', () => {
             currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
             wishlistFilter.classList.toggle('active', currentFilter === 'wishlist');
-            
-            const container = document.querySelector('.container');
-            container.classList.toggle('wishlist-mode', currentFilter === 'wishlist');
-            container.classList.remove('search-mode'); // Remove search mode when switching to wishlist
-            taskSearchInput.value = ''; // Clear search input
-            
             filterTasks();
-        });
-
-        // Add Quick Add button functionality
-        const quickAddButton = document.getElementById('quickAddButton');
-        
-        quickAddButton.addEventListener('click', () => {
-            // Set difficulty to custom (6)
-            difficultySelect.value = "6";
-            
-            // Show and set custom points input
-            const customPointsInput = document.getElementById('customPoints');
-            customPointsInput.style.display = 'block';
-            customPointsInput.value = '99';
-            
-            // Focus the task input
-            taskInput.focus();
         });
 
         // ===========================
