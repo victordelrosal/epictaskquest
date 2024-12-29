@@ -370,6 +370,7 @@ body {
     transform: translateZ(0);
     position: relative;
     flex-wrap: wrap; /* Allow items to wrap */
+    min-height: calc(2.8em + 2rem); /* Account for 2 lines of text plus padding */
 }
 
 .task-item:hover {
@@ -380,11 +381,12 @@ body {
 
 .task-details {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Align items to top for multi-line text */
     gap: 1rem;
     flex: 1;
     min-width: 200px;
     position: relative;
+    padding: 0.2rem 0; /* Add small vertical padding */
 }
 
 .task-details input[type="checkbox"] {
@@ -393,12 +395,14 @@ body {
     cursor: pointer;
     accent-color: var(--primary-gradient);
     transition: transform var(--transition-speed) ease;
+    margin-top: 0.4rem; /* Align checkbox with first line of text */
 }
 
 .task-details input[type="checkbox"]:hover {
     transform: scale(1.2);
 }
 
+/* Update Task Text Input Styling */
 .task-text {
     flex: 1;
     background: transparent;
@@ -409,11 +413,18 @@ body {
     cursor: text;
     transition: color var(--transition-speed) ease;
     font-family: var(--font-secondary);
-    word-break: break-word; /* Allow words to break */
-    white-space: normal; /* Allow text to wrap */
-    line-height: 1.4; /* Better line height for readability */
-    min-height: 2.8em; /* Accommodate up to 2 lines */
-    max-width: 100%; /* Ensure text doesn't overflow */
+    word-break: break-word;
+    white-space: pre-wrap; /* Changed from normal to pre-wrap */
+    line-height: 1.4;
+    min-height: 2.8em; /* This ensures space for 2 lines */
+    max-height: 2.8em; /* Limit to exactly 2 lines */
+    overflow-y: hidden; /* Hide any overflow beyond 2 lines */
+    width: 100%;
+    resize: none; /* Prevent resizing */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    padding: 0.2rem 0; /* Add small vertical padding */
 }
 
 .task-text:disabled {
