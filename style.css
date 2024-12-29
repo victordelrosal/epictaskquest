@@ -1,0 +1,1273 @@
+/* CSS Variables for Deep Dark Purple Theme with Tron Blue Highlights */
+:root {
+    /* Our seven approved blue colors */
+    --blue-1: #000000;  /* Darkest-black tiny*/
+    --blue-2: #000036; /* Very Dark Blue */
+    --blue-3: #02066F; /* Dark Blue */
+    --blue-4: #170484; /* Dark Blue with Deep Hue */
+    --blue-5: #050c91; /* 050c91 */
+    --blue-6: #001489; /* Pantone Reflex Blue C Color */
+    --blue-7: #0000B3;  /* Brightest: Bright Blue */
+
+    /* Single background gradient using approved colors */
+    --background-gradient: linear-gradient(
+        to bottom,
+        var(--blue-1) 0%,
+        var(--blue-2) 5%,
+        var(--blue-3) 20%,
+        var(--blue-4) 35%,
+        var(--blue-5) 50%,
+        var(--blue-6) 75%,
+        var(--blue-7) 100%
+    );
+
+    /* Remove unused gradient variables */
+    --background-gradient-odd: none;
+    --background-gradient-even: none;
+
+    /* Update other gradients to use only approved colors */
+    --primary-gradient: linear-gradient(
+        to bottom,
+        var(--blue-1) 0%,
+        var(--blue-4) 50%,
+        var(--blue-7) 100%
+    );
+    
+    --secondary-gradient: linear-gradient(
+        to bottom,
+        var(--blue-1) 0%,
+        var(--blue-3) 50%,
+        var(--blue-7) 100%
+    );
+    
+    --task-form-gradient: linear-gradient(
+        to bottom,
+        rgba(0, 0, 105, 0.95) 0%,    /* Based on #000069 */
+        rgba(27, 2, 177, 0.95) 100%   /* Based on #1b02b1 */
+    );
+
+    /* Keep existing non-blue colors */
+    --text-color: #FFD700;
+    --muted-text: #FFA500;
+    --bright-text: #FFDF00;
+    --header-gradient: linear-gradient(
+        to bottom,
+        #FFD700 0%,
+        #FFA500 100%
+    );
+
+    /* Other non-gradient variables remain unchanged */
+    --card-background: rgba(255, 255, 255, 0.05);
+    --overlay-background: rgba(255, 255, 255, 0.02);
+    --error-color: #ff4d4d;
+    --success-color: #4caf50;
+    --font-primary: 'Montserrat', sans-serif;
+    --font-secondary: 'Roboto', sans-serif;
+    --box-shadow: 0 8px 32px 0 rgba(0, 0, 105, 0.37);
+    --backdrop-filter: blur(8px);
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+
+    /* Animation Durations */
+    --animation-duration-pulse: 0.6s;
+    --animation-duration-shine: 1s;
+    --animation-duration-confetti: 1.5s;
+}
+
+/* Basic Reset and Styling */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-secondary);
+    font-size: 24px;
+    background: var(--background-gradient);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Changed from center to flex-start */
+    padding: 10px;
+    position: relative;
+    /* Removed overflow: hidden; to enable scrolling */
+    overflow: visible;
+    padding-top: 60px; /* Adjust padding to account for fixed navbar */
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    padding: 1.5rem;
+    animation: fadeIn 0.6s ease-out;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: relative;
+    overflow: visible !important;
+}
+
+.container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+.container::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 5px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-gradient);
+}
+
+/* Header Component */
+.header {
+    text-align: center;
+    position: relative;
+    padding: 1rem 3rem;
+    margin: 0;
+    background: none;
+    backdrop-filter: none;
+    z-index: 1;
+}
+
+.header .title {
+    font-family: var(--font-primary);
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background 0.5s ease;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 9999;
+}
+
+.header p {
+    display: none; /* Hide the subtext */
+}
+
+/* Stats Component */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.stats div {
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--overlay-background);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    flex: 1 1 150px;
+    text-align: center;
+    cursor: default;
+    color: var(--bright-text);
+    position: relative;
+}
+
+.stats div:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Progress Bar Component */
+.progress-container {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    overflow: hidden;
+    height: 20px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--header-gradient);
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px var(--primary-gradient);
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 1.3rem;
+    color: var(--muted-text);
+    font-weight: 500;
+}
+
+/* Task Form Component */
+.task-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: stretch;
+    background: var(--task-form-gradient);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: background 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+}
+
+.task-form:hover {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 51, 1) 0%,
+        rgba(25, 25, 112, 1) 100%
+    );
+}
+
+.task-form input[type="text"] {
+    flex: 2;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.task-form input[type="text"]::placeholder {
+    color: rgba(255, 215, 0, 0.6);
+}
+
+.task-form input[type="text"]:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 8px var(--primary-gradient);
+}
+
+.task-form select {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: 400;
+    width: auto;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    outline: none;
+}
+
+.task-form select:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 8px var(--secondary-gradient);
+}
+
+.task-form button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-gradient);
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.task-form button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    background: var(--secondary-gradient);
+}
+
+/* Task Lists Component */
+.task-list {
+    background: var(--overlay-background);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: background 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+/* Add specific styling for completed tasks list only */
+#completedTasksList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Keep the scrollbar styling only for completed tasks */
+#completedTasksList::-webkit-scrollbar {
+    width: 10px;
+}
+
+#completedTasksList::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+#completedTasksList::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 5px;
+}
+
+#completedTasksList::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-gradient);
+}
+
+.task-list h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: var(--header-gradient);
+    background: var(--header-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Task Item Component */
+.task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transform: translateZ(0);
+    position: relative;
+    flex-wrap: wrap; /* Allow items to wrap */
+}
+
+.task-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.task-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.task-details input[type="checkbox"] {
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    accent-color: var(--primary-gradient);
+    transition: transform var(--transition-speed) ease;
+}
+
+.task-details input[type="checkbox"]:hover {
+    transform: scale(1.2);
+}
+
+.task-text {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.3rem;
+    outline: none;
+    cursor: text;
+    transition: color var(--transition-speed) ease;
+    font-family: var(--font-secondary);
+    word-break: break-word; /* Allow words to break */
+    white-space: normal; /* Allow text to wrap */
+    line-height: 1.4; /* Better line height for readability */
+    min-height: 2.8em; /* Accommodate up to 2 lines */
+    max-width: 100%; /* Ensure text doesn't overflow */
+}
+
+.task-text:disabled {
+    color: var(--muted-text);
+    cursor: not-allowed;
+}
+
+.task-text.completed {
+    text-decoration: line-through;
+    color: var(--muted-text);
+}
+
+.task-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.task-actions select {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    outline: none;
+}
+
+.task-actions select:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.task-actions button {
+    background: none;
+    border: none;
+    color: var(--blue-7); /* Replace #1e90ff with our brightest blue */
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-actions button:hover {
+    color: #ffffff;
+    transform: scale(1.2);
+}
+
+/* Reset Button Component */
+.reset-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-gradient);
+    color: var(--bright-text);
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform var(--transition-speed) ease, box-shadow var (--transition-speed) ease, background 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.reset-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    background: var(--secondary-gradient);
+}
+
+/* Modal Component */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.05);
+    margin: auto;
+    padding: 2.5rem;
+    border: none;
+    width: 80%;
+    max-width: 500px;
+    border-radius: var(--border-radius);
+    position: relative;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    animation: slideDown 0.6s ease-out;
+    color: var(--text-color);
+}
+
+.close-modal {
+    color: #aaa;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+/* Confirmation Modal Component */
+.confirm-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1500;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.confirm-modal-content {
+    background-color: rgba(255, 255, 255, 0.05);
+    margin: auto;
+    padding: 2.5rem;
+    border: none;
+    width: 80%;
+    max-width: 400px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    position: relative;
+    box-shadow: var(--box-shadow);
+    backdrop-filter: var(--backdrop-filter);
+    animation: slideDown 0.6s ease-out;
+    color: var(--text-color);
+}
+
+.confirm-modal-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.confirm-modal-buttons button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    width: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.confirm-modal-buttons .confirm {
+    background: var(--primary-gradient);
+    color: #fff;
+}
+
+.confirm-modal-buttons .confirm:hover {
+    background: var(--secondary-gradient);
+    transform: translateY(-3px);
+}
+
+.confirm-modal-buttons .cancel {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.confirm-modal-buttons .cancel:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+}
+
+/* Confetti Container */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: var(--bright-text);
+    opacity: 0.9;
+    animation: confetti var(--animation-duration-confetti) linear forwards;
+    border-radius: 50%; /* Make confetti circular */
+}
+
+/* Animations */
+
+/* Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Slide Down */
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Pulse Animation for Completed Tasks */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse var(--animation-duration-pulse) ease;
+}
+
+/* Shine Animation for Level Up */
+@keyframes shine {
+    0% {
+        box-shadow: 0 0 10px var(--success-color);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--success-color);
+    }
+    100% {
+        box-shadow: 0 0 10px var(--success-color);
+    }
+}
+
+.shine {
+    animation: shine var(--animation-duration-shine) ease-in-out;
+}
+
+/* Level Up Badge Animation */
+@keyframes scaleUp {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+.level-up-badge {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 1rem;
+    background: var(--success-color);
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    opacity: 0;
+    animation: scaleUp 1s forwards;
+    z-index: 1001;
+    font-weight: bold;
+}
+
+/* Confetti Animation */
+@keyframes confetti {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Optional: Smooth Number Transition */
+.number-transition {
+    transition: all 0.5s ease;
+}
+
+/* Navbar Styles */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary-gradient);
+    color: #fff;
+    z-index: 10000;
+    height: 60px; /* Fixed height */
+    display: flex; /* Add flex display */
+    align-items: center; /* Center items vertically */
+}
+
+.navbar-container {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.navbar-title {
+    font-size: 24px;
+    margin: 0;
+    flex: 0 0 auto;
+    line-height: 60px; /* Match navbar height */
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.search-input {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+    width: 200px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.2);
+    width: 250px;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 215, 0, 0.6);
+}
+
+#logoutButton {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 36px;
+    width: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+#logoutButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Wishlist Checkbox Wrapper */
+.wishlist-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.wishlist-checkbox-wrapper:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.wishlist-checkbox {
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    accent-color: var(--primary-gradient);
+}
+
+/* Filter Button */
+.filter-button {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.filter-button.active {
+    background: var(--secondary-gradient);
+    transform: scale(1.05);
+}
+
+/* Task Item Wishlist Indicator */
+.task-item.wishlist::before {
+    content: '🛍️';
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.2rem;
+    opacity: 0.7;
+}
+
+/* Cart Toggle Button */
+.cart-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: transform 0.2s ease;
+    opacity: 0.5;
+}
+
+.cart-toggle.active {
+    opacity: 1;
+}
+
+.cart-toggle:hover {
+    transform: scale(1.2);
+}
+
+/* Achievement Image Styling */
+.achievement-image {
+    width: 100%;
+    max-width: 800px;
+    margin: 1rem auto;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    order: 3; /* Place after active tasks but before task form */
+}
+
+.achievement-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.achievement-image.visible {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        padding-top: 0; /* Remove top padding since header has its own */
+    }
+
+    .header .title {
+        font-size: 1.8rem; /* Slightly reduce font size on mobile */
+        padding: 0 2rem; /* Add horizontal padding */
+    }
+
+    #logoutButton span {
+        display: none; /* Hide button text on mobile */
+    }
+
+    #logoutButton {
+        top: 0.5rem;
+        right: 0.5rem;
+        border-radius: 50%; /* Make it circular on mobile */
+    }
+    
+    .header p {
+        font-size: 1.3rem;
+    }
+
+    .stats {
+        justify-content: space-between;
+    }
+
+    .task-form {
+        flex-direction: column;
+    }
+
+    .task-form input[type="text"],
+    .task-form select,
+    .task-form button {
+        width: 100%;
+    }
+
+    .task-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-actions select,
+    .task-actions button {
+        width: 100%;
+    }
+
+    /* Reorder container elements using flexbox order */
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header {
+        padding: 1rem;
+        padding-top: 3rem; /* Add space above title for logout button */
+    }
+
+    .task-form {
+        order: 2;
+        margin-top: 1.5rem;
+    }
+
+    .stats {
+        order: 3;
+        margin-top: 1.5rem;
+    }
+
+    .progress-container {
+        order: 4;
+    }
+
+    .task-list {
+        order: 5;
+    }
+
+    #completedTasksList {
+        order: 6;
+    }
+
+    .reset-button {
+        order: 7;
+    }
+
+    .navbar-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: 300px;
+        margin-top: 10px;
+    }
+
+    #logoutButton {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .task-actions {
+        flex-direction: row; /* Keep actions in a single row */
+        justify-content: flex-start; /* Align to the start */
+        gap: 0.5rem; /* Reduce gap between elements */
+        margin-top: 0; /* Remove top margin */
+        flex-wrap: nowrap; /* Prevent wrapping */
+    }
+
+    .task-actions select {
+        width: auto; /* Allow select to shrink */
+        min-width: 80px; /* Minimum width for select */
+        padding: 0.5rem; /* Reduce padding */
+        font-size: 1rem; /* Smaller font size */
+    }
+
+    .task-item {
+        padding: 0.75rem; /* Reduce overall padding */
+    }
+
+    .task-details {
+        margin-bottom: 0.5rem; /* Add space between details and actions */
+        width: 100%; /* Full width for details */
+    }
+
+    /* Custom points input adjustments */
+    input[type="number"].custom-points {
+        width: 60px; /* Smaller width */
+        padding: 0.5rem; /* Reduced padding */
+        font-size: 1rem; /* Smaller font size */
+    }
+
+    /* Delete button adjustments */
+    .task-actions button {
+        padding: 0.5rem; /* Reduced padding */
+        font-size: 1rem; /* Smaller font size */
+        margin: 0; /* Remove margins */
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 1.5rem;
+    }
+
+    .header .title {
+        font-size: 1.75rem;
+    }
+
+    .header p {
+        font-size: 1.3rem;
+    }
+
+    .stats div {
+        font-size: 1.3rem;
+    }
+
+    .task-form input[type="text"],
+    .task-form select,
+    .task-form button {
+        padding: 0.6rem 1rem;
+        font-size: 1.3rem;
+    }
+
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-details {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+
+    .task-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .task-actions select,
+    .task-actions button {
+        font-size: 1.3rem;
+        padding: 0.5rem;
+    }
+
+    .progress-text {
+        font-size: 1.3rem;
+    }
+
+    .confirm-modal-content,
+    .modal-content {
+        padding: 2rem;
+    }
+
+    .confirm-modal-buttons button {
+        padding: 0.6rem 1rem;
+        font-size: 1.3rem;
+        width: 45%;
+    }
+}
+
+/* Login Container Styling */
+#loginContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: var(--background-gradient);
+    color: var(--text-color);
+}
+
+#loginContainer input[type="email"],
+#loginContainer input[type="password"] {
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    border: none;
+    width: 300px;
+    max-width: 80%;
+    font-size: 1.3rem;
+    outline: none;
+}
+
+#loginContainer button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-gradient);
+    color: #fff;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+}
+
+#loginContainer button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+    background: var(--secondary-gradient);
+}
+
+#loginError {
+    color: var(--error-color);
+    margin-top: 1rem;
+    display: none;
+    font-size: 1.3rem;
+}
+
+/* Logout Button Styling */
+/* Note: Styles for #logoutButton are already defined above */
+
+/* Custom Points Input Styling */
+input[type="number"].custom-points,
+#customPoints {
+    font-size: 1.3rem !important; /* Match the size of other form elements */
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    width: 120px; /* Increased width for better visibility */
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    transition: all var(--transition-speed) ease;
+    margin: 0;
+    height: auto;
+    outline: none;
+}
+
+input[type="number"].custom-points:focus,
+#customPoints:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 8px var(--primary-gradient);
+    outline: none;
+}
+
+/* Style the number input spinners */
+input[type="number"].custom-points::-webkit-inner-spin-button,
+input[type="number"].custom-points::-webkit-outer-spin-button,
+#customPoints::-webkit-inner-spin-button,
+#customPoints::-webkit-outer-spin-button {
+    height: 40px;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="number"].custom-points::-webkit-inner-spin-button,
+input[type="number"].custom-points::-webkit-outer-spin-button {
+    height: 30px;
+    opacity: 1;
+}
+
+/* Hashtag Group Styles */
+.hashtag-group {
+    border-left: 3px solid var(--blue-7);
+    margin: 1.5rem 0;
+    padding-left: 1rem;
+}
+
+.hashtag-header {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+/* Make hashtags in task text stand out */
+.task-text .hashtag {
+    color: var(--blue-7);
+    font-weight: 500;
+}
+
+/* Task Numbering */
+.task-number {
+    min-width: 2rem;
+    text-align: right;
+    padding-right: 1rem;
+    color: var(--muted-text);
+    font-size: 1rem;
+    user-select: none;
+}
+
+/* Achievement Image Visible Class */
+.achievement-image.visible {
+    opacity: 1;
+}
+
+/* Navbar Responsive Styles */
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 0 10px;
+    }
+
+    .navbar-title {
+        left: 10px;
+        font-size: 20px;
+    }
+
+    .search-input {
+        width: 140px;
+        left: 50%;
+    }
+
+    .search-input:focus {
+        width: 180px;
+    }
+
+    #logoutButton {
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-input {
+        width: 120px;
+        font-size: 14px;
+    }
+
+    .search-input:focus {
+        width: 150px;
+    }
+}
