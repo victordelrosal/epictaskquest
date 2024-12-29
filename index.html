@@ -1482,9 +1482,9 @@
 
         /* Update task list styling for better visibility */
         #activeTasksList {
-            max-height: 50vh; /* Limit height to half viewport height */
-            overflow-y: auto; /* Enable scrolling if needed */
-            margin-bottom: 2rem; /* Add space before the task form */
+            margin-bottom: 2rem;
+            max-height: none; /* Remove height limit */
+            overflow-y: visible; /* Remove scroll */
         }
 
         #activeTasksList:empty {
