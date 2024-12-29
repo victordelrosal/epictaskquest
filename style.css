@@ -359,7 +359,7 @@ body {
 /* Task Item Component */
 .task-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Change from center to flex-start */
     justify-content: space-between;
     background-color: rgba(255, 255, 255, 0.05);
     padding: 1rem;
@@ -370,7 +370,8 @@ body {
     transform: translateZ(0);
     position: relative;
     flex-wrap: wrap; /* Allow items to wrap */
-    min-height: calc(2.8em + 2rem); /* Account for 2 lines of text plus padding */
+    gap: 1rem; /* Add gap between wrapped elements */
+    min-height: auto; /* Remove fixed height constraint */
 }
 
 .task-item:hover {
@@ -384,7 +385,7 @@ body {
     align-items: flex-start; /* Align items to top for multi-line text */
     gap: 1rem;
     flex: 1;
-    min-width: 200px;
+    min-width: 250px; /* Ensure enough space for text */
     position: relative;
     padding: 0.2rem 0; /* Add small vertical padding */
 }
@@ -414,16 +415,16 @@ body {
     transition: color var(--transition-speed) ease;
     font-family: var(--font-secondary);
     word-break: break-word;
-    white-space: pre-wrap; /* Changed from normal to pre-wrap */
+    white-space: pre-wrap; /* Allow text to wrap */
     line-height: 1.4;
-    min-height: 2.8em; /* This ensures space for 2 lines */
-    max-height: 2.8em; /* Limit to exactly 2 lines */
-    overflow-y: hidden; /* Hide any overflow beyond 2 lines */
+    min-height: auto; /* Remove fixed height */
+    max-height: none; /* Remove max height restriction */
+    overflow: visible; /* Show all content */
     width: 100%;
     resize: none; /* Prevent resizing */
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limit to 2 lines */
-    -webkit-box-orient: vertical;
+    display: block; /* Change from -webkit-box to block */
+    -webkit-line-clamp: unset; /* Remove line clamping */
+    -webkit-box-orient: unset;
     padding: 0.2rem 0; /* Add small vertical padding */
 }
 
@@ -441,9 +442,10 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-top: 0.5rem;
     flex-wrap: wrap;
     justify-content: flex-end;
+    margin-left: auto; /* Push actions to the right */
+    padding-left: 1rem; /* Add some space from the text */
 }
 
 .task-actions select {
