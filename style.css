@@ -372,6 +372,8 @@ body {
     flex-wrap: wrap; /* Allow items to wrap */
     gap: 1rem; /* Add gap between wrapped elements */
     min-height: auto; /* Remove fixed height constraint */
+    height: auto; /* Allow height to grow */
+    width: 100%; /* Full width */
 }
 
 .task-item:hover {
@@ -388,6 +390,9 @@ body {
     min-width: 250px; /* Ensure enough space for text */
     position: relative;
     padding: 0.2rem 0; /* Add small vertical padding */
+    flex: 1 1 auto; /* Allow flex growing and shrinking */
+    min-width: 0; /* Allow text to wrap */
+    width: 100%; /* Full width */
 }
 
 .task-details input[type="checkbox"] {
@@ -426,6 +431,26 @@ body {
     -webkit-line-clamp: unset; /* Remove line clamping */
     -webkit-box-orient: unset;
     padding: 0.2rem 0; /* Add small vertical padding */
+    flex: 1 1 auto; /* Allow growing and shrinking */
+    min-width: 0; /* Allow text wrapping */
+    max-width: none; /* Remove max width constraint */
+    height: auto; /* Allow height to grow */
+    min-height: 1.5em; /* Minimum height for single line */
+    white-space: pre-wrap; /* Preserve whitespace and wrap */
+    overflow: visible; /* Show all content */
+    text-overflow: clip; /* Don't truncate */
+    word-wrap: break-word; /* Break long words */
+    word-break: break-word; /* Break words at appropriate points */
+    line-height: 1.4;
+    padding: 0.2rem 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    resize: none;
+    display: block; /* Use block display */
+    font-family: var(--font-secondary);
+    font-size: 1.3rem;
+    color: var(--text-color);
 }
 
 .task-text:disabled {
@@ -446,6 +471,8 @@ body {
     justify-content: flex-end;
     margin-left: auto; /* Push actions to the right */
     padding-left: 1rem; /* Add some space from the text */
+    flex: 0 0 auto; /* Prevent shrinking of actions */
+    margin-left: auto;
 }
 
 .task-actions select {
@@ -1029,11 +1056,25 @@ body {
 
     .task-item {
         padding: 0.75rem; /* Reduce overall padding */
+        padding: 1rem;
+        gap: 1rem;
     }
 
     .task-details {
         margin-bottom: 0.5rem; /* Add space between details and actions */
         width: 100%; /* Full width for details */
+        width: 100%;
+        min-width: 0;
+    }
+
+    .task-text {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .task-actions {
+        width: auto;
+        flex-wrap: nowrap;
     }
 
     /* Custom points input adjustments */
