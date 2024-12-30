@@ -130,6 +130,9 @@ let level = 1;
 let completedTasks = 0;
 const pointsToNextLevel = 100;
 
+// Add at the top with other global variables
+let openToggles = new Set();
+
 // DOM Elements
 const taskInput = document.getElementById('taskInput');
 const difficultySelect = document.getElementById('difficultySelect');
@@ -427,6 +430,9 @@ async function editTaskText(taskId, newText) {
     }
 
     try {
+        // Save toggle states before updating
+        saveToggleStates();
+
         const taskDoc = doc(db, "tasks", taskId);
         const taskIndex = tasks.findIndex(t => t.id === taskId);
         const currentTask = tasks[taskIndex];
@@ -450,6 +456,8 @@ async function editTaskText(taskId, newText) {
             tasks[taskIndex].text = newText;
             tasks[taskIndex].isWishlist = hasBuyTag;
             renderTasks(tasks);
+            // Restore toggle states after rendering
+            restoreToggleStates();
         }
     } catch (error) {
         console.error("Error editing task:", error);
@@ -613,12 +621,14 @@ function renderTasks(filteredTasks = tasks) {
                 setTimeout(() => {
                     contentDiv.style.display = 'none';
                 }, 300);
+                toggleHeader.classList.remove('expanded');
+                openToggles.delete(toggleHeader.querySelector('.hashtag-label').textContent);
             } else {
                 contentDiv.style.display = 'block';
                 contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+                toggleHeader.classList.add('expanded');
+                openToggles.add(toggleHeader.querySelector('.hashtag-label').textContent);
             }
-            
-            toggleHeader.classList.toggle('expanded');
         });
 
         // Add tasks to content container
@@ -1185,4 +1195,27 @@ function showSuccessNotification() {
         successOverlay.classList.remove('show');
         successMessage.classList.remove('show');
     }, 1500); // Remove after 1.5 seconds
+}
+
+// Add new function to save toggle states
+function saveToggleStates() {
+    openToggles.clear();
+    document.querySelectorAll('.hashtag-toggle.expanded').forEach(toggle => {
+        const label = toggle.querySelector('.hashtag-label').textContent;
+        openToggles.add(label);
+    });
+}
+
+// Add new function to restore toggle states
+function restoreToggleStates() {
+    document.querySelectorAll('.hashtag-toggle').forEach(toggle => {
+        const label = toggle.querySelector('.hashtag-label').textContent;
+        if (openToggles.has(label)) {
+            const contentDiv = toggle.nextElementSibling;
+            toggle.classList.add('expanded');
+            toggle.querySelector('.toggle-icon').textContent = '▼';
+            contentDiv.style.display = 'block';
+            contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+        }
+    });
 }
