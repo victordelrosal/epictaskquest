@@ -386,12 +386,8 @@ body {
     display: flex;
     align-items: flex-start; /* Align items to top for multi-line text */
     gap: 1rem;
-    flex: 1;
-    min-width: 250px; /* Ensure enough space for text */
-    position: relative;
-    padding: 0.2rem 0; /* Add small vertical padding */
-    flex: 1 1 auto; /* Allow flex growing and shrinking */
-    min-width: 0; /* Allow text to wrap */
+    flex: 1 1 auto; /* Allow growing and shrinking */
+    min-width: 0; /* Allow text wrapping */
     width: 100%; /* Full width */
 }
 
@@ -410,27 +406,6 @@ body {
 
 /* Update Task Text Input Styling */
 .task-text {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    font-size: 1.3rem;
-    outline: none;
-    cursor: text;
-    transition: color var(--transition-speed) ease;
-    font-family: var(--font-secondary);
-    word-break: break-word;
-    white-space: pre-wrap; /* Allow text to wrap */
-    line-height: 1.4;
-    min-height: auto; /* Remove fixed height */
-    max-height: none; /* Remove max height restriction */
-    overflow: visible; /* Show all content */
-    width: 100%;
-    resize: none; /* Prevent resizing */
-    display: block; /* Change from -webkit-box to block */
-    -webkit-line-clamp: unset; /* Remove line clamping */
-    -webkit-box-orient: unset;
-    padding: 0.2rem 0; /* Add small vertical padding */
     flex: 1 1 auto; /* Allow growing and shrinking */
     min-width: 0; /* Allow text wrapping */
     max-width: none; /* Remove max width constraint */
@@ -1050,22 +1025,12 @@ body {
         flex-wrap: nowrap; /* Prevent wrapping */
     }
 
-    .task-actions select {
-        width: auto; /* Allow select to shrink */
-        min-width: 80px; /* Minimum width for select */
-        padding: 0.5rem; /* Reduce padding */
-        font-size: 1rem; /* Smaller font size */
-    }
-
     .task-item {
-        padding: 0.75rem; /* Reduce overall padding */
         padding: 1rem;
         gap: 1rem;
     }
 
     .task-details {
-        margin-bottom: 0.5rem; /* Add space between details and actions */
-        width: 100%; /* Full width for details */
         width: 100%;
         min-width: 0;
     }
