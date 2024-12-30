@@ -425,14 +425,14 @@ async function editTaskText(taskId, newText) {
         const currentTask = tasks[taskIndex];
         
         // Check if #buy was added
-        const hadShopTag = currentTask.text.includes('#buy');
-        const hasShopTag = newText.includes('#buy');
+        const hadBuyTag = currentTask.text.includes('#buy');
+        const hasBuyTag = newText.includes('#buy');
         
         // Update wishlist status if #buy tag was added or removed
-        if (hasShopTag !== hadShopTag) {
+        if (hasBuyTag !== hadBuyTag) {
             await updateDoc(taskDoc, { 
                 text: newText,
-                isWishlist: hasShopTag
+                isWishlist: hasBuyTag
             });
         } else {
             await updateDoc(taskDoc, { text: newText });
@@ -441,7 +441,7 @@ async function editTaskText(taskId, newText) {
         // Update local task data
         if (taskIndex !== -1) {
             tasks[taskIndex].text = newText;
-            tasks[taskIndex].isWishlist = hasShopTag;
+            tasks[taskIndex].isWishlist = hasBuyTag;
             renderTasks(tasks);
         }
     } catch (error) {
@@ -1125,17 +1125,22 @@ async function syncShoppingTags() {
 async function migrateShopToBuyTags() {
     const updates = [];
     tasks.forEach(task => {
-        if (task.text.includes('#shop')) {
-            // Replace #shop with #buy and remove duplicates
-            const newText = task.text
+        const text = task.text;
+        // Check for both old and new tags to ensure complete migration
+        if (text.includes('#shop') || text.includes('#buy')) {
+            // Replace all variations and clean up
+            const newText = text
                 .replace(/#shop\b/g, '#buy')
                 .replace(/(#buy\s*)+/g, '#buy ') // Remove duplicate #buy tags
                 .trim();
             
-            updates.push({
-                id: task.id,
-                newText: newText
-            });
+            if (newText !== text) {
+                updates.push({
+                    id: task.id,
+                    newText: newText,
+                    isWishlist: true // Ensure wishlist status is set for any task with #buy
+                });
+            }
         }
     });
 
@@ -1144,7 +1149,10 @@ async function migrateShopToBuyTags() {
         const batch = writeBatch(db);
         updates.forEach(update => {
             const taskRef = doc(db, "tasks", update.id);
-            batch.update(taskRef, { text: update.newText });
+            batch.update(taskRef, { 
+                text: update.newText,
+                isWishlist: update.isWishlist
+            });
         });
 
         try {
