@@ -318,7 +318,7 @@ async function loadTasks() {
     }
 }
 
-// Add a new task to Firestore
+// Modify addTask function to automatically append #shop tag
 async function addTask() {
     let text = taskInput.value.trim();
     const difficulty = parseInt(difficultySelect.value);
@@ -330,6 +330,11 @@ async function addTask() {
     if (text === "") {
         alert("Please enter a task.");
         return;
+    }
+
+    // Automatically append #shop tag if wishlist is checked and tag doesn't exist
+    if (isWishlist && !text.includes('#shop')) {
+        text = `${text} #shop`;
     }
 
     // Get active tasks count
@@ -401,27 +406,41 @@ async function toggleTaskCompletion(taskId, completed) {
     }
 }
 
-// Edit task text
+// Modify editTaskText function to handle #shop tag
 async function editTaskText(taskId, newText) {
     if (newText.trim() === "") {
         alert("Task text cannot be empty.");
-        loadTasks(); // Reload to reset changes
+        loadTasks();
         return;
     }
 
     try {
         const taskDoc = doc(db, "tasks", taskId);
-        await updateDoc(taskDoc, { text: newText });
-        console.log(`Task ${taskId} text updated.`);
-        
-        // Re-render tasks immediately to show new hashtag grouping
         const taskIndex = tasks.findIndex(t => t.id === taskId);
+        const currentTask = tasks[taskIndex];
+        
+        // Check if #shop was added
+        const hadShopTag = currentTask.text.includes('#shop');
+        const hasShopTag = newText.includes('#shop');
+        
+        // Update wishlist status if #shop tag was added or removed
+        if (hasShopTag !== hadShopTag) {
+            await updateDoc(taskDoc, { 
+                text: newText,
+                isWishlist: hasShopTag
+            });
+        } else {
+            await updateDoc(taskDoc, { text: newText });
+        }
+
+        // Update local task data
         if (taskIndex !== -1) {
             tasks[taskIndex].text = newText;
-            renderTasks(tasks); // Re-render with updated task
+            tasks[taskIndex].isWishlist = hasShopTag;
+            renderTasks(tasks);
         }
     } catch (error) {
-        console.error("Error editing task: ", error);
+        console.error("Error editing task:", error);
     }
 }
 
@@ -730,16 +749,35 @@ function createTaskElement(task, isCompleted) {
         cartToggle.addEventListener('click', async () => {
             try {
                 const taskDoc = doc(db, "tasks", task.id);
+                const newWishlistStatus = !task.isWishlist;
+                let newText = task.text;
+
+                // Add or remove #shop tag based on wishlist status
+                if (newWishlistStatus && !task.text.includes('#shop')) {
+                    newText = `${task.text} #shop`;
+                } else if (!newWishlistStatus && task.text.includes('#shop')) {
+                    newText = task.text.replace(/#shop\b/g, '').trim();
+                }
+
                 await updateDoc(taskDoc, { 
-                    isWishlist: !task.isWishlist 
+                    isWishlist: newWishlistStatus,
+                    text: newText
                 });
-                cartToggle.innerHTML = !task.isWishlist ? '🛒' : '☐';
+
+                cartToggle.innerHTML = newWishlistStatus ? '🛒' : '☐';
                 cartToggle.classList.toggle('active');
-                task.isWishlist = !task.isWishlist;
+                task.isWishlist = newWishlistStatus;
+                task.text = newText;
+
+                // Update the task text display
+                const taskText = taskItem.querySelector('.task-text');
+                taskText.value = newText;
 
                 // Refresh the task list if we're currently filtering by wishlist
                 if (currentFilter === 'wishlist') {
                     filterTasks(taskSearchInput.value);
+                } else {
+                    renderTasks();
                 }
             } catch (error) {
                 console.error("Error updating wishlist status:", error);
