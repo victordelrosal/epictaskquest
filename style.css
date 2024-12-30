@@ -356,7 +356,7 @@ body {
     display: inline-block;
 }
 
-/* Task Item Component */
+/* Task Item Component - Updated for better mobile wrapping */
 .task-item {
     display: flex;
     align-items: flex-start; /* Change from center to flex-start */
