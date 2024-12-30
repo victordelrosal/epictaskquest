@@ -12,7 +12,9 @@ import {
     setPersistence, 
     browserLocalPersistence,
     GoogleAuthProvider,
-    signInWithPopup 
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -38,6 +40,11 @@ console.log("Firebase initialized successfully.");
 // Authentication Logic
 // ===========================
 
+// Mobile browser detection
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 // DOM Elements for Login
 const loginContainer = document.getElementById('loginContainer');
 const appContainer = document.getElementById('appContainer');
@@ -61,31 +68,76 @@ setPersistence(auth, browserLocalPersistence)
     });
 
 // Google Login Function
-googleLoginButton.addEventListener('click', () => {
-    signInWithPopup(auth, googleProvider)
-        .then((result) => {
-            // This gives you a Google Access Token
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
-            // The signed-in user info
-            const user = result.user;
-            
-            // Check if user's email is authorized
+googleLoginButton.addEventListener('click', async () => {
+    try {
+        if (isMobileDevice()) {
+            // Use redirect method for mobile
+            await signInWithRedirect(auth, googleProvider);
+        } else {
+            // Use popup for desktop
+            const result = await signInWithPopup(auth, googleProvider);
+            handleAuthResult(result);
+        }
+    } catch (error) {
+        console.error("Authentication error:", error);
+        loginError.textContent = "Sign-in failed. Please try again.";
+        loginError.style.display = "block";
+    }
+});
+
+// Add handler for redirect result
+onAuthStateChanged(auth, async (user) => {
+    try {
+        if (isMobileDevice()) {
+            const result = await getRedirectResult(auth);
+            if (result) {
+                handleAuthResult(result);
+            }
+        }
+        // Rest of your existing onAuthStateChanged logic
+        if (user) {
             if (user.email === authorizedEmail) {
-                console.log("Google sign-in successful");
-                loginError.style.display = "none";
+                // Show the main app
+                loginContainer.style.display = "none";
+                appContainer.style.display = "flex";
+                loadTasks(); // Load tasks only after authentication
             } else {
                 // Unauthorized user
+                loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
+                console.warn(`User ${user.email} is not authorized to view this content.`);
+                // Optionally, you can sign out the unauthorized user
                 signOut(auth);
-                loginError.textContent = "Unauthorized email address";
-                loginError.style.display = "block";
             }
-        })
-        .catch((error) => {
-            console.error("Error during Google sign-in:", error);
-            loginError.textContent = "Google sign-in failed. Please try again.";
-            loginError.style.display = "block";
-        });
+        } else {
+            // No user is signed in
+            loginContainer.style.display = "flex";
+            appContainer.style.display = "none";
+        }
+    } catch (error) {
+        console.error("Auth state change error:", error);
+    }
+});
+
+// Add authentication result handler
+function handleAuthResult(result) {
+    const user = result.user;
+    if (user.email === authorizedEmail) {
+        console.log("Sign-in successful");
+        loginError.style.display = "none";
+    } else {
+        signOut(auth);
+        loginError.textContent = "Unauthorized email address";
+        loginError.style.display = "block";
+    }
+}
+
+// Update Google Provider configuration
+googleProvider.setCustomParameters({
+    prompt: 'select_account',
+    // Add mobile-friendly settings
+    mobile: true,
+    // Enable cross-origin isolation support
+    crossOrigin: 'use-credentials'
 });
 
 // Logout Button
@@ -97,28 +149,6 @@ logoutButton.addEventListener('click', () => {
     }).catch((error) => {
         console.error("Error signing out:", error);
     });
-});
-
-// Monitor Authentication State
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        if (user.email === authorizedEmail) {
-            // Show the main app
-            loginContainer.style.display = "none";
-            appContainer.style.display = "flex";
-            loadTasks(); // Load tasks only after authentication
-        } else {
-            // Unauthorized user
-            loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
-            console.warn(`User ${user.email} is not authorized to view this content.`);
-            // Optionally, you can sign out the unauthorized user
-            signOut(auth);
-        }
-    } else {
-        // No user is signed in
-        loginContainer.style.display = "flex";
-        appContainer.style.display = "none";
-    }
 });
 
 // ===========================
