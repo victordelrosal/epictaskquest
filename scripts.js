@@ -150,6 +150,8 @@ const confettiContainer = document.getElementById('confettiContainer');
 const taskSearchInput = document.getElementById('taskSearchInput');
 const wishlistCheckbox = document.getElementById('wishlistCheckbox');
 const wishlistFilter = document.getElementById('wishlistFilter');
+const successOverlay = document.getElementById('successOverlay');
+const successMessage = document.getElementById('successMessage');
 let currentFilter = 'all';
 
 // Add achievement image URLs array
@@ -383,6 +385,7 @@ async function addTask() {
         
         renderTasks();
         animateTaskAddition(docRef.id);
+        showSuccessNotification(); // Add success notification
         
         // Reset form
         taskInput.value = "";
@@ -1167,4 +1170,15 @@ async function migrateShopToBuyTags() {
             console.error("Error migrating shopping tags:", error);
         }
     }
+}
+
+// Add function to show success notification
+function showSuccessNotification() {
+    successOverlay.classList.add('show');
+    successMessage.classList.add('show');
+    
+    setTimeout(() => {
+        successOverlay.classList.remove('show');
+        successMessage.classList.remove('show');
+    }, 1500); // Remove after 1.5 seconds
 }
