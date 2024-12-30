@@ -193,12 +193,17 @@ const achievementImages = [
 
 // Add these variables after other DOM element declarations
 const prevBadgeButton = document.getElementById('prevBadge');
-const nextBadgeButton = document.getElementById('nextBadge');
 let currentBadgeIndex = 0;
 
 // Add badge navigation functions
 function updateBadgeDisplay(index) {
     const achievementContainer = document.getElementById('achievementImage');
+    
+    // Ensure we don't show badges beyond the current level
+    if (index >= level) {
+        index = level - 1; // Show the current level's badge
+    }
+    
     achievementContainer.innerHTML = `<img src="${achievementImages[index]}" alt="Level ${index + 1} Achievement">`;
     achievementContainer.classList.remove('visible');
     // Force reflow
@@ -207,21 +212,20 @@ function updateBadgeDisplay(index) {
     
     // Update button states
     currentBadgeIndex = index;
+    
+    // Show/hide prev button based on current index
+    prevBadgeButton.style.display = index > 0 ? 'flex' : 'none';
 }
 
-function navigateBadge(direction) {
-    let newIndex;
-    if (direction === 'prev') {
-        newIndex = (currentBadgeIndex - 1 + achievementImages.length) % achievementImages.length;
-    } else {
-        newIndex = (currentBadgeIndex + 1) % achievementImages.length;
+function navigateBadge() {
+    let newIndex = currentBadgeIndex - 1;
+    if (newIndex >= 0) {
+        updateBadgeDisplay(newIndex);
     }
-    updateBadgeDisplay(newIndex);
 }
 
 // Add event listeners for badge navigation
-prevBadgeButton.addEventListener('click', () => navigateBadge('prev'));
-nextBadgeButton.addEventListener('click', () => navigateBadge('next'));
+prevBadgeButton.addEventListener('click', () => navigateBadge());
 
 // ===========================
 // Utility Functions
