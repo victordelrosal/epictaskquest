@@ -358,6 +358,131 @@ body {
     background: var(--secondary-gradient);
 }
 
+/* Task Form Updates */
+.task-form {
+    padding: 1.5rem;
+    background: var(--task-form-gradient);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.task-form-row {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.task-form-row input[type="text"] {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+.task-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.task-controls select {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.3rem;
+    cursor: pointer;
+    min-width: 80px;
+}
+
+.task-controls #customPoints {
+    width: 80px;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.3rem;
+}
+
+.wishlist-checkbox-wrapper {
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    height: 46px;
+}
+
+#addTaskButton {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-gradient);
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    height: 46px;
+}
+
+/* Mobile Responsiveness Updates */
+@media (max-width: 768px) {
+    .task-form-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .task-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .task-controls select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .task-controls #customPoints {
+        width: 60px;
+    }
+
+    .wishlist-checkbox-wrapper,
+    #addTaskButton {
+        min-width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .task-form {
+        padding: 1rem;
+    }
+
+    .task-controls {
+        gap: 0.25rem;
+    }
+
+    .task-controls select,
+    .task-controls #customPoints,
+    .wishlist-checkbox-wrapper,
+    #addTaskButton {
+        font-size: 1.1rem;
+        padding: 0.6rem;
+    }
+}
+
 /* Task Lists Component */
 .task-list {
     background: var(--overlay-background);
