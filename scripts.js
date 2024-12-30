@@ -303,6 +303,9 @@ async function loadTasks() {
             }
         });
 
+        // Add sync after loading tasks
+        await syncShoppingTags();
+
         level = Math.floor(totalPoints / pointsToNextLevel) + 1;
         updateStats();
         renderTasks();
@@ -1057,28 +1060,61 @@ function filterTasks(searchTerm = '') {
         );
     }
     
-    // Apply wishlist filter
+    // Apply wishlist filter and sync tags if needed
     if (currentFilter === 'wishlist') {
+        syncShoppingTags(); // Sync tags when showing shopping list
         filteredTasks = filteredTasks.filter(task => task.isWishlist);
+        activeTasksList.innerHTML = `<h3>🛒 Shopping List</h3>`;
+    } else {
+        activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
     }
     
-    // Clear and update active tasks list first
-    activeTasksList.innerHTML = `<h3>${currentFilter === 'wishlist' ? '🛒 Shopping List' : 'Active Tasks'}</h3>`;
-    
-    // Sort and display active tasks
-    const activeTasks = filteredTasks.filter(task => !task.completed);
-    activeTasks
-        .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
-        .forEach((task, index) => {
-            const taskItem = createTaskElement(task, false, index + 1);
-            activeTasksList.appendChild(taskItem);
-        });
-        
-    // Update completed tasks separately
-    const completedTasksArr = filteredTasks.filter(task => task.completed);
-    completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
-    completedTasksArr.forEach((task, index) => {
-        const taskItem = createTaskElement(task, true, index + 1);
-        completedTasksList.appendChild(taskItem);
+    // Rest of existing filterTasks code...
+    // ...existing code...
+}
+
+// Add new function to sync shopping tags
+async function syncShoppingTags() {
+    const updates = [];
+    tasks.forEach(task => {
+        if (task.isWishlist && !task.text.includes('#shop')) {
+            // Task is in shopping list but missing #shop tag
+            updates.push({
+                id: task.id,
+                newText: `${task.text} #shop`
+            });
+        } else if (!task.isWishlist && task.text.includes('#shop')) {
+            // Task has #shop tag but not in shopping list
+            updates.push({
+                id: task.id,
+                isWishlist: true
+            });
+        }
     });
+
+    // Apply updates if needed
+    if (updates.length > 0) {
+        const batch = writeBatch(db);
+        updates.forEach(update => {
+            const taskRef = doc(db, "tasks", update.id);
+            if (update.newText) {
+                batch.update(taskRef, { 
+                    text: update.newText
+                });
+            }
+            if (update.isWishlist !== undefined) {
+                batch.update(taskRef, { 
+                    isWishlist: update.isWishlist
+                });
+            }
+        });
+
+        try {
+            await batch.commit();
+            console.log("Shopping tags synchronized successfully");
+            await loadTasks(); // Reload tasks to reflect changes
+        } catch (error) {
+            console.error("Error synchronizing shopping tags:", error);
+        }
+    }
 }
