@@ -866,7 +866,7 @@ body {
     width: 1.5rem;
     height: 1.5rem;
     cursor: pointer;
-    accent-color: var(--primary-gradient);
+    accent-color: #ADD8E6; /* Light blue */
 }
 
 /* Filter Button */
