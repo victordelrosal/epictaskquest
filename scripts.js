@@ -360,7 +360,7 @@ function getPoints(difficulty, customPoints) {
         3: 15,
         4: 20,
         5: 25,
-        6: customPoints || 30 // Use stored custom points if available
+        6: 50 // Changed from custom points to fixed 50
     };
     return pointsMap[difficulty] || 5;
 }
@@ -967,49 +967,15 @@ function createTaskElement(task, isCompleted) {
     [1, 2, 3, 4, 5, 6].forEach(num => {
         const option = document.createElement('option');
         option.value = num;
-        if (num === 6) {
-            // For Custom difficulty, just show the points
-            option.textContent = `${task.customPoints || 30}`;
-        } else {
-            // For predefined difficulties, just show the points
-            option.textContent = `${getPoints(num)}`;
-        }
+        option.textContent = `${getPoints(num)}`; // Simply show points for all options
         if (num === task.difficulty) option.selected = true;
         difficultySelectElement.appendChild(option);
     });
 
-    // Custom points input
-    const customPointsInputElement = document.createElement('input');
-    customPointsInputElement.type = 'number';
-    customPointsInputElement.min = '1';
-    customPointsInputElement.max = '100';
-    customPointsInputElement.placeholder = 'Enter points';
-    customPointsInputElement.className = 'custom-points';
-    customPointsInputElement.style.display = task.difficulty === 6 ? 'block' : 'none';
-    customPointsInputElement.value = task.customPoints || '';
-    customPointsInputElement.disabled = isCompleted;
-
-    // Add event listener for custom points changes
-    customPointsInputElement.addEventListener('change', () => {
-        updateTaskCustomPoints(task.id, customPointsInputElement.value)
-            .then(() => {
-                // Only sort after custom points have been set
-                loadTasks();
-            });
-    });
-
+    // Remove custom points input element and its related code
     difficultySelectElement.addEventListener('change', () => {
         const difficulty = parseInt(difficultySelectElement.value);
-        customPointsInputElement.style.display = difficulty === 6 ? 'block' : 'none';
-        
-        if (difficulty !== 6) {
-            // Only update difficulty and sort when switching away from custom
-            updateTaskDifficulty(task.id, difficulty);
-        } else {
-            // Just update difficulty without sorting when switching to custom
-            const taskDoc = doc(db, "tasks", task.id);
-            updateDoc(taskDoc, { difficulty: difficulty });
-        }
+        updateTaskDifficulty(task.id, difficulty);
     });
 
     // Delete Button
@@ -1022,7 +988,6 @@ function createTaskElement(task, isCompleted) {
 
     // Append actions
     taskActions.appendChild(difficultySelectElement);
-    taskActions.appendChild(customPointsInputElement);
     if (!isCompleted) {
         taskActions.appendChild(deleteButton);
     }
@@ -1222,17 +1187,9 @@ function triggerConfetti() {
 // Responsive Task Form Handling
 // ===========================
 
-// Add event listener for the main form's difficulty select
+// Remove the custom points input event listener from the main form
 document.getElementById('difficultySelect').addEventListener('change', (e) => {
-    const customPointsInput = document.getElementById('customPoints');
-    if (e.target.value === '6') {
-        customPointsInput.style.display = 'block';
-        customPointsInput.value = '30'; // Set default value
-        customPointsInput.focus(); // Optional: automatically focus the input
-    } else {
-        customPointsInput.style.display = 'none';
-        customPointsInput.value = ''; // Clear the value when not using custom
-    }
+    // Remove the custom points handling as it's no longer needed
 });
 
 // Filter tasks based on search term
