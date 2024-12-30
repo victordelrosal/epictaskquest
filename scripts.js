@@ -511,22 +511,53 @@ function renderTasks(filteredTasks = tasks) {
     // Group active tasks by hashtags
     const { sortedGroups, noHashtagGroup } = groupTasksByHashtags(activeTasks);
 
-    // Render hashtag groups
-    let activeNumber = 1;
+    // Render hashtag groups with toggles
     sortedGroups.forEach(([tag, tasks]) => {
         const groupDiv = document.createElement('div');
         groupDiv.classList.add('hashtag-group');
         
-        const headerDiv = document.createElement('div');
-        headerDiv.classList.add('hashtag-header');
-        headerDiv.textContent = tag;
-        groupDiv.appendChild(headerDiv);
-
-        tasks.forEach(task => {
-            const taskItem = createTaskElement(task, false, activeNumber++);
-            groupDiv.appendChild(taskItem);
+        // Create toggle header
+        const toggleHeader = document.createElement('div');
+        toggleHeader.classList.add('hashtag-toggle');
+        toggleHeader.innerHTML = `
+            <span class="toggle-icon">▶</span>
+            <span class="hashtag-label">${tag}</span>
+            <span class="task-count">${tasks.length}</span>
+        `;
+        
+        // Create content container
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('hashtag-content');
+        contentDiv.style.display = 'none'; // Initially collapsed
+        
+        // Add toggle functionality
+        toggleHeader.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isExpanded = contentDiv.style.display !== 'none';
+            toggleHeader.querySelector('.toggle-icon').textContent = isExpanded ? '▶' : '▼';
+            
+            // Animate content
+            if (isExpanded) {
+                contentDiv.style.maxHeight = '0';
+                setTimeout(() => {
+                    contentDiv.style.display = 'none';
+                }, 300); // Match transition duration
+            } else {
+                contentDiv.style.display = 'block';
+                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+            }
+            
+            toggleHeader.classList.toggle('expanded');
         });
 
+        // Add tasks to content container
+        tasks.forEach(task => {
+            const taskItem = createTaskElement(task, false);
+            contentDiv.appendChild(taskItem);
+        });
+
+        groupDiv.appendChild(toggleHeader);
+        groupDiv.appendChild(contentDiv);
         activeTasksList.appendChild(groupDiv);
     });
 
@@ -535,38 +566,60 @@ function renderTasks(filteredTasks = tasks) {
         const groupDiv = document.createElement('div');
         groupDiv.classList.add('hashtag-group');
         
-        const headerDiv = document.createElement('div');
-        headerDiv.classList.add('hashtag-header');
-        headerDiv.textContent = 'Other Tasks';
-        groupDiv.appendChild(headerDiv);
+        // Create toggle header for other tasks
+        const toggleHeader = document.createElement('div');
+        toggleHeader.classList.add('hashtag-toggle');
+        toggleHeader.innerHTML = `
+            <span class="toggle-icon">▶</span>
+            <span class="hashtag-label">Other Tasks</span>
+            <span class="task-count">${noHashtagGroup.length}</span>
+        `;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.classList.add('hashtag-content');
+        contentDiv.style.display = 'none';
+        
+        toggleHeader.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isExpanded = contentDiv.style.display !== 'none';
+            toggleHeader.querySelector('.toggle-icon').textContent = isExpanded ? '▶' : '▼';
+            
+            if (isExpanded) {
+                contentDiv.style.maxHeight = '0';
+                setTimeout(() => {
+                    contentDiv.style.display = 'none';
+                }, 300);
+            } else {
+                contentDiv.style.display = 'block';
+                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+            }
+            
+            toggleHeader.classList.toggle('expanded');
+        });
 
         noHashtagGroup
             .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
             .forEach(task => {
-                const taskItem = createTaskElement(task, false, activeNumber++);
-                groupDiv.appendChild(taskItem);
+                const taskItem = createTaskElement(task, false);
+                contentDiv.appendChild(taskItem);
             });
 
+        groupDiv.appendChild(toggleHeader);
+        groupDiv.appendChild(contentDiv);
         activeTasksList.appendChild(groupDiv);
     }
 
     // Render Completed Tasks (unchanged)
-    let completedNumber = 1;
     completedTasksArr
         .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
         .forEach(task => {
-            const taskItem = createTaskElement(task, true, completedNumber++);
+            const taskItem = createTaskElement(task, true);
             completedTasksList.appendChild(taskItem);
         });
 }
 
-// Update task text to highlight hashtags
-function highlightHashtags(text) {
-    return text.replace(/(#[\w\u0590-\u05ff]+)/g, '<span class="hashtag">$1</span>');
-}
-
-// Create a task element
-function createTaskElement(task, isCompleted, number) {
+// Update createTaskElement to remove the task number
+function createTaskElement(task, isCompleted) {
     const taskItem = document.createElement('div');
     taskItem.classList.add('task-item');
     taskItem.setAttribute('data-id', task.id);
@@ -575,12 +628,6 @@ function createTaskElement(task, isCompleted, number) {
     // Task Details
     const taskDetails = document.createElement('div');
     taskDetails.classList.add('task-details');
-
-    // Add task number
-    const taskNumber = document.createElement('span');
-    taskNumber.classList.add('task-number');
-    taskNumber.textContent = `${number}.`;
-    taskDetails.appendChild(taskNumber);
 
     // Checkbox
     const checkbox = document.createElement('input');
