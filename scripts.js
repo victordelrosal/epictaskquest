@@ -527,13 +527,43 @@ async function addTask() {
 async function toggleTaskCompletion(taskId, completed) {
     try {
         const taskDoc = doc(db, "tasks", taskId);
-        await updateDoc(taskDoc, { completed: completed });
-        console.log(`Task ${taskId} marked as ${completed ? 'completed' : 'active'}.`);
-        loadTasks(); // Reload tasks to update stats and trigger animations
+        const taskIndex = tasks.findIndex(t => t.id === taskId);
+        const task = tasks[taskIndex];
+
+        // Check if task has #repeat tag
+        const isRepeatTask = task.text.includes('#repeat');
 
         if (completed) {
+            // Credit points regardless of repeat status
+            completedTasks++;
+            totalPoints += getPoints(task.difficulty, task.customPoints);
+            updateStats();
             triggerConfetti();
+
+            if (isRepeatTask) {
+                // For repeat tasks, immediately reset completion status
+                await updateDoc(taskDoc, { completed: false });
+                tasks[taskIndex].completed = false;
+                renderTasks();
+            } else {
+                // For non-repeat tasks, mark as completed normally
+                await updateDoc(taskDoc, { completed: true });
+                tasks[taskIndex].completed = true;
+                renderTasks();
+            }
+        } else {
+            // Handle unchecking (only possible for non-repeat tasks)
+            if (!isRepeatTask) {
+                await updateDoc(taskDoc, { completed: false });
+                tasks[taskIndex].completed = false;
+                completedTasks--;
+                totalPoints -= getPoints(task.difficulty, task.customPoints);
+                updateStats();
+                renderTasks();
+            }
         }
+
+        console.log(`Task ${taskId} handled: ${completed ? 'completed' : 'uncompleted'}, Repeat: ${isRepeatTask}`);
     } catch (error) {
         console.error("Error updating task: ", error);
     }
@@ -834,7 +864,18 @@ function createTaskElement(task, isCompleted) {
     checkbox.checked = isCompleted;
     checkbox.disabled = isCompleted; // Disable checkbox for completed tasks
     checkbox.addEventListener('change', () => {
+        const isRepeatTask = task.text.includes('#repeat');
+        
+        // For repeat tasks, always pass true for completion to trigger points
+        // but the toggle function will handle resetting it
         toggleTaskCompletion(task.id, checkbox.checked);
+        
+        // For repeat tasks, immediately uncheck the checkbox
+        if (isRepeatTask && checkbox.checked) {
+            setTimeout(() => {
+                checkbox.checked = false;
+            }, 500); // Small delay to show the check animation
+        }
     });
 
     // Task Text
