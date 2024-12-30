@@ -35,6 +35,35 @@ const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Add debugging code
+window.onerror = function (message, source, lineno, colno, error) {
+    const debugInfo = `
+        <div style="background: rgba(240, 128, 128, 0.9); color: white; padding: 15px; margin: 10px; border-radius: 8px; font-family: monospace; font-size: 14px; word-wrap: break-word; max-width: 100%; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;">
+            <strong>Error:</strong> ${message}<br>
+            <strong>Source:</strong> ${source}<br>
+            <strong>Line:</strong> ${lineno}, Column: ${colno}<br>
+            <strong>Stack:</strong> ${error?.stack || 'N/A'}<br>
+            <strong>User Agent:</strong> ${navigator.userAgent}<br>
+            <strong>Platform:</strong> ${navigator.platform}<br>
+            <strong>Is Mobile:</strong> ${isMobileDevice()}<br>
+            <strong>Time:</strong> ${new Date().toISOString()}
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', debugInfo);
+    console.error('Error:', { message, source, lineno, colno, error });
+};
+
+// Add detailed console logging
+console.log('Initializing app...', {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    isMobile: isMobileDevice(),
+    firebaseConfig: {
+        authDomain: firebaseConfig.authDomain,
+        redirectDomain: firebaseConfig.redirectDomain
+    }
+});
+
 console.log("Firebase initialized successfully.");
 
 // ===========================
@@ -71,18 +100,37 @@ setPersistence(auth, browserLocalPersistence)
 // Google Login Function
 googleLoginButton.addEventListener('click', async () => {
     try {
+        console.log('Starting Google sign-in process...');
         // First try popup for all devices
-        const result = await signInWithPopup(auth, googleProvider);
-        handleAuthResult(result);
-    } catch (popupError) {
-        console.log("Popup failed, trying redirect...", popupError);
+        console.log('Attempting popup sign-in...');
         try {
-            // If popup fails, fall back to redirect
-            await signInWithRedirect(auth, googleProvider);
-        } catch (redirectError) {
-            console.error("Both auth methods failed:", redirectError);
-            handleAuthError(redirectError);
+            const result = await signInWithPopup(auth, googleProvider);
+            console.log('Popup sign-in successful:', result);
+            handleAuthResult(result);
+        } catch (popupError) {
+            console.warn('Popup sign-in failed:', popupError);
+            console.log('Attempting redirect sign-in...');
+            try {
+                await signInWithRedirect(auth, googleProvider);
+                console.log('Redirect initiated successfully');
+            } catch (redirectError) {
+                console.error('Both auth methods failed:', {
+                    popupError,
+                    redirectError,
+                    userAgent: navigator.userAgent,
+                    isMobile: isMobileDevice()
+                });
+                handleAuthError(redirectError);
+            }
         }
+    } catch (error) {
+        console.error('Authentication error:', {
+            error,
+            code: error.code,
+            message: error.message,
+            stack: error.stack
+        });
+        handleAuthError(error);
     }
 });
 
@@ -1289,3 +1337,30 @@ function restoreToggleStates() {
         }
     });
 }
+
+// Add auth state logging
+auth.onAuthStateChanged((user) => {
+    console.log('Auth state changed:', {
+        isLoggedIn: !!user,
+        userEmail: user?.email,
+        emailVerified: user?.emailVerified,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Add debugging for redirect result handling
+getRedirectResult(auth)
+    .then((result) => {
+        console.log('Redirect result received:', result);
+        if (result) {
+            handleAuthResult(result);
+        }
+    })
+    .catch((error) => {
+        console.error('Redirect result error:', {
+            error,
+            code: error.code,
+            message: error.message,
+            stack: error.stack
+        });
+    });
