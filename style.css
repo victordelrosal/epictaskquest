@@ -822,20 +822,27 @@ body {
     accent-color: #ADD8E6; /* Light blue */
 }
 
-/* Filter Button */
+/* Filter Button - Updated size and styling */
 .filter-button {
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     border: none;
     border-radius: 8px;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.2rem;  /* Increased padding */
     cursor: pointer;
     transition: all var(--transition-speed) ease;
+    font-size: 1.5rem;  /* Increased font size */
 }
 
 .filter-button.active {
     background: var(--secondary-gradient);
-    transform: scale(1.05);
+    transform: scale(1.1);  /* Slightly larger scale on active state */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.filter-button:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 /* Task Item Wishlist Indicator */
