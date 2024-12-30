@@ -562,19 +562,16 @@ function renderTasks(filteredTasks = tasks) {
     activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
     completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
 
-    // Separate active and completed tasks
     const activeTasks = filteredTasks.filter(task => !task.completed);
     const completedTasksArr = filteredTasks.filter(task => task.completed);
 
-    // Group active tasks by hashtags
     const { sortedGroups, noHashtagGroup } = groupTasksByHashtags(activeTasks);
 
-    // Render hashtag groups with toggles
+    // Render hashtag groups
     sortedGroups.forEach(([tag, tasks]) => {
         const groupDiv = document.createElement('div');
         groupDiv.classList.add('hashtag-group');
         
-        // Create toggle header
         const toggleHeader = document.createElement('div');
         toggleHeader.classList.add('hashtag-toggle');
         toggleHeader.innerHTML = `
@@ -583,23 +580,32 @@ function renderTasks(filteredTasks = tasks) {
             <span class="task-count">${tasks.length}</span>
         `;
         
-        // Create content container
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('hashtag-content');
-        contentDiv.style.display = 'none'; // Initially collapsed
         
-        // Add toggle functionality
+        // Determine if this section should be expanded
+        const shouldExpand = currentFilter === 'wishlist' && tag === '#buy';
+        contentDiv.style.display = shouldExpand ? 'block' : 'none';
+        toggleHeader.querySelector('.toggle-icon').textContent = shouldExpand ? '▼' : '▶';
+        if (shouldExpand) {
+            toggleHeader.classList.add('expanded');
+            // Set appropriate maxHeight for animation
+            setTimeout(() => {
+                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+            }, 0);
+        }
+        
+        // Rest of toggle functionality
         toggleHeader.addEventListener('click', (e) => {
             e.stopPropagation();
             const isExpanded = contentDiv.style.display !== 'none';
             toggleHeader.querySelector('.toggle-icon').textContent = isExpanded ? '▶' : '▼';
             
-            // Animate content
             if (isExpanded) {
                 contentDiv.style.maxHeight = '0';
                 setTimeout(() => {
                     contentDiv.style.display = 'none';
-                }, 300); // Match transition duration
+                }, 300);
             } else {
                 contentDiv.style.display = 'block';
                 contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
@@ -619,7 +625,7 @@ function renderTasks(filteredTasks = tasks) {
         activeTasksList.appendChild(groupDiv);
     });
 
-    // Render tasks without hashtags
+    // Handle non-hashtag tasks
     if (noHashtagGroup.length > 0) {
         const groupDiv = document.createElement('div');
         groupDiv.classList.add('hashtag-group');
@@ -906,6 +912,8 @@ window.addEventListener('click', (event) => {
 wishlistFilter.addEventListener('click', () => {
     currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
     wishlistFilter.classList.toggle('active', currentFilter === 'wishlist');
+    
+    // Refresh the task list with current search term
     filterTasks(taskSearchInput.value);
 });
 
@@ -1062,17 +1070,13 @@ function filterTasks(searchTerm = '') {
         );
     }
     
-    // Apply wishlist filter and sync tags if needed
+    // Apply wishlist filter differently - now just expand relevant sections
     if (currentFilter === 'wishlist') {
-        syncShoppingTags(); // Sync tags when showing shopping list
-        filteredTasks = filteredTasks.filter(task => task.isWishlist);
-        activeTasksList.innerHTML = `<h3>🛒 Shopping List</h3>`;
-    } else {
-        activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
+        syncShoppingTags(); // Ensure tags are synced
     }
     
-    // Rest of existing filterTasks code...
-    // ...existing code...
+    // Always render all tasks, but control expansion state
+    renderTasks(filteredTasks);
 }
 
 // Add new function to sync shopping tags
