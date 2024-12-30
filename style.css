@@ -205,9 +205,8 @@ body {
 /* Task Form Component */
 .task-form {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
-    flex-wrap: wrap;
-    align-items: stretch;
     background: var(--task-form-gradient);
     padding: 1.5rem;
     border-radius: var(--border-radius);
@@ -216,6 +215,78 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     z-index: 1;
+}
+
+.task-form .input-row {
+    width: 100%;
+}
+
+.task-form .input-row input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.task-form .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.task-form .points-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.task-form .points-controls select {
+    min-width: 100px;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.task-form .points-controls input[type="number"] {
+    width: 100px;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1.3rem;
+}
+
+.task-form .button-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.task-form .button-row button {
+    min-width: 150px;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-gradient);
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .task-form:hover {
@@ -804,11 +875,13 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     cursor: pointer;
     transition: all var(--transition-speed) ease;
+    justify-content: center;
+    min-width: 50px;
 }
 
 .wishlist-checkbox-wrapper:hover {
@@ -1064,6 +1137,36 @@ body {
 
     .stats div {
         font-size: 1.3rem;
+    }
+
+    .task-form {
+        padding: 1rem;
+    }
+
+    .task-form .controls-row {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .task-form .points-controls {
+        flex: 1;
+    }
+
+    .task-form .points-controls select,
+    .task-form .points-controls input[type="number"] {
+        font-size: 1.1rem;
+        padding: 0.6rem 0.8rem;
+        min-width: 80px;
+    }
+
+    .wishlist-checkbox-wrapper {
+        padding: 0.6rem 0.8rem;
+        min-width: 44px;
+    }
+
+    .task-form .button-row button {
+        width: 100%;
+        max-width: 200px;
     }
 
     .task-form input[type="text"],
