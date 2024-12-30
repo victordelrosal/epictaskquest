@@ -57,11 +57,9 @@
 
         <!-- Task Form Component -->
         <div class="task-form">
-            <div class="input-row">
+            <div class="task-form-row">
                 <input type="text" id="taskInput" placeholder="Enter your quest...">
-            </div>
-            <div class="controls-row">
-                <div class="points-controls">
+                <div class="task-controls">
                     <select id="difficultySelect">
                         <option value="1">5 pts</option>
                         <option value="2">10 pts</option>
@@ -70,15 +68,13 @@
                         <option value="5">25 pts</option>
                         <option value="6">Other</option>
                     </select>
-                    <input type="number" id="customPoints" placeholder="Enter points" min="1" max="100" style="display: none;">
+                    <input type="number" id="customPoints" placeholder="Points" min="1" max="100" style="display: none;">
+                    <label class="wishlist-checkbox-wrapper">
+                        <input type="checkbox" id="wishlistCheckbox" class="wishlist-checkbox">
+                        🛒
+                    </label>
+                    <button id="addTaskButton"><i class="fas fa-plus"></i></button>
                 </div>
-                <label class="wishlist-checkbox-wrapper">
-                    <input type="checkbox" id="wishlistCheckbox" class="wishlist-checkbox">
-                    🛒
-                </label>
-            </div>
-            <div class="button-row">
-                <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
             </div>
         </div>
 
