@@ -8,13 +8,13 @@ import {
     getAuth, 
     onAuthStateChanged, 
     signInWithEmailAndPassword, 
+    signInWithPopup, 
+    signInWithRedirect, 
+    getRedirectResult,
     signOut, 
     setPersistence, 
     browserLocalPersistence,
-    GoogleAuthProvider,
-    signInWithPopup,
-    signInWithRedirect,
-    getRedirectResult
+    GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -25,7 +25,8 @@ const firebaseConfig = {
     storageBucket: "epic-task-quest.appspot.com",
     messagingSenderId: "421446505180",
     appId: "1:421446505180:web:ac2270f8c0b92d16529a19",
-    measurementId: "G-35SX22QFBS"
+    measurementId: "G-35SX22QFBS",
+    redirectDomain: "victordelrosal.github.io"
 };
 
 // Initialize Firebase
@@ -70,74 +71,73 @@ setPersistence(auth, browserLocalPersistence)
 // Google Login Function
 googleLoginButton.addEventListener('click', async () => {
     try {
-        if (isMobileDevice()) {
-            // Use redirect method for mobile
+        // First try popup for all devices
+        const result = await signInWithPopup(auth, googleProvider);
+        handleAuthResult(result);
+    } catch (popupError) {
+        console.log("Popup failed, trying redirect...", popupError);
+        try {
+            // If popup fails, fall back to redirect
             await signInWithRedirect(auth, googleProvider);
-        } else {
-            // Use popup for desktop
-            const result = await signInWithPopup(auth, googleProvider);
-            handleAuthResult(result);
+        } catch (redirectError) {
+            console.error("Both auth methods failed:", redirectError);
+            handleAuthError(redirectError);
         }
-    } catch (error) {
-        console.error("Authentication error:", error);
-        loginError.textContent = "Sign-in failed. Please try again.";
-        loginError.style.display = "block";
     }
 });
 
 // Add handler for redirect result
 onAuthStateChanged(auth, async (user) => {
     try {
-        if (isMobileDevice()) {
-            const result = await getRedirectResult(auth);
-            if (result) {
-                handleAuthResult(result);
-            }
+        // Handle redirect result first
+        const result = await getRedirectResult(auth);
+        if (result) {
+            console.log("Redirect result received:", result);
+            handleAuthResult(result);
+            return; // Exit early if we handled a redirect
         }
-        // Rest of your existing onAuthStateChanged logic
+
+        // Normal auth state changes
         if (user) {
             if (user.email === authorizedEmail) {
-                // Show the main app
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
-                loadTasks(); // Load tasks only after authentication
+                loadTasks();
             } else {
-                // Unauthorized user
-                loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
-                console.warn(`User ${user.email} is not authorized to view this content.`);
-                // Optionally, you can sign out the unauthorized user
-                signOut(auth);
+                handleUnauthorizedUser(user);
             }
         } else {
-            // No user is signed in
-            loginContainer.style.display = "flex";
-            appContainer.style.display = "none";
+            showLoginScreen();
         }
     } catch (error) {
         console.error("Auth state change error:", error);
+        handleAuthError(error);
     }
 });
 
 // Add authentication result handler
 function handleAuthResult(result) {
+    if (!result) return;
+    
     const user = result.user;
     if (user.email === authorizedEmail) {
         console.log("Sign-in successful");
         loginError.style.display = "none";
+        // Store auth token if needed
+        user.getIdToken().then(token => {
+            localStorage.setItem('authToken', token);
+        });
     } else {
-        signOut(auth);
-        loginError.textContent = "Unauthorized email address";
-        loginError.style.display = "block";
+        handleUnauthorizedUser(user);
     }
 }
 
 // Update Google Provider configuration
 googleProvider.setCustomParameters({
     prompt: 'select_account',
-    // Add mobile-friendly settings
-    mobile: true,
-    // Enable cross-origin isolation support
-    crossOrigin: 'use-credentials'
+    login_hint: authorizedEmail,
+    scope: 'profile email',
+    redirect_uri: `https://${firebaseConfig.redirectDomain}/epictaskquest/`
 });
 
 // Logout Button
@@ -150,6 +150,46 @@ logoutButton.addEventListener('click', () => {
         console.error("Error signing out:", error);
     });
 });
+
+// Add helper functions for better error handling and user management
+function handleUnauthorizedUser(user) {
+    console.warn(`User ${user.email} is not authorized`);
+    signOut(auth).then(() => {
+        loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
+        loginError.textContent = "Unauthorized email address";
+        loginError.style.display = "block";
+    });
+}
+
+function handleAuthError(error) {
+    console.error("Authentication error:", error);
+    let errorMessage = "Sign-in failed. Please try again.";
+    
+    // Handle specific error codes
+    switch (error.code) {
+        case 'auth/popup-blocked':
+            errorMessage = "Popup was blocked. Please allow popups or try again.";
+            break;
+        case 'auth/popup-closed-by-user':
+            errorMessage = "Sign-in was cancelled. Please try again.";
+            break;
+        case 'auth/unauthorized-domain':
+            errorMessage = "This domain is not authorized for sign-in.";
+            break;
+        case 'auth/operation-not-supported-in-this-environment':
+            errorMessage = "Sign-in not supported in this browser. Please try another browser.";
+            break;
+    }
+    
+    loginError.textContent = errorMessage;
+    loginError.style.display = "block";
+}
+
+function showLoginScreen() {
+    loginContainer.style.display = "flex";
+    appContainer.style.display = "none";
+    loginError.style.display = "none";
+}
 
 // ===========================
 // Initialize Global Variables
