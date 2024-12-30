@@ -303,7 +303,9 @@ async function loadTasks() {
             }
         });
 
-        // Add sync after loading tasks
+        // Run migration from #shop to #buy
+        await migrateShopToBuyTags();
+        // Run normal sync after migration
         await syncShoppingTags();
 
         level = Math.floor(totalPoints / pointsToNextLevel) + 1;
@@ -321,7 +323,7 @@ async function loadTasks() {
     }
 }
 
-// Modify addTask function to automatically append #shop tag
+// Modify addTask function to automatically append #buy tag
 async function addTask() {
     let text = taskInput.value.trim();
     const difficulty = parseInt(difficultySelect.value);
@@ -335,9 +337,9 @@ async function addTask() {
         return;
     }
 
-    // Automatically append #shop tag if wishlist is checked and tag doesn't exist
-    if (isWishlist && !text.includes('#shop')) {
-        text = `${text} #shop`;
+    // Automatically append #buy tag if wishlist is checked and tag doesn't exist
+    if (isWishlist && !text.includes('#buy')) {
+        text = `${text} #buy`;
     }
 
     // Get active tasks count
@@ -409,7 +411,7 @@ async function toggleTaskCompletion(taskId, completed) {
     }
 }
 
-// Modify editTaskText function to handle #shop tag
+// Modify editTaskText function to handle #buy tag
 async function editTaskText(taskId, newText) {
     if (newText.trim() === "") {
         alert("Task text cannot be empty.");
@@ -422,11 +424,11 @@ async function editTaskText(taskId, newText) {
         const taskIndex = tasks.findIndex(t => t.id === taskId);
         const currentTask = tasks[taskIndex];
         
-        // Check if #shop was added
-        const hadShopTag = currentTask.text.includes('#shop');
-        const hasShopTag = newText.includes('#shop');
+        // Check if #buy was added
+        const hadShopTag = currentTask.text.includes('#buy');
+        const hasShopTag = newText.includes('#buy');
         
-        // Update wishlist status if #shop tag was added or removed
+        // Update wishlist status if #buy tag was added or removed
         if (hasShopTag !== hadShopTag) {
             await updateDoc(taskDoc, { 
                 text: newText,
@@ -743,11 +745,11 @@ function createTaskElement(task, isCompleted) {
                 const newWishlistStatus = !task.isWishlist;
                 let newText = task.text;
 
-                // Add or remove #shop tag based on wishlist status
-                if (newWishlistStatus && !task.text.includes('#shop')) {
-                    newText = `${task.text} #shop`;
-                } else if (!newWishlistStatus && task.text.includes('#shop')) {
-                    newText = task.text.replace(/#shop\b/g, '').trim();
+                // Add or remove #buy tag based on wishlist status
+                if (newWishlistStatus && !task.text.includes('#buy')) {
+                    newText = `${task.text} #buy`;
+                } else if (!newWishlistStatus && task.text.includes('#buy')) {
+                    newText = task.text.replace(/#buy\b/g, '').trim();
                 }
 
                 await updateDoc(taskDoc, { 
@@ -1077,14 +1079,14 @@ function filterTasks(searchTerm = '') {
 async function syncShoppingTags() {
     const updates = [];
     tasks.forEach(task => {
-        if (task.isWishlist && !task.text.includes('#shop')) {
-            // Task is in shopping list but missing #shop tag
+        if (task.isWishlist && !task.text.includes('#buy')) {
+            // Task is in shopping list but missing #buy tag
             updates.push({
                 id: task.id,
-                newText: `${task.text} #shop`
+                newText: `${task.text} #buy`
             });
-        } else if (!task.isWishlist && task.text.includes('#shop')) {
-            // Task has #shop tag but not in shopping list
+        } else if (!task.isWishlist && task.text.includes('#buy')) {
+            // Task has #buy tag but not in shopping list
             updates.push({
                 id: task.id,
                 isWishlist: true
@@ -1115,6 +1117,42 @@ async function syncShoppingTags() {
             await loadTasks(); // Reload tasks to reflect changes
         } catch (error) {
             console.error("Error synchronizing shopping tags:", error);
+        }
+    }
+}
+
+// Add new migration function to convert #shop to #buy
+async function migrateShopToBuyTags() {
+    const updates = [];
+    tasks.forEach(task => {
+        if (task.text.includes('#shop')) {
+            // Replace #shop with #buy and remove duplicates
+            const newText = task.text
+                .replace(/#shop\b/g, '#buy')
+                .replace(/(#buy\s*)+/g, '#buy ') // Remove duplicate #buy tags
+                .trim();
+            
+            updates.push({
+                id: task.id,
+                newText: newText
+            });
+        }
+    });
+
+    // Apply updates if needed
+    if (updates.length > 0) {
+        const batch = writeBatch(db);
+        updates.forEach(update => {
+            const taskRef = doc(db, "tasks", update.id);
+            batch.update(taskRef, { text: update.newText });
+        });
+
+        try {
+            await batch.commit();
+            console.log("Shopping tags migrated successfully");
+            await loadTasks(); // Reload tasks to reflect changes
+        } catch (error) {
+            console.error("Error migrating shopping tags:", error);
         }
     }
 }
