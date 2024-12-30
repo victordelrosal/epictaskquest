@@ -716,18 +716,6 @@ function createTaskElement(task, isCompleted) {
         }
     });
 
-    // Add input event listener to show hashtag suggestions
-    taskText.addEventListener('input', (e) => {
-        const cursorPosition = e.target.selectionStart;
-        const text = e.target.value;
-        
-        // Check if we're typing a hashtag
-        if (text[cursorPosition - 1] === '#') {
-            // Show hashtag suggestions from existing tags
-            showHashtagSuggestions(e.target);
-        }
-    });
-
     taskDetails.appendChild(checkbox);
     taskDetails.appendChild(taskText);
 
@@ -862,80 +850,6 @@ function createTaskElement(task, isCompleted) {
     taskItem.appendChild(taskActions);
 
     return taskItem;
-}
-
-// Add hashtag suggestions functionality
-function showHashtagSuggestions(inputElement) {
-    // Get all existing hashtags
-    const allHashtags = new Set();
-    tasks.forEach(task => {
-        const hashtags = extractHashtags(task.text);
-        hashtags.forEach(tag => allHashtags.add(tag));
-    });
-
-    // Create suggestions dropdown if it doesn't exist
-    let suggestionsDiv = document.getElementById('hashtag-suggestions');
-    if (!suggestionsDiv) {
-        suggestionsDiv = document.createElement('div');
-        suggestionsDiv.id = 'hashtag-suggestions';
-        suggestionsDiv.style.position = 'absolute';
-        suggestionsDiv.style.background = 'var(--card-background)';
-        suggestionsDiv.style.border = '1px solid var(--blue-7)';
-        suggestionsDiv.style.borderRadius = 'var(--border-radius)';
-        suggestionsDiv.style.maxHeight = '200px';
-        suggestionsDiv.style.overflow = 'auto';
-        suggestionsDiv.style.zIndex = '1000';
-        document.body.appendChild(suggestionsDiv);
-    }
-
-    // Position the suggestions below the input
-    const rect = inputElement.getBoundingClientRect();
-    suggestionsDiv.style.left = `${rect.left}px`;
-    suggestionsDiv.style.top = `${rect.bottom + 5}px`;
-    suggestionsDiv.style.width = `${rect.width}px`;
-
-    // Add suggestions
-    suggestionsDiv.innerHTML = '';
-    allHashtags.forEach(tag => {
-        const suggestion = document.createElement('div');
-        suggestion.textContent = tag;
-        suggestion.style.padding = '0.5rem 1rem';
-        suggestion.style.cursor = 'pointer';
-        suggestion.style.color = 'var(--text-color)';
-        suggestion.style.transition = 'background-color 0.2s';
-
-        suggestion.addEventListener('mouseenter', () => {
-            suggestion.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        });
-
-        suggestion.addEventListener('mouseleave', () => {
-            suggestion.style.backgroundColor = 'transparent';
-        });
-
-        suggestion.addEventListener('click', () => {
-            const cursorPosition = inputElement.selectionStart;
-            const text = inputElement.value;
-            const textBeforeCursor = text.substring(0, cursorPosition);
-            const textAfterCursor = text.substring(cursorPosition);
-            const lastHashIndex = textBeforeCursor.lastIndexOf('#');
-            inputElement.value = textBeforeCursor.substring(0, lastHashIndex) + tag + textAfterCursor;
-            inputElement.focus();
-            inputElement.setSelectionRange(cursorPosition + tag.length - (textBeforeCursor.length - lastHashIndex - 1), cursorPosition + tag.length - (textBeforeCursor.length - lastHashIndex - 1));
-            suggestionsDiv.style.display = 'none';
-        });
-
-        suggestionsDiv.appendChild(suggestion);
-    });
-
-    // Show suggestions
-    suggestionsDiv.style.display = 'block';
-
-    // Hide suggestions when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!suggestionsDiv.contains(e.target) && e.target !== inputElement) {
-            suggestionsDiv.style.display = 'none';
-        }
-    }, { once: true });
 }
 
 // ===========================
