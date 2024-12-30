@@ -189,6 +189,38 @@ const achievementImages = [
     'https://i.postimg.cc/7fVCX8kH/33k.png'
 ];
 
+// Add these variables after other DOM element declarations
+const prevBadgeButton = document.getElementById('prevBadge');
+const nextBadgeButton = document.getElementById('nextBadge');
+let currentBadgeIndex = 0;
+
+// Add badge navigation functions
+function updateBadgeDisplay(index) {
+    const achievementContainer = document.getElementById('achievementImage');
+    achievementContainer.innerHTML = `<img src="${achievementImages[index]}" alt="Level ${index + 1} Achievement">`;
+    achievementContainer.classList.remove('visible');
+    // Force reflow
+    void achievementContainer.offsetWidth;
+    achievementContainer.classList.add('visible');
+    
+    // Update button states
+    currentBadgeIndex = index;
+}
+
+function navigateBadge(direction) {
+    let newIndex;
+    if (direction === 'prev') {
+        newIndex = (currentBadgeIndex - 1 + achievementImages.length) % achievementImages.length;
+    } else {
+        newIndex = (currentBadgeIndex + 1) % achievementImages.length;
+    }
+    updateBadgeDisplay(newIndex);
+}
+
+// Add event listeners for badge navigation
+prevBadgeButton.addEventListener('click', () => navigateBadge('prev'));
+nextBadgeButton.addEventListener('click', () => navigateBadge('next'));
+
 // ===========================
 // Utility Functions
 // ===========================
@@ -245,12 +277,8 @@ function updateStats() {
     // Handle achievement image display
     if (level > prevLevel) {
         const imageIndex = ((level - 1) % achievementImages.length);
-        const achievementContainer = document.getElementById('achievementImage');
-        achievementContainer.innerHTML = `<img src="${achievementImages[imageIndex]}" alt="Level ${level} Achievement">`;
-        achievementContainer.classList.remove('visible');
-        // Force reflow
-        void achievementContainer.offsetWidth;
-        achievementContainer.classList.add('visible');
+        currentBadgeIndex = imageIndex; // Update current badge index
+        updateBadgeDisplay(imageIndex);
     }
 }
 
@@ -279,6 +307,12 @@ async function loadTasks() {
         updateStats();
         renderTasks();
         console.log("Tasks loaded successfully from Firestore.");
+
+        // Initialize badge display based on current level
+        const imageIndex = ((level - 1) % achievementImages.length);
+        currentBadgeIndex = imageIndex;
+        updateBadgeDisplay(imageIndex);
+        
     } catch (error) {
         console.error("Error loading tasks: ", error);
     }

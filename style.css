@@ -169,28 +169,6 @@ body {
     z-index: 1;
 }
 
-.stats div {
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--overlay-background);
-    padding: 0.75rem 1rem;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-    flex: 1 1 150px;
-    text-align: center;
-    cursor: default;
-    color: var(--bright-text);
-    position: relative;
-}
-
-.stats div:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-}
-
 /* Progress Bar Component */
 .progress-container {
     width: 100%;
@@ -1387,3 +1365,96 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
         font-size: 0.8rem;
     }
 }
+
+/* Badge Section Styles */
+.badge-section {
+    width: 100%;
+    margin: 2rem 0;
+    order: 4;
+}
+
+.badge-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.badge-nav-button {
+    background: var(--overlay-background);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.badge-nav-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.1);
+}
+
+.badge-nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Update Achievement Image Styles */
+.achievement-image {
+    width: 200px;
+    height: 200px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Update Completed Tasks List Styles */
+.completed-list {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.completed-list .task-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.completed-list .task-text {
+    font-size: 1rem;
+}
+
+.completed-list h3 {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Update Stats Section */
+.stats {
+    order: 5;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--overlay-background);
+    border-radius: var(--border-radius);
+}
+
+/* Reorder sections using flexbox order */
+.header { order: 1; }
+.task-form { order: 2; }
+#activeTasksList { order: 3; }
+.badge-section { order: 4; }
+.stats { order: 5; }
+.progress-container { order: 6; }
+#completedTasksList { order: 7; }
+.reset-button { order: 8; }

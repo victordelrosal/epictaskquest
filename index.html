@@ -51,9 +51,6 @@
             <!-- Active tasks will be dynamically added here -->
         </div>
 
-        <!-- Achievement Image Component -->
-        <div id="achievementImage" class="achievement-image"></div>
-
         <!-- Task Form Component -->
         <div class="task-form">
             <input type="text" id="taskInput" placeholder="Enter your quest...">
@@ -71,6 +68,15 @@
                 🛒
             </label>
             <button id="addTaskButton"><i class="fas fa-plus"></i> Add</button>
+        </div>
+
+        <!-- Badge Display Section -->
+        <div class="badge-section">
+            <div class="badge-navigation">
+                <button id="prevBadge" class="badge-nav-button"><i class="fas fa-chevron-left"></i></button>
+                <div id="achievementImage" class="achievement-image"></div>
+                <button id="nextBadge" class="badge-nav-button"><i class="fas fa-chevron-right"></i></button>
+            </div>
         </div>
 
         <!-- Stats Component -->
@@ -100,7 +106,7 @@
         </div>
         
         <!-- Completed Tasks List Component -->
-        <div class="task-list" id="completedTasksList">
+        <div class="task-list completed-list" id="completedTasksList">
             <h3>Completed Tasks</h3>
             <!-- Completed tasks will be dynamically added here -->
         </div>
