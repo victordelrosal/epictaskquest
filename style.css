@@ -903,14 +903,17 @@ body {
     padding: 5px 10px;
     transition: transform 0.2s ease;
     opacity: 0.5;
+    color: #ADD8E6; /* Light blue */
 }
 
 .cart-toggle.active {
     opacity: 1;
+    color: #87CEFA; /* Lighter shade of blue */
 }
 
 .cart-toggle:hover {
     transform: scale(1.2);
+    color: #B0E0E6; /* Slightly different light blue for hover */
 }
 
 /* Achievement Image Styling */
