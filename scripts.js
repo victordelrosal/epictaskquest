@@ -452,6 +452,7 @@ async function loadTasks() {
 
 // Modify addTask function to automatically append #buy tag
 async function addTask() {
+    saveToggleStates();
     let text = taskInput.value.trim();
     const difficulty = parseInt(difficultySelect.value);
     const customPoints = difficulty === 6 ? 
@@ -509,6 +510,7 @@ async function addTask() {
         }
         
         renderTasks();
+        restoreToggleStates();
         animateTaskAddition(docRef.id);
         showSuccessNotification(); // Add success notification
         
@@ -525,6 +527,7 @@ async function addTask() {
 
 // Toggle task completion
 async function toggleTaskCompletion(taskId, completed) {
+    saveToggleStates();
     try {
         const taskDoc = doc(db, "tasks", taskId);
         const taskIndex = tasks.findIndex(t => t.id === taskId);
@@ -564,6 +567,8 @@ async function toggleTaskCompletion(taskId, completed) {
         }
 
         console.log(`Task ${taskId} handled: ${completed ? 'completed' : 'uncompleted'}, Repeat: ${isRepeatTask}`);
+        await renderTasks();
+        restoreToggleStates();
     } catch (error) {
         console.error("Error updating task: ", error);
     }
@@ -578,7 +583,6 @@ async function editTaskText(taskId, newText) {
     }
 
     try {
-        // Save toggle states before updating
         saveToggleStates();
 
         const taskDoc = doc(db, "tasks", taskId);
@@ -603,8 +607,7 @@ async function editTaskText(taskId, newText) {
         if (taskIndex !== -1) {
             tasks[taskIndex].text = newText;
             tasks[taskIndex].isWishlist = hasBuyTag;
-            renderTasks(tasks);
-            // Restore toggle states after rendering
+            await renderTasks(tasks);
             restoreToggleStates();
         }
     } catch (error) {
@@ -614,11 +617,19 @@ async function editTaskText(taskId, newText) {
 
 // Update task difficulty
 async function updateTaskDifficulty(taskId, newDifficulty) {
+    saveToggleStates();
     try {
         const taskDoc = doc(db, "tasks", taskId);
         await updateDoc(taskDoc, { difficulty: newDifficulty });
         console.log(`Task ${taskId} difficulty updated to ${newDifficulty}.`);
         loadTasks(); // Reload tasks to update UI and trigger animations
+        const taskIndex = tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            tasks[taskIndex].difficulty = newDifficulty;
+            updateStats();
+            await renderTasks();
+            restoreToggleStates();
+        }
     } catch (error) {
         console.error("Error updating task difficulty: ", error);
     }
@@ -626,11 +637,20 @@ async function updateTaskDifficulty(taskId, newDifficulty) {
 
 // Delete a task
 async function deleteTask(taskId) {
+    saveToggleStates();
     try {
         await deleteDoc(doc(db, "tasks", taskId));
         console.log(`Task ${taskId} deleted.`);
         animateTaskDeletion(taskId);
         loadTasks(); // Reload tasks to update list and stats
+        const taskIndex = tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            tasks.splice(taskIndex, 1);
+        }
+        
+        animateTaskDeletion(taskId);
+        await renderTasks();
+        restoreToggleStates();
     } catch (error) {
         console.error("Error deleting task: ", error);
     }
@@ -1318,7 +1338,13 @@ function saveToggleStates() {
     openToggles.clear();
     document.querySelectorAll('.hashtag-toggle.expanded').forEach(toggle => {
         const label = toggle.querySelector('.hashtag-label').textContent;
+        const contentDiv = toggle.nextElementSibling;
         openToggles.add(label);
+        
+        // Store scroll position
+        if (contentDiv) {
+            sessionStorage.setItem(`scroll-${label}`, contentDiv.scrollTop);
+        }
     });
 }
 
@@ -1331,10 +1357,27 @@ function restoreToggleStates() {
             toggle.classList.add('expanded');
             toggle.querySelector('.toggle-icon').textContent = '▼';
             contentDiv.style.display = 'block';
-            contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+            
+            // Use setTimeout to ensure the content is rendered
+            setTimeout(() => {
+                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+                // Restore scroll position
+                const scrollPos = sessionStorage.getItem(`scroll-${label}`);
+                if (scrollPos) {
+                    contentDiv.scrollTop = parseInt(scrollPos);
+                }
+            }, 0);
         }
     });
 }
+
+// Add event listener for scroll position saving
+document.addEventListener('scroll', (e) => {
+    if (e.target.classList && e.target.classList.contains('hashtag-content')) {
+        const label = e.target.previousElementSibling.querySelector('.hashtag-label').textContent;
+        sessionStorage.setItem(`scroll-${label}`, e.target.scrollTop);
+    }
+}, true);
 
 // Add auth state logging
 auth.onAuthStateChanged((user) => {
