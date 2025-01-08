@@ -1776,3 +1776,46 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
+
+/* Update mobile-specific navbar styles */
+@media (max-width: 768px) {
+    .navbar-container {
+        flex-direction: row; /* Change to row instead of column */
+        padding: 0 8px;
+        height: 50px;
+    }
+
+    .navbar-left, .navbar-right {
+        flex: 0 0 auto;
+        width: 40px; /* Fixed width for side buttons */
+    }
+
+    .navbar-center {
+        flex: 1;
+        max-width: calc(100% - 100px); /* Account for side buttons and padding */
+        margin: 0 10px;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 32px;
+        font-size: 0.9rem;
+        margin: 0; /* Remove any margin */
+    }
+}
+
+/* Extra small devices - adjust sizes further */
+@media (max-width: 480px) {
+    .navbar-container {
+        padding: 0 4px;
+    }
+
+    .navbar-left, .navbar-right {
+        width: 36px; /* Slightly smaller buttons */
+    }
+
+    .navbar-center {
+        max-width: calc(100% - 88px);
+        margin: 0 6px;
+    }
+}
