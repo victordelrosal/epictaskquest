@@ -56,85 +56,84 @@
     </div>
 
     <!-- Main Application Container (Initially Hidden) -->
-    <div class="container" id="appContainer" style="display: none;">
-        
-        <!-- Header Component COMMENTED OUT FOR NOW
-        <div class="header">
-            <h1 class="title"></h1>
-        </div> -->
-
-        <!-- Active Tasks List Component (Moved up) -->
-        <div class="task-list" id="activeTasksList">
-            <h3>Active Tasks</h3>
-            <!-- Active tasks will be dynamically added here -->
-        </div>
-
-        <!-- Task Form Component -->
-        <div class="task-form">
-            <div class="task-form-row">
-                <input type="text" id="taskInput" placeholder="Enter your quest...">
-                <div class="task-controls">
-                    <select id="difficultySelect">
-                        <option value="1">5</option>
-                        <option value="2">10</option>
-                        <option value="3">15</option>
-                        <option value="4">20</option>
-                        <option value="5">25</option>
-                        <option value="6">50</option>
-                    </select>
-                    <input type="number" id="customPoints" placeholder="Points" min="1" max="100" style="display: none;">
-                    <label class="wishlist-checkbox-wrapper">
-                        <input type="checkbox" id="wishlistCheckbox" class="wishlist-checkbox">
-                        🛒
-                    </label>
-                    <button id="addTaskButton"><i class="fas fa-plus"></i></button>
+    <div id="appContainer" style="display: none;">
+        <!-- Container 1: Task Input Area -->
+        <div class="container container-input">
+            <div class="task-form">
+                <div class="task-form-row">
+                    <input type="text" id="taskInput" placeholder="Enter your quest...">
+                    <div class="task-controls">
+                        <select id="difficultySelect">
+                            <option value="1">5</option>
+                            <option value="2">10</option>
+                            <option value="3">15</option>
+                            <option value="4">20</option>
+                            <option value="5">25</option>
+                            <option value="6">50</option>
+                        </select>
+                        <input type="number" id="customPoints" placeholder="Points" min="1" max="100" style="display: none;">
+                        <label class="wishlist-checkbox-wrapper">
+                            <input type="checkbox" id="wishlistCheckbox" class="wishlist-checkbox">
+                            🛒
+                        </label>
+                        <button id="addTaskButton"><i class="fas fa-plus"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Badge Display Section -->
-        <div class="badge-section">
-            <div class="badge-navigation">
-                <button id="prevBadge" class="badge-nav-button"><i class="fas fa-chevron-left"></i></button>
-                <div id="achievementImage" class="achievement-image"></div>
-                <!-- Removed next button -->
+        <!-- Container 2: Main Content -->
+        <div class="container container-main">
+            <!-- Active Tasks List Component -->
+            <div class="task-list" id="activeTasksList">
+                <h3>Active Tasks</h3>
+                <!-- Active tasks will be dynamically added here -->
             </div>
-        </div>
 
-        <!-- Stats Component -->
-        <div class="stats">
-            <div>
-                <i class="fas fa-check-circle"></i>
-                Completed: <span id="completedTasks" class="number-transition">0</span>
+            <!-- Badge Display Section -->
+            <div class="badge-section">
+                <div class="badge-navigation">
+                    <button id="prevBadge" class="badge-nav-button"><i class="fas fa-chevron-left"></i></button>
+                    <div id="achievementImage" class="achievement-image"></div>
+                    <!-- Removed next button -->
+                </div>
             </div>
-            <div>
-                <i class="fas fa-star"></i>
-                Points: <span id="totalPoints" class="number-transition">0</span>
-            </div>
-            <div>
-                <i class="fas fa-level-up-alt"></i>
-                Level: <span id="level" class="number-transition">1</span>
-            </div>
-        </div>
 
-        <!-- Progress Bar Component -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
+            <!-- Stats Component -->
+            <div class="stats">
+                <div>
+                    <i class="fas fa-check-circle"></i>
+                    Completed: <span id="completedTasks" class="number-transition">0</span>
+                </div>
+                <div>
+                    <i class="fas fa-star"></i>
+                    Points: <span id="totalPoints" class="number-transition">0</span>
+                </div>
+                <div>
+                    <i class="fas fa-level-up-alt"></i>
+                    Level: <span id="level" class="number-transition">1</span>
+                </div>
             </div>
-            <div class="progress-text">
-                Progress to Next Level: <span id="progressText">0/100</span>
-            </div>
-        </div>
-        
-        <!-- Completed Tasks List Component -->
-        <div class="task-list completed-list" id="completedTasksList">
-            <h3>Completed Tasks</h3>
-            <!-- Completed tasks will be dynamically added here -->
-        </div>
 
-        <!-- Reset Progress Button Component -->
-        <button class="reset-button" id="resetButton"><i class="fas fa-redo-alt"></i> ☢️</button>
+            <!-- Progress Bar Component -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text">
+                    Progress to Next Level: <span id="progressText">0/100</span>
+                </div>
+            </div>
+            
+            <!-- Completed Tasks List Component -->
+            <div class="task-list completed-list" id="completedTasksList">
+                <h3>Completed Tasks</h3>
+                <!-- Completed tasks will be dynamically added here -->
+            </div>
+
+            <!-- Reset Progress Button Component -->
+            <button class="reset-button" id="resetButton"><i class="fas fa-redo-alt"></i> ☢️</button>
+        </div>
     </div>
 
     <!-- Confirmation Modal Component -->
