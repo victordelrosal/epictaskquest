@@ -1324,13 +1324,94 @@ async function migrateShopToBuyTags() {
 
 // Add function to show success notification
 function showSuccessNotification() {
+    // Create and append success message if it doesn't exist
+    let successOverlay = document.getElementById('successOverlay');
+    let successMessage = document.getElementById('successMessage');
+    
+    if (!successOverlay) {
+        successOverlay = document.createElement('div');
+        successOverlay.id = 'successOverlay';
+        document.body.appendChild(successOverlay);
+        
+        successMessage = document.createElement('button');
+        successMessage.id = 'successMessage';
+        successMessage.className = 'crystal-button';
+        successMessage.textContent = 'Quest Added';
+        successOverlay.appendChild(successMessage);
+        
+        // Add the crystal button styles
+        const style = document.createElement('style');
+        style.textContent = `
+            #successOverlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.3);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease-in-out;
+                z-index: 1000;
+            }
+            
+            #successOverlay.show {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .crystal-button {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: white;
+                background: linear-gradient(145deg, #ff7eb3, #ff758c, #f1a7f1, #8e8cd8);
+                background-size: 300% 300%;
+                border: none;
+                border-radius: 50px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+                padding: 15px 40px;
+                text-transform: uppercase;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+                cursor: pointer;
+                transition: all 0.3s ease-in-out;
+                animation: colorShift 5s infinite alternate;
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            
+            .crystal-button.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+            @keyframes colorShift {
+                0% { background-position: 0% 0%; }
+                100% { background-position: 100% 100%; }
+            }
+            
+            .crystal-button:hover {
+                box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3), inset 0 2px 10px rgba(255, 255, 255, 0.6);
+                transform: translateY(-3px);
+            }
+            
+            .crystal-button:active {
+                box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
     successOverlay.classList.add('show');
     successMessage.classList.add('show');
     
     setTimeout(() => {
         successOverlay.classList.remove('show');
         successMessage.classList.remove('show');
-    }, 1500); // Remove after 1.5 seconds
+    }, 1500);
 }
 
 // Add new function to save toggle states
