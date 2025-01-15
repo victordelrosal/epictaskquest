@@ -1445,7 +1445,7 @@ function showSuccessNotification() {
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0, 0, 0, 0.3);
+                background: rgba(0, 21, 255, 0.15);
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -1464,17 +1464,21 @@ function showSuccessNotification() {
                 font-size: 1.5rem;
                 font-weight: bold;
                 color: white;
-                background: linear-gradient(145deg, #ff7eb3, #ff758c, #f1a7f1, #8e8cd8);
+                background: linear-gradient(145deg, #0066ff, #0033ff, #001aff, #0000ff);
                 background-size: 300% 300%;
                 border: none;
                 border-radius: 50px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+                box-shadow: 
+                    0 0 15px rgba(0, 89, 255, 0.5),
+                    0 0 30px rgba(0, 89, 255, 0.3),
+                    0 0 45px rgba(0, 89, 255, 0.1),
+                    inset 0 0 15px rgba(255, 255, 255, 0.4);
                 padding: 15px 40px;
                 text-transform: uppercase;
-                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+                text-shadow: 0 0 10px rgba(0, 89, 255, 0.8);
                 cursor: pointer;
                 transition: all 0.3s ease-in-out;
-                animation: colorShift 5s infinite alternate;
+                animation: neonPulse 2s infinite alternate;
                 opacity: 0;
                 transform: translateY(20px);
             }
@@ -1484,18 +1488,44 @@ function showSuccessNotification() {
                 transform: translateY(0);
             }
             
+            @keyframes neonPulse {
+                0% {
+                    box-shadow: 
+                        0 0 15px rgba(0, 89, 255, 0.5),
+                        0 0 30px rgba(0, 89, 255, 0.3),
+                        0 0 45px rgba(0, 89, 255, 0.1),
+                        inset 0 0 15px rgba(255, 255, 255, 0.4);
+                    text-shadow: 0 0 10px rgba(0, 89, 255, 0.8);
+                }
+                100% {
+                    box-shadow: 
+                        0 0 20px rgba(0, 89, 255, 0.7),
+                        0 0 35px rgba(0, 89, 255, 0.5),
+                        0 0 50px rgba(0, 89, 255, 0.3),
+                        inset 0 0 20px rgba(255, 255, 255, 0.6);
+                    text-shadow: 0 0 15px rgba(0, 89, 255, 1);
+                }
+            }
+            
             @keyframes colorShift {
                 0% { background-position: 0% 0%; }
                 100% { background-position: 100% 100%; }
             }
             
             .crystal-button:hover {
-                box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3), inset 0 2px 10px rgba(255, 255, 255, 0.6);
+                box-shadow: 
+                    0 0 25px rgba(0, 89, 255, 0.8),
+                    0 0 40px rgba(0, 89, 255, 0.6),
+                    0 0 55px rgba(0, 89, 255, 0.4),
+                    inset 0 0 25px rgba(255, 255, 255, 0.8);
                 transform: translateY(-3px);
             }
             
             .crystal-button:active {
-                box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+                box-shadow: 
+                    0 0 15px rgba(0, 89, 255, 0.5),
+                    0 0 30px rgba(0, 89, 255, 0.3),
+                    inset 0 0 15px rgba(0, 0, 0, 0.2);
                 transform: translateY(0);
             }
         `;
