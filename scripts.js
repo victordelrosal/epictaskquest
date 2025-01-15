@@ -348,6 +348,20 @@ const pointsToNextLevel = 100;
 // Add at the top with other global variables
 let openToggles = new Set();
 
+// Add after other global variables
+const hashtagToggleConfig = {
+    default: {
+        fontSize: '11px',
+        fontFamily: 'Arial',
+        hoverBgColor: 'rgba(255, 255, 255, 0.1)',
+        easterEgg: null
+    },
+    // Special configurations for specific hashtags
+    customConfig: {
+        // Example: '#buy': { fontSize: '12px', easterEgg: '🛍️' }
+    }
+};
+
 // DOM Elements
 const taskInput = document.getElementById('taskInput');
 const difficultySelect = document.getElementById('difficultySelect');
@@ -857,12 +871,41 @@ function renderTasks(filteredTasks = tasks) {
         
         const toggleHeader = document.createElement('div');
         toggleHeader.classList.add('hashtag-toggle');
+        
+        // Apply default styling
+        const config = hashtagToggleConfig.customConfig[tag] || hashtagToggleConfig.default;
+        toggleHeader.style.fontSize = config.fontSize;
+        toggleHeader.style.fontFamily = config.fontFamily;
+        
+        // Add data attribute for easter egg
+        if (config.easterEgg) {
+            toggleHeader.dataset.easterEgg = config.easterEgg;
+        }
+        
         toggleHeader.innerHTML = `
             <span class="toggle-icon">▶</span>
             <span class="hashtag-label">${tag}</span>
             <span class="task-count">${tasks.length}</span>
         `;
         
+        // Add hover effect handlers
+        toggleHeader.addEventListener('mouseenter', () => {
+            toggleHeader.style.backgroundColor = config.hoverBgColor;
+            if (config.easterEgg) {
+                const label = toggleHeader.querySelector('.hashtag-label');
+                label.dataset.originalText = label.textContent;
+                label.textContent = config.easterEgg;
+            }
+        });
+        
+        toggleHeader.addEventListener('mouseleave', () => {
+            toggleHeader.style.backgroundColor = '';
+            if (config.easterEgg) {
+                const label = toggleHeader.querySelector('.hashtag-label');
+                label.textContent = label.dataset.originalText;
+            }
+        });
+
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('hashtag-content');
         
@@ -922,6 +965,21 @@ function renderTasks(filteredTasks = tasks) {
         // Create toggle header for other tasks
         const toggleHeader = document.createElement('div');
         toggleHeader.classList.add('hashtag-toggle');
+        
+        // Apply default styling
+        const config = hashtagToggleConfig.default;
+        toggleHeader.style.fontSize = config.fontSize;
+        toggleHeader.style.fontFamily = config.fontFamily;
+        
+        // Add hover handlers
+        toggleHeader.addEventListener('mouseenter', () => {
+            toggleHeader.style.backgroundColor = config.hoverBgColor;
+        });
+        
+        toggleHeader.addEventListener('mouseleave', () => {
+            toggleHeader.style.backgroundColor = '';
+        });
+        
         toggleHeader.innerHTML = `
             <span class="toggle-icon">▶</span>
             <span class="hashtag-label">Other Tasks</span>
@@ -1634,3 +1692,22 @@ getRedirectResult(auth)
             stack: error.stack
         });
     });
+
+// Add a utility function to update toggle styling
+function updateHashtagToggleStyle(hashtag, newConfig) {
+    hashtagToggleConfig.customConfig[hashtag] = {
+        ...hashtagToggleConfig.default,
+        ...hashtagToggleConfig.customConfig[hashtag],
+        ...newConfig
+    };
+    renderTasks(tasks); // Re-render to apply changes
+}
+
+// Add a utility function to update default toggle styling
+function updateDefaultToggleStyle(newConfig) {
+    hashtagToggleConfig.default = {
+        ...hashtagToggleConfig.default,
+        ...newConfig
+    };
+    renderTasks(tasks); // Re-render to apply changes
+}
