@@ -361,11 +361,11 @@ const hashtagToggleConfig = {
     customConfig: {
         // Example: '#buy': { fontSize: '12px', easterEgg: '🛍️' }
         '#0': {
-            fontSize: '40px',
+            fontSize: '33px',
             fontFamily: 'Source Code Pro',
             hoverBgColor: 'rgba(255, 0, 0, 0.1)', // Semi-transparent red
             easterEgg: '🔥',
-            height: '60px' // Custom height for #0
+            height: '50px' // Custom height for #0
         }
     }
 };
