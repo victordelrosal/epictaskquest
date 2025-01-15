@@ -351,7 +351,7 @@ let openToggles = new Set();
 // Add after other global variables
 const hashtagToggleConfig = {
     default: {
-        fontSize: '13px',
+        fontSize: '20px',
         fontFamily: 'Arial',
         hoverBgColor: 'rgba(255, 255, 255, 0.1)',
         easterEgg: null,
