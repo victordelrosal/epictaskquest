@@ -359,6 +359,10 @@ const hashtagToggleConfig = {
     // Special configurations for specific hashtags
     customConfig: {
         // Example: '#buy': { fontSize: '12px', easterEgg: '🛍️' }
+        '#0': {
+            fontSize: '12px',
+            hoverBgColor: 'rgba(255, 0, 0, 0.1)' // Semi-transparent red
+        }
     }
 };
 
