@@ -838,6 +838,9 @@ function groupTasksByHashtags(tasks) {
 }
 
 function renderTasks(filteredTasks = tasks) {
+    // Save current toggle states before clearing the lists
+    saveToggleStates();
+    
     // Clear existing tasks
     activeTasksList.innerHTML = `<h3>Active Tasks</h3>`;
     completedTasksList.innerHTML = `<h3>Completed Tasks</h3>`;
@@ -863,16 +866,20 @@ function renderTasks(filteredTasks = tasks) {
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('hashtag-content');
         
-        // Determine if this section should be expanded
-        const shouldExpand = currentFilter === 'wishlist' && tag === '#buy';
-        contentDiv.style.display = shouldExpand ? 'block' : 'none';
-        toggleHeader.querySelector('.toggle-icon').textContent = shouldExpand ? '▼' : '▶';
+        // Set initial state based on openToggles or wishlist filter
+        const shouldExpand = openToggles.has(tag) || (currentFilter === 'wishlist' && tag === '#buy');
+        
         if (shouldExpand) {
             toggleHeader.classList.add('expanded');
-            // Set appropriate maxHeight for animation
+            toggleHeader.querySelector('.toggle-icon').textContent = '▼';
+            contentDiv.style.display = 'block';
+            // Set maxHeight after content is added
             setTimeout(() => {
-                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+                contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
             }, 0);
+        } else {
+            contentDiv.style.display = 'none';
+            contentDiv.style.maxHeight = '0';
         }
         
         // Rest of toggle functionality
@@ -962,6 +969,9 @@ function renderTasks(filteredTasks = tasks) {
             const taskItem = createTaskElement(task, true);
             completedTasksList.appendChild(taskItem);
         });
+
+    // At the end of renderTasks, restore states
+    restoreToggleStates();
 }
 
 // Update createTaskElement to remove the task number
@@ -1548,42 +1558,43 @@ function saveToggleStates() {
         const label = toggle.querySelector('.hashtag-label').textContent;
         const contentDiv = toggle.nextElementSibling;
         
-        // Improved expanded state detection
-        const isExpanded = toggle.classList.contains('expanded') || 
-                          contentDiv.style.display === 'block' ||
-                          contentDiv.style.maxHeight !== '0px';
-        
-        if (isExpanded) {
+        if (contentDiv && (
+            toggle.classList.contains('expanded') || 
+            contentDiv.style.display === 'block' || 
+            contentDiv.style.maxHeight !== '0px'
+        )) {
             openToggles.add(label);
-            // Store scroll position
-            if (contentDiv) {
-                sessionStorage.setItem(`scroll-${label}`, contentDiv.scrollTop);
-            }
+            sessionStorage.setItem(`scroll-${label}`, contentDiv.scrollTop || '0');
         }
     });
 }
 
 function restoreToggleStates() {
+    // Give the DOM a chance to update first
     requestAnimationFrame(() => {
         document.querySelectorAll('.hashtag-toggle').forEach(toggle => {
             const label = toggle.querySelector('.hashtag-label').textContent;
-            const contentDiv = toggle.nextElementSibling;
-            
             if (openToggles.has(label)) {
-                toggle.classList.add('expanded');
-                toggle.querySelector('.toggle-icon').textContent = '▼';
-                contentDiv.style.display = 'block';
-                
-                // Ensure proper height calculation after content is rendered
-                requestAnimationFrame(() => {
-                    contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
+                const contentDiv = toggle.nextElementSibling;
+                if (contentDiv) {
+                    // Update toggle state
+                    toggle.classList.add('expanded');
+                    toggle.querySelector('.toggle-icon').textContent = '▼';
                     
-                    // Restore scroll position
-                    const scrollPos = sessionStorage.getItem(`scroll-${label}`);
-                    if (scrollPos) {
-                        contentDiv.scrollTop = parseInt(scrollPos);
-                    }
-                });
+                    // Show content immediately
+                    contentDiv.style.display = 'block';
+                    
+                    // Ensure proper height calculation
+                    requestAnimationFrame(() => {
+                        contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
+                        
+                        // Restore scroll position
+                        const scrollPos = sessionStorage.getItem(`scroll-${label}`);
+                        if (scrollPos) {
+                            contentDiv.scrollTop = parseInt(scrollPos);
+                        }
+                    });
+                }
             }
         });
     });
