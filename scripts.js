@@ -365,7 +365,7 @@ const hashtagToggleConfig = {
             fontFamily: 'Impact',
             hoverBgColor: 'rgba(255, 0, 0, 0.1)', // Semi-transparent red
             easterEgg: '🔥',
-            height: '60px' // Custom height for #0
+            height: '80px' // Custom height for #0
         }
     }
 };
