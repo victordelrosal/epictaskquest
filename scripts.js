@@ -882,28 +882,43 @@ function renderTasks(filteredTasks = tasks) {
         
         // Apply default styling
         const config = hashtagToggleConfig.customConfig[tag] || hashtagToggleConfig.default;
+        
+        // Style the toggle header
         toggleHeader.style.fontSize = config.fontSize;
         toggleHeader.style.fontFamily = config.fontFamily;
         toggleHeader.style.height = config.height;
         toggleHeader.style.display = 'flex';
-        toggleHeader.style.alignItems = 'center'; // Ensure content stays vertically centered
+        toggleHeader.style.alignItems = 'center';
         
-        // Add data attribute for easter egg
-        if (config.easterEgg) {
-            toggleHeader.dataset.easterEgg = config.easterEgg;
-        }
-        
-        toggleHeader.innerHTML = `
-            <span class="toggle-icon">▶</span>
-            <span class="hashtag-label">${tag}</span>
-            <span class="task-count">${tasks.length}</span>
-        `;
+        // Create elements with specific styling
+        const toggleIcon = document.createElement('span');
+        toggleIcon.className = 'toggle-icon';
+        toggleIcon.textContent = '▶';
+        toggleIcon.style.fontSize = `calc(${config.fontSize} * 0.8)`; // Scale icon with text
+        toggleIcon.style.marginRight = `calc(${config.fontSize} * 0.5)`;
+
+        const label = document.createElement('span');
+        label.className = 'hashtag-label';
+        label.textContent = tag;
+        label.style.fontSize = config.fontSize; // Explicitly set font size on label
+        label.style.lineHeight = config.height; // Match line height to container height
+
+        const count = document.createElement('span');
+        count.className = 'task-count';
+        count.textContent = tasks.length;
+        count.style.fontSize = `calc(${config.fontSize} * 0.8)`; // Scale count with text
+        count.style.padding = `calc(${config.fontSize} * 0.2) calc(${config.fontSize} * 0.4)`;
+
+        // Clear any existing content and append new elements
+        toggleHeader.innerHTML = '';
+        toggleHeader.appendChild(toggleIcon);
+        toggleHeader.appendChild(label);
+        toggleHeader.appendChild(count);
         
         // Add hover effect handlers
         toggleHeader.addEventListener('mouseenter', () => {
             toggleHeader.style.backgroundColor = config.hoverBgColor;
             if (config.easterEgg) {
-                const label = toggleHeader.querySelector('.hashtag-label');
                 label.dataset.originalText = label.textContent;
                 label.textContent = config.easterEgg;
             }
@@ -912,7 +927,6 @@ function renderTasks(filteredTasks = tasks) {
         toggleHeader.addEventListener('mouseleave', () => {
             toggleHeader.style.backgroundColor = '';
             if (config.easterEgg) {
-                const label = toggleHeader.querySelector('.hashtag-label');
                 label.textContent = label.dataset.originalText;
             }
         });
