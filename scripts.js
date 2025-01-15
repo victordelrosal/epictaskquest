@@ -361,7 +361,7 @@ const hashtagToggleConfig = {
     customConfig: {
         // Example: '#buy': { fontSize: '12px', easterEgg: '🛍️' }
         '#0': {
-            fontSize: '20px',
+            fontSize: '40px',
             fontFamily: 'Impact',
             hoverBgColor: 'rgba(255, 0, 0, 0.1)', // Semi-transparent red
             easterEgg: '🔥',
