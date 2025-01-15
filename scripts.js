@@ -354,16 +354,18 @@ const hashtagToggleConfig = {
         fontSize: '11px',
         fontFamily: 'Arial',
         hoverBgColor: 'rgba(255, 255, 255, 0.1)',
-        easterEgg: null
+        easterEgg: null,
+        height: '40px' // Add default height
     },
     // Special configurations for specific hashtags
     customConfig: {
         // Example: '#buy': { fontSize: '12px', easterEgg: '🛍️' }
         '#0': {
-            fontSize: '14px',
+            fontSize: '15px',
             fontFamily: 'Impact',
             hoverBgColor: 'rgba(255, 0, 0, 0.1)', // Semi-transparent red
-            easterEgg: '🔥'
+            easterEgg: '🔥',
+            height: '60px' // Custom height for #0
         }
     }
 };
@@ -882,6 +884,9 @@ function renderTasks(filteredTasks = tasks) {
         const config = hashtagToggleConfig.customConfig[tag] || hashtagToggleConfig.default;
         toggleHeader.style.fontSize = config.fontSize;
         toggleHeader.style.fontFamily = config.fontFamily;
+        toggleHeader.style.height = config.height;
+        toggleHeader.style.display = 'flex';
+        toggleHeader.style.alignItems = 'center'; // Ensure content stays vertically centered
         
         // Add data attribute for easter egg
         if (config.easterEgg) {
@@ -976,6 +981,9 @@ function renderTasks(filteredTasks = tasks) {
         const config = hashtagToggleConfig.default;
         toggleHeader.style.fontSize = config.fontSize;
         toggleHeader.style.fontFamily = config.fontFamily;
+        toggleHeader.style.height = config.height;
+        toggleHeader.style.display = 'flex';
+        toggleHeader.style.alignItems = 'center';
         
         // Add hover handlers
         toggleHeader.addEventListener('mouseenter', () => {
