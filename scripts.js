@@ -1544,38 +1544,48 @@ function showSuccessNotification() {
 // Add new function to save toggle states
 function saveToggleStates() {
     openToggles.clear();
-    document.querySelectorAll('.hashtag-toggle.expanded').forEach(toggle => {
+    document.querySelectorAll('.hashtag-toggle').forEach(toggle => {
         const label = toggle.querySelector('.hashtag-label').textContent;
         const contentDiv = toggle.nextElementSibling;
-        openToggles.add(label);
         
-        // Store scroll position
-        if (contentDiv) {
-            sessionStorage.setItem(`scroll-${label}`, contentDiv.scrollTop);
+        // Improved expanded state detection
+        const isExpanded = toggle.classList.contains('expanded') || 
+                          contentDiv.style.display === 'block' ||
+                          contentDiv.style.maxHeight !== '0px';
+        
+        if (isExpanded) {
+            openToggles.add(label);
+            // Store scroll position
+            if (contentDiv) {
+                sessionStorage.setItem(`scroll-${label}`, contentDiv.scrollTop);
+            }
         }
     });
 }
 
-// Add new function to restore toggle states
 function restoreToggleStates() {
-    document.querySelectorAll('.hashtag-toggle').forEach(toggle => {
-        const label = toggle.querySelector('.hashtag-label').textContent;
-        if (openToggles.has(label)) {
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.hashtag-toggle').forEach(toggle => {
+            const label = toggle.querySelector('.hashtag-label').textContent;
             const contentDiv = toggle.nextElementSibling;
-            toggle.classList.add('expanded');
-            toggle.querySelector('.toggle-icon').textContent = '▼';
-            contentDiv.style.display = 'block';
             
-            // Use setTimeout to ensure the content is rendered
-            setTimeout(() => {
-                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
-                // Restore scroll position
-                const scrollPos = sessionStorage.getItem(`scroll-${label}`);
-                if (scrollPos) {
-                    contentDiv.scrollTop = parseInt(scrollPos);
-                }
-            }, 0);
-        }
+            if (openToggles.has(label)) {
+                toggle.classList.add('expanded');
+                toggle.querySelector('.toggle-icon').textContent = '▼';
+                contentDiv.style.display = 'block';
+                
+                // Ensure proper height calculation after content is rendered
+                requestAnimationFrame(() => {
+                    contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
+                    
+                    // Restore scroll position
+                    const scrollPos = sessionStorage.getItem(`scroll-${label}`);
+                    if (scrollPos) {
+                        contentDiv.scrollTop = parseInt(scrollPos);
+                    }
+                });
+            }
+        });
     });
 }
 
