@@ -21,8 +21,14 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; connect-src https: wss:;">
     <meta name="google-signin-client_id" content="421446505180-vp3v8f3k8vq9jh9v0ks8v3q9v8v9v8v9.apps.googleusercontent.com">
     <meta name="google-signin-cookiepolicy" content="single_host_origin">
+    <!-- Add Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+    <!-- Add background containers before other content -->
+    <div id="gradientBackground" class="fixed-background"></div>
+    <div id="starsContainer" class="fixed-background"></div>
+    
     <!-- Success Notification Elements -->
     <div class="success-overlay" id="successOverlay"></div>
     <div class="success-message" id="successMessage">Quest added</div>

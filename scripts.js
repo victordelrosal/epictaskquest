@@ -17,6 +17,102 @@ import {
     GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
+// Add Starfield initialization at the beginning of the file
+function initStarfield() {
+    const container = document.getElementById('starsContainer');
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, width / height, 1, 2000);
+    camera.position.z = 500;
+
+    const renderer = new THREE.WebGLRenderer({ 
+        antialias: true,
+        alpha: true
+    });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    // Create stars
+    const starsGeometry = new THREE.BufferGeometry();
+    const starCount = 8000;
+    const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
+    const sizes = new Float32Array(starCount);
+
+    const colorPalette = [
+        new THREE.Color('#0000B3').multiplyScalar(1.5),
+        new THREE.Color('#001489').multiplyScalar(1.5),
+        new THREE.Color('#050c91').multiplyScalar(1.5),
+        new THREE.Color('#170484').multiplyScalar(1.5),
+        new THREE.Color('#02066F').multiplyScalar(1.5),
+        new THREE.Color('#000036').multiplyScalar(1.5),
+        new THREE.Color('#FFFFFF')
+    ];
+
+    for (let i = 0; i < starCount; i++) {
+        const i3 = i * 3;
+        positions[i3] = (Math.random() - 0.5) * 2000;
+        positions[i3 + 1] = (Math.random() - 0.5) * 2000;
+        positions[i3 + 2] = (Math.random() - 0.5) * 2000;
+
+        const colorIndex = Math.floor(Math.pow(Math.random(), 2) * colorPalette.length);
+        const color = colorPalette[colorIndex];
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+
+        sizes[i] = Math.random() * 5 + 1;
+    }
+
+    starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    starsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    starsGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const starsMaterial = new THREE.PointsMaterial({
+        size: 3,
+        vertexColors: true,
+        transparent: true,
+        opacity: 1,
+        blending: THREE.AdditiveBlending,
+    });
+
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(stars);
+
+    // Animation
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        const positions = stars.geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+            positions[i + 2] += 1;
+            if (positions[i + 2] > 1000) {
+                positions[i + 2] = -1000;
+            }
+        }
+        stars.geometry.attributes.position.needsUpdate = true;
+        
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle resize
+    function handleResize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    }
+
+    window.addEventListener('resize', handleResize);
+}
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyASqKkvoIp6qvX2Dvze5s6nfKBghQ41axQ",
@@ -148,6 +244,7 @@ onAuthStateChanged(auth, async (user) => {
         // Normal auth state changes
         if (user) {
             if (user.email === authorizedEmail) {
+                initStarfield(); // Initialize starfield
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
                 loadTasks();
