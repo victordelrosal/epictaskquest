@@ -1826,11 +1826,11 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(76, 175, 80, 0.35); /* Increased opacity for greener appearance */
+    background-color: rgba(0, 89, 255, 0.25); /* Electric blue with transparency */
     pointer-events: none;
     opacity: 0;
     z-index: 9999;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother transition */
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .success-message {
@@ -1839,24 +1839,46 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     left: 50%;
     transform: translate(-50%, -50%) scale(0.95);
     background: linear-gradient(135deg, 
-        rgba(76, 175, 80, 0.95) 0%,
-        rgba(56, 142, 60, 0.95) 100%);
+        rgba(0, 89, 255, 0.95) 0%,
+        rgba(0, 60, 255, 0.95) 100%);
     color: white;
     padding: 1.25rem 2.5rem;
     border-radius: var(--border-radius);
     font-size: 1.5rem;
-    font-family: var(--font-primary);
     font-weight: 600;
     letter-spacing: 0.5px;
     pointer-events: none;
     opacity: 0;
     z-index: 10000;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 
+        0 0 20px rgba(0, 89, 255, 0.5),
+        0 0 40px rgba(0, 89, 255, 0.3),
+        0 0 60px rgba(0, 89, 255, 0.1),
+        inset 0 2px 6px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 0 10px rgba(0, 89, 255, 0.8);
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: neonGlow 2s infinite alternate;
+}
+
+@keyframes neonGlow {
+    0% {
+        box-shadow: 
+            0 0 20px rgba(0, 89, 255, 0.5),
+            0 0 40px rgba(0, 89, 255, 0.3),
+            0 0 60px rgba(0, 89, 255, 0.1),
+            inset 0 2px 6px rgba(255, 255, 255, 0.4);
+        text-shadow: 0 0 10px rgba(0, 89, 255, 0.8);
+    }
+    100% {
+        box-shadow: 
+            0 0 25px rgba(0, 89, 255, 0.7),
+            0 0 50px rgba(0, 89, 255, 0.5),
+            0 0 75px rgba(0, 89, 255, 0.3),
+            inset 0 2px 10px rgba(255, 255, 255, 0.6);
+        text-shadow: 0 0 15px rgba(0, 89, 255, 1);
+    }
 }
 
 .success-overlay.show {
