@@ -1004,6 +1004,45 @@ body {
     align-items: center;
 }
 
+/* Add after the navbar styles */
+.search-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.clear-search {
+    position: absolute;
+    right: 12px;
+    color: var(--muted-text);
+    background: none;
+    border: none;
+    font-size: 20px;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.clear-search:hover {
+    color: var(--text-color);
+}
+
+/* Show clear button when search has content */
+.search-input:not(:placeholder-shown) + .clear-search {
+    opacity: 0.5;
+}
+
+.search-input {
+    padding-right: 35px !important;
+}
+
 /* Mobile-specific navbar styles */
 @media (max-width: 768px) {
     .navbar {
