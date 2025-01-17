@@ -1271,6 +1271,14 @@ wishlistFilter.addEventListener('click', () => {
     filterTasks(taskSearchInput.value);
 });
 
+// Add after other event listeners
+document.getElementById('clearSearch').addEventListener('click', () => {
+    const searchInput = document.getElementById('taskSearchInput');
+    searchInput.value = '';
+    searchInput.focus();
+    filterTasks('');
+});
+
 // ===========================
 // Initialize App
 // ===========================
