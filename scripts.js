@@ -1882,3 +1882,60 @@ function initConfigPanel() {
         }, 3000);
     }
 }
+
+// Hashtag Configuration Sync Functions
+function saveHashtagConfig() {
+    const config = {
+        defaultFontSize: document.getElementById('defaultFontSize').value,
+        defaultFontFamily: document.getElementById('defaultFontFamily').value,
+        defaultHoverColor: document.getElementById('defaultHoverColor').value,
+        defaultEasterEgg: document.getElementById('defaultEasterEgg').value,
+        customTag: document.getElementById('customTag').value,
+        customFontSize: document.getElementById('customFontSize').value,
+        customFontFamily: document.getElementById('customFontFamily').value,
+        customHoverColor: document.getElementById('customHoverColor').value,
+        customEasterEgg: document.getElementById('customEasterEgg').value
+    };
+    localStorage.setItem('hashtagConfig', JSON.stringify(config));
+}
+
+function loadHashtagConfig() {
+    const config = JSON.parse(localStorage.getItem('hashtagConfig')) || {};
+    
+    // Apply saved values to inputs
+    Object.keys(config).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+            element.value = config[key];
+        }
+    });
+}
+
+// Add event listeners to configuration inputs
+const configInputs = [
+    'defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg',
+    'customTag', 'customFontSize', 'customFontFamily', 'customHoverColor', 'customEasterEgg'
+];
+
+configInputs.forEach(inputId => {
+    const element = document.getElementById(inputId);
+    if (element) {
+        element.addEventListener('change', () => {
+            saveHashtagConfig();
+            // Apply changes immediately if needed
+            applyHashtagStyles();
+        });
+    }
+});
+
+// Load saved configurations when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // ...existing DOMContentLoaded code...
+    loadHashtagConfig();
+});
+
+// Function to apply hashtag styles (you may already have this)
+function applyHashtagStyles() {
+    // Apply the current configuration to your hashtags
+    // Implementation depends on how you're currently handling hashtag styling
+}
