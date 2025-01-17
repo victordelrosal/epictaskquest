@@ -16,6 +16,7 @@ import {
     browserLocalPersistence,
     GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { AlarmService } from './js/AlarmService.js';
 
 // Add Starfield initialization at the beginning of the file
 function initStarfield() {
@@ -130,6 +131,14 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+// Initialize AlarmService
+const alarmService = new AlarmService();
+
+// Restore alarms when app loads
+window.addEventListener('load', () => {
+    alarmService.restoreAlarms();
+});
 
 // Add debugging code
 window.onerror = function (message, source, lineno, colno, error) {
@@ -607,6 +616,9 @@ async function addTask() {
         position = activeTasks + 1;
     }
 
+    // Check for alarm pattern and schedule if found
+    const alarmDate = alarmService.parseAlarmPattern(text);
+    
     const task = {
         text,
         difficulty,
@@ -614,13 +626,22 @@ async function addTask() {
         completed: false,
         timestamp: serverTimestamp(),
         isWishlist: isWishlist,
-        position: position || activeTasks + 1
+        position: position || activeTasks + 1,
+        alarm: alarmDate ? {
+            time: alarmDate.getTime(),
+            text: text
+        } : null
     };
 
     try {
         const docRef = await addDoc(collection(db, "tasks"), task);
         console.log("Task added with ID: ", docRef.id);
         task.id = docRef.id;
+        
+        // Schedule alarm if present
+        if (alarmDate) {
+            alarmService.scheduleAlarm(docRef.id, text, alarmDate);
+        }
         
         // Insert task at the correct position
         if (position) {
@@ -730,6 +751,16 @@ async function editTaskText(taskId, newText) {
             await renderTasks(tasks);
             restoreToggleStates();
         }
+
+        const oldAlarm = alarmService.alarms.get(taskId);
+        if (oldAlarm) {
+            alarmService.clearAlarm(taskId);
+        }
+
+        const newAlarmDate = alarmService.parseAlarmPattern(newText);
+        if (newAlarmDate) {
+            alarmService.scheduleAlarm(taskId, newText, newAlarmDate);
+        }
     } catch (error) {
         console.error("Error editing task:", error);
     }
@@ -759,6 +790,7 @@ async function updateTaskDifficulty(taskId, newDifficulty) {
 async function deleteTask(taskId) {
     saveToggleStates();
     try {
+        alarmService.clearAlarm(taskId);
         await deleteDoc(doc(db, "tasks", taskId));
         console.log(`Task ${taskId} deleted.`);
         animateTaskDeletion(taskId);

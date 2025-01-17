@@ -2237,3 +2237,68 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
         box-shadow: var(--box-shadow);
     }
 }
+
+/* Alarm Overlay Styles */
+.alarm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alarm-message {
+    background: var(--primary-gradient);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    max-width: 90%;
+    width: 400px;
+    text-align: center;
+    animation: slideIn 0.3s ease-out;
+}
+
+.alarm-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.alarm-text {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    word-break: break-word;
+}
+
+.alarm-dismiss {
+    background: var(--secondary-gradient);
+    color: var(--text-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.alarm-dismiss:hover {
+    transform: scale(1.05);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
