@@ -1747,3 +1747,94 @@ function updateDefaultToggleStyle(newConfig) {
     };
     renderTasks(tasks); // Re-render to apply changes
 }
+
+// Hashtag Configuration Panel
+const configToggle = document.getElementById('configToggle');
+const configPanel = document.getElementById('configPanel');
+const applyCustom = document.getElementById('applyCustom');
+
+// Show/hide configuration panel
+configToggle.addEventListener('click', () => {
+    const isVisible = configPanel.style.display === 'block';
+    configPanel.style.display = isVisible ? 'none' : 'block';
+    configToggle.innerHTML = isVisible ? '⚙️' : '×';
+});
+
+// Apply default style changes
+document.getElementById('defaultFontSize').addEventListener('change', (e) => {
+    updateDefaultToggleStyle({
+        fontSize: `${e.target.value}px`
+    });
+});
+
+document.getElementById('defaultFontFamily').addEventListener('change', (e) => {
+    updateDefaultToggleStyle({
+        fontFamily: e.target.value
+    });
+});
+
+document.getElementById('defaultHoverColor').addEventListener('change', (e) => {
+    updateDefaultToggleStyle({
+        hoverBgColor: `${e.target.value}33` // Add 20% opacity
+    });
+});
+
+document.getElementById('defaultEasterEgg').addEventListener('change', (e) => {
+    updateDefaultToggleStyle({
+        easterEgg: e.target.value
+    });
+});
+
+// Apply custom style
+applyCustom.addEventListener('click', () => {
+    const hashtag = document.getElementById('customTag').value;
+    if (!hashtag.startsWith('#')) {
+        alert('Please enter a valid hashtag starting with #');
+        return;
+    }
+
+    const config = {
+        fontSize: `${document.getElementById('customFontSize').value}px`,
+        fontFamily: document.getElementById('customFontFamily').value,
+        hoverBgColor: `${document.getElementById('customHoverColor').value}33`,
+        easterEgg: document.getElementById('customEasterEgg').value
+    };
+
+    // Remove empty values
+    Object.keys(config).forEach(key => {
+        if (!config[key] || config[key] === 'px') {
+            delete config[key];
+        }
+    });
+
+    updateHashtagToggleStyle(hashtag, config);
+});
+
+// Store configurations in localStorage
+function saveConfigurations() {
+    const configs = {
+        default: hashtagToggleConfig.default,
+        custom: hashtagToggleConfig.customConfig
+    };
+    localStorage.setItem('hashtagConfigs', JSON.stringify(configs));
+}
+
+// Load configurations from localStorage
+function loadConfigurations() {
+    const saved = localStorage.getItem('hashtagConfigs');
+    if (saved) {
+        const configs = JSON.parse(saved);
+        hashtagToggleConfig.default = { ...hashtagToggleConfig.default, ...configs.default };
+        hashtagToggleConfig.customConfig = { ...hashtagToggleConfig.customConfig, ...configs.custom };
+        renderTasks(tasks);
+    }
+}
+
+// Save configurations when changed
+['defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg'].forEach(id => {
+    document.getElementById(id).addEventListener('change', saveConfigurations);
+});
+applyCustom.addEventListener('click', saveConfigurations);
+
+// Load configurations on startup
+loadConfigurations();
