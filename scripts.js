@@ -1881,32 +1881,102 @@ function initConfigPanel() {
             localStorage.setItem('configPanelSeen', 'true');
         }, 3000);
     }
+
+    // Initialize configuration sync
+    initConfigSync();
+    
+    // Load saved configurations
+    loadHashtagConfig();
 }
 
 // Hashtag Configuration Sync Functions
 function saveHashtagConfig() {
     const config = {
-        defaultFontSize: document.getElementById('defaultFontSize').value,
-        defaultFontFamily: document.getElementById('defaultFontFamily').value,
-        defaultHoverColor: document.getElementById('defaultHoverColor').value,
-        defaultEasterEgg: document.getElementById('defaultEasterEgg').value,
-        customTag: document.getElementById('customTag').value,
-        customFontSize: document.getElementById('customFontSize').value,
-        customFontFamily: document.getElementById('customFontFamily').value,
-        customHoverColor: document.getElementById('customHoverColor').value,
-        customEasterEgg: document.getElementById('customEasterEgg').value
+        default: {
+            fontSize: document.getElementById('defaultFontSize').value,
+            fontFamily: document.getElementById('defaultFontFamily').value,
+            hoverBgColor: document.getElementById('defaultHoverColor').value + '33',
+            easterEgg: document.getElementById('defaultEasterEgg').value,
+            height: '45px'
+        },
+        customConfig: {}
     };
+
+    // Save custom hashtag configurations
+    const customTag = document.getElementById('customTag').value;
+    if (customTag && customTag.startsWith('#')) {
+        config.customConfig[customTag] = {
+            fontSize: document.getElementById('customFontSize').value,
+            fontFamily: document.getElementById('customFontFamily').value,
+            hoverBgColor: document.getElementById('customHoverColor').value + '33',
+            easterEgg: document.getElementById('customEasterEgg').value,
+            height: '50px'
+        };
+    }
+
+    // Save to localStorage and update global config
     localStorage.setItem('hashtagConfig', JSON.stringify(config));
+    Object.assign(hashtagToggleConfig, config);
+    renderTasks(tasks); // Re-render to apply changes
 }
 
 function loadHashtagConfig() {
-    const config = JSON.parse(localStorage.getItem('hashtagConfig')) || {};
-    
-    // Apply saved values to inputs
-    Object.keys(config).forEach(key => {
-        const element = document.getElementById(key);
+    try {
+        const saved = localStorage.getItem('hashtagConfig');
+        if (!saved) return;
+
+        const config = JSON.parse(saved);
+
+        // Update global config
+        Object.assign(hashtagToggleConfig, config);
+
+        // Update default inputs
+        if (config.default) {
+            document.getElementById('defaultFontSize').value = config.default.fontSize?.replace('px', '') || '';
+            document.getElementById('defaultFontFamily').value = config.default.fontFamily || '';
+            document.getElementById('defaultHoverColor').value = config.default.hoverBgColor?.replace('33', '') || '';
+            document.getElementById('defaultEasterEgg').value = config.default.easterEgg || '';
+        }
+
+        // Update custom inputs if there's a saved custom config
+        const customConfigs = Object.entries(config.customConfig || {});
+        if (customConfigs.length > 0) {
+            const [tag, settings] = customConfigs[0];
+            document.getElementById('customTag').value = tag;
+            document.getElementById('customFontSize').value = settings.fontSize?.replace('px', '') || '';
+            document.getElementById('customFontFamily').value = settings.fontFamily || '';
+            document.getElementById('customHoverColor').value = settings.hoverBgColor?.replace('33', '') || '';
+            document.getElementById('customEasterEgg').value = settings.easterEgg || '';
+        }
+
+        renderTasks(tasks); // Re-render with new styles
+    } catch (error) {
+        console.error('Error loading hashtag config:', error);
+    }
+}
+
+// Update event listeners for real-time syncing
+function initConfigSync() {
+    const configInputs = [
+        'defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg',
+        'customTag', 'customFontSize', 'customFontFamily', 'customHoverColor', 'customEasterEgg'
+    ];
+
+    configInputs.forEach(id => {
+        const element = document.getElementById(id);
         if (element) {
-            element.value = config[key];
+            ['change', 'input'].forEach(eventType => {
+                element.addEventListener(eventType, () => {
+                    saveHashtagConfig();
+                });
+            });
+        }
+    });
+
+    // Listen for storage changes from other tabs/windows
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'hashtagConfig') {
+            loadHashtagConfig();
         }
     });
 }
