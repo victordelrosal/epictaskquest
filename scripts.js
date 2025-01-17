@@ -245,6 +245,7 @@ onAuthStateChanged(auth, async (user) => {
         if (user) {
             if (user.email === authorizedEmail) {
                 initStarfield(); // Initialize starfield
+                initConfigPanel(); // Add this line
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
                 loadTasks();
@@ -1758,6 +1759,14 @@ configToggle.addEventListener('click', () => {
     const isVisible = configPanel.style.display === 'block';
     configPanel.style.display = isVisible ? 'none' : 'block';
     configToggle.innerHTML = isVisible ? '⚙️' : '×';
+    
+    // Save state to localStorage
+    localStorage.setItem('configPanelVisible', !isVisible);
+    
+    // If opening, scroll panel into view on mobile
+    if (!isVisible && window.innerWidth <= 768) {
+        configPanel.scrollIntoView({ behavior: 'smooth' });
+    }
 });
 
 // Apply default style changes
@@ -1838,3 +1847,38 @@ applyCustom.addEventListener('click', saveConfigurations);
 
 // Load configurations on startup
 loadConfigurations();
+
+// Add initialization for panel visibility
+function initConfigPanel() {
+    // Check if panel was visible before
+    const wasVisible = localStorage.getItem('configPanelVisible') === 'true';
+    if (wasVisible) {
+        configPanel.style.display = 'block';
+        configToggle.innerHTML = '×';
+    }
+    
+    // Show a tooltip on first visit
+    const firstVisit = !localStorage.getItem('configPanelSeen');
+    if (firstVisit) {
+        const tooltip = document.createElement('div');
+        tooltip.style.cssText = `
+            position: fixed;
+            bottom: 60px;
+            right: 1rem;
+            background: var(--primary-gradient);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        `;
+        tooltip.textContent = 'Customize hashtag styles!';
+        document.body.appendChild(tooltip);
+        
+        setTimeout(() => {
+            tooltip.remove();
+            localStorage.setItem('configPanelSeen', 'true');
+        }, 3000);
+    }
+}
