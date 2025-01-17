@@ -295,7 +295,7 @@ body {
     border: none;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
+    color: var (--text-color);
     font-size: 1.3rem;
     cursor: pointer;
 }
@@ -2123,5 +2123,78 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     .clear-search {
         right: 10px;
         font-size: 18px;
+    }
+}
+
+/* Hashtag Configuration Panel */
+.hashtag-config-panel {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--overlay-background);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    color: var(--text-color);
+}
+
+.hashtag-config-toggle {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: var(--primary-gradient);
+    color: var(--text-color);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: var(--box-shadow);
+    z-index: 1001;
+    display: none; /* Hidden by default */
+}
+
+.hashtag-config-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hashtag-preset {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    flex: 1 1 300px;
+}
+
+.hashtag-preset input[type="text"],
+.hashtag-preset input[type="number"],
+.hashtag-preset input[type="color"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem;
+    color: var(--text-color);
+    width: 100%;
+    margin: 0.25rem 0;
+}
+
+.hashtag-preset input[type="color"] {
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Only show on desktop */
+@media (min-width: 1024px) {
+    .hashtag-config-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
