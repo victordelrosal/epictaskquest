@@ -1065,38 +1065,54 @@ body {
         margin: 0 0.5rem;
     }
 
+    .search-container {
+        flex: 1;
+        position: relative;
+        max-width: none;
+        width: 100%;
+        height: 36px; /* Fixed height for mobile */
+    }
+
     .search-input {
         width: 100%;
         height: 36px;
-        font-size: 0.9rem;
-        padding: 0 0.75rem;
+        font-size: 16px; /* Prevent iOS zoom on focus */
+        padding: 0 32px 0 12px; /* Make room for the X button */
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-color);
+        border: none;
+        outline: none;
+        box-sizing: border-box; /* Ensure padding is included in width */
     }
 
-    #wishlistFilter,
-    #logoutButton {
-        width: 36px;
-        height: 36px;
-        padding: 0;
+    .clear-search {
+        position: absolute;
+        right: 8px; /* Position further left to stay inside */
+        top: 50%;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 24px;
+        font-size: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
+        background: none;
+        border: none;
+        color: rgba(255, 215, 0, 0.6);
+        padding: 0;
         margin: 0;
+        pointer-events: auto;
+        z-index: 2;
+        opacity: 0;
     }
 
-    /* Ensure filter button stays in place */
-    .filter-button {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        margin: 0;
-        padding: 0;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Override any flex-basis or min-width that might cause shrinking */
+    .navbar-center {
+        flex: 1;
+        width: 100%;
+        min-width: 0;
+        max-width: calc(100% - 88px);
     }
 
     body {
