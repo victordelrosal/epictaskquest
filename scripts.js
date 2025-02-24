@@ -1010,6 +1010,19 @@ function renderTasks(filteredTasks = tasks) {
             contentDiv.appendChild(taskItem);
         });
 
+        // Add (+) button to the toggle header
+        const addButton = document.createElement('button');
+        addButton.classList.add('add-task-button');
+        addButton.innerHTML = '+';
+        addButton.title = `Add task with ${tag}`;
+        addButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            taskInput.value = tag; // Pre-populate the task input with the hashtag
+            taskInput.focus(); // Focus the task input
+        });
+
+        toggleHeader.appendChild(addButton);
+
         groupDiv.appendChild(toggleHeader);
         groupDiv.appendChild(contentDiv);
         activeTasksList.appendChild(groupDiv);

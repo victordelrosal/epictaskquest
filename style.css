@@ -1785,14 +1785,51 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     user-select: none;
     transition: background-color 0.3s ease;
     margin-bottom: 0.5rem;
+    position: relative; /* Add relative positioning */
 }
 
-.hashtag-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
+/* Add styles for the (+) button */
+.hashtag-toggle .add-task-button {
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--primary-gradient);
+    color: var(--text-color);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.hashtag-toggle.expanded {
-    background: rgba(255, 255, 255, 0.15);
+.hashtag-toggle .add-task-button:hover {
+    background: var(--secondary-gradient);
+    transform: scale(1.1);
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .hashtag-toggle {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .hashtag-label {
+        font-size: 1rem;
+    }
+
+    .task-count {
+        font-size: 0.8rem;
+    }
+
+    /* Ensure the (+) button is visible on mobile */
+    .hashtag-toggle .add-task-button {
+        display: flex;
+    }
 }
 
 .toggle-icon {
