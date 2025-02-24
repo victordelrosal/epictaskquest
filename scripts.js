@@ -2041,3 +2041,11 @@ function applyHashtagStyles() {
     // Apply the current configuration to your hashtags
     // Implementation depends on how you're currently handling hashtag styling
 }
+
+// Ensure tasks is defined as an array
+tasks = tasks || [];
+
+// Later when using .map, you can also use optional chaining:
+const myMapped = tasks?.map(task => {
+    // ...process each task...
+});
