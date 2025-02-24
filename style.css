@@ -2339,3 +2339,17 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
         opacity: 1;
     }
 }
+
+/* Alarm Overlay Effect */
+.alarm-overlay {
+    animation: pulseEffect 1s infinite alternate;
+}
+
+@keyframes pulseEffect {
+    0% {
+        background-color: rgba(255, 0, 0, 0.1);
+    }
+    100% {
+        background-color: rgba(255, 0, 0, 0.3);
+    }
+}

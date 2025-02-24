@@ -1,6 +1,7 @@
 export class AlarmService {
     constructor() {
         this.alarms = new Map();
+        this.alarmSound = new Audio('path/to/alarm-sound.mp3'); // Add path to your alarm sound file
         this.initializeNotifications();
     }
 
@@ -69,25 +70,35 @@ export class AlarmService {
     }
 
     scheduleAlarm(taskId, taskText, alarmDate) {
-        if (!alarmDate || alarmDate < new Date()) return null;
+        const alarmTime = alarmDate.getTime();
+        const now = Date.now();
+        const delay = alarmTime - now;
 
-        const timeoutId = setTimeout(() => {
-            this.triggerAlarm(taskText);
-        }, alarmDate.getTime() - Date.now());
+        if (delay > 0) {
+            const timeoutId = setTimeout(() => {
+                this.triggerAlarm(taskId, taskText);
+            }, delay);
 
-        const alarm = {
-            id: taskId,
-            text: taskText,
-            date: alarmDate,
-            timeoutId
-        };
-
-        this.alarms.set(taskId, alarm);
-        this.persistAlarms();
-        return alarm;
+            this.alarms.set(taskId, { timeoutId, alarmTime });
+        }
     }
 
     async triggerAlarm(taskText) {
+        // Play alarm sound
+        this.alarmSound.play();
+
+        // Make window pulse
+        document.body.classList.add('alarm-overlay');
+        setTimeout(() => {
+            document.body.classList.remove('alarm-overlay');
+        }, 3000); // Pulse duration
+
+        // Show alert
+        alert(`Alarm for task: ${taskText}`);
+
+        // Clear the alarm from the map
+        this.alarms.delete(taskId);
+
         // Visual notification
         if (Notification.permission === 'granted') {
             new Notification('Task Reminder', {
