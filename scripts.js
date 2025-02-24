@@ -1017,8 +1017,10 @@ function renderTasks(filteredTasks = tasks) {
         addButton.title = `Add task with ${tag}`;
         addButton.addEventListener('click', (e) => {
             e.stopPropagation();
-            taskInput.value = tag; // Pre-populate the task input with the hashtag
+            const hashtagWithSpace = ` ${tag}`;
+            taskInput.value = hashtagWithSpace; // Pre-populate the task input with the hashtag and a space
             taskInput.focus(); // Focus the task input
+            taskInput.setSelectionRange(0, 0); // Place the cursor at the beginning
         });
 
         toggleHeader.appendChild(addButton);
