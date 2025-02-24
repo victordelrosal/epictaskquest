@@ -84,8 +84,10 @@ export class AlarmService {
     }
 
     async triggerAlarm(taskText) {
-        // Play alarm sound
-        this.alarmSound.play();
+        // Play alarm sound immediately
+        this.alarmSound.play().catch(error => {
+            console.error('Error playing alarm sound:', error);
+        });
 
         // Make window pulse
         document.body.classList.add('alarm-overlay');
