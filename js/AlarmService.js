@@ -1,7 +1,7 @@
 export class AlarmService {
     constructor() {
         this.alarms = new Map();
-        this.alarmSound = new Audio('path/to/alarm-sound.mp3'); // Add path to your alarm sound file
+        this.alarmSound = new Audio('alert.mp3'); // Use the local alert.mp3 file
         this.initializeNotifications();
     }
 
@@ -96,9 +96,6 @@ export class AlarmService {
         // Show alert
         alert(`Alarm for task: ${taskText}`);
 
-        // Clear the alarm from the map
-        this.alarms.delete(taskId);
-
         // Visual notification
         if (Notification.permission === 'granted') {
             new Notification('Task Reminder', {
@@ -107,10 +104,6 @@ export class AlarmService {
                 requireInteraction: true
             });
         }
-
-        // Audio notification
-        const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAsAABIAAEBAwUHBwkLDQ0PERMVFRcZGx0dHyEjJSUnKSstLS8xMzU1Nzk7PT0/QUNGR0hKTE5OUFJUVlZYWlxeXmBiZGZmaGpsb29xc3V3d3l7fX9/gYOFh4eJi42NjpCSlJSWmJqcnJ6goqSkpqisrq6ws7W1t7m7vb2/wcPFxcfJy83Nz9HT1dXX2dzd3d/h4+Xl5+nr7e3v8fP19ff5+/39AAAAOUxBTUUzLjEwMACwBQAAKwkgJCHhABYAAAFYAAAAAUpTdGVyZW8AAA8AAAADAAAEAAABAAAAAAA=');
-        await audio.play().catch(console.error);
 
         // Show overlay
         this.showAlarmOverlay(taskText);
