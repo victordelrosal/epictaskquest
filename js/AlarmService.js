@@ -109,24 +109,22 @@ export class AlarmService {
 
         // Show overlay
         this.showAlarmOverlay(taskText);
+
+        // Make browser tab blink
+        this.blinkTabTitle();
     }
 
-    showAlarmOverlay(taskText) {
-        const overlay = document.createElement('div');
-        overlay.className = 'alarm-overlay';
-        overlay.innerHTML = `
-            <div class="alarm-message">
-                <div class="alarm-title">⏰ Task Reminder</div>
-                <div class="alarm-text">${taskText}</div>
-                <button class="alarm-dismiss">Dismiss</button>
-            </div>
-        `;
+    blinkTabTitle() {
+        const originalTitle = document.title;
+        let blinkInterval = setInterval(() => {
+            document.title = document.title === '🚨 Alarm! 🚨' ? originalTitle : '🚨 Alarm! 🚨';
+        }, 1000);
 
-        document.body.appendChild(overlay);
-        
-        overlay.querySelector('.alarm-dismiss').addEventListener('click', () => {
-            overlay.remove();
-        });
+        // Stop blinking after 10 seconds
+        setTimeout(() => {
+            clearInterval(blinkInterval);
+            document.title = originalTitle;
+        }, 10000);
     }
 
     persistAlarms() {
