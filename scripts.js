@@ -369,7 +369,7 @@ const hashtagToggleConfig = {
     },
     // Special configurations for specific hashtags
     customConfig: {
-        // Example: '#buy': { fontSize: '12px', easterEgg: '🛍️' }
+        // Example: '#0buy': { fontSize: '12px', easterEgg: '🛍️' }
         '#0': {
             fontSize: '33px',
             fontFamily: 'IBM Plex Sans',
@@ -559,7 +559,7 @@ async function loadTasks() {
             }
         });
 
-        // Run migration from #shop to #buy
+        // Run migration from #shop to #0buy
         await migrateShopToBuyTags();
         // Run normal sync after migration
         await syncShoppingTags();
@@ -579,7 +579,7 @@ async function loadTasks() {
     }
 }
 
-// Modify addTask function to automatically append #buy tag
+// Modify addTask function to automatically append #0buy tag
 async function addTask() {
     saveToggleStates();
     let text = taskInput.value.trim();
@@ -594,9 +594,9 @@ async function addTask() {
         return;
     }
 
-    // Automatically append #buy tag if wishlist is checked and tag doesn't exist
-    if (isWishlist && !text.includes('#buy')) {
-        text = `${text} #buy`;
+    // Automatically append #0buy tag if wishlist is checked and tag doesn't exist
+    if (isWishlist && !text.includes('#0buy')) {
+        text = `${text} #0buy`;
     }
 
     // Get active tasks count
@@ -715,7 +715,7 @@ async function toggleTaskCompletion(taskId, completed) {
     }
 }
 
-// Modify editTaskText function to handle #buy tag
+// Modify editTaskText function to handle #0buy tag
 async function editTaskText(taskId, newText) {
     if (newText.trim() === "") {
         alert("Task text cannot be empty.");
@@ -730,11 +730,11 @@ async function editTaskText(taskId, newText) {
         const taskIndex = tasks.findIndex(t => t.id === taskId);
         const currentTask = tasks[taskIndex];
         
-        // Check if #buy was added
-        const hadBuyTag = currentTask.text.includes('#buy');
-        const hasBuyTag = newText.includes('#buy');
+        // Check if #0buy was added
+        const hadBuyTag = currentTask.text.includes('#0buy');
+        const hasBuyTag = newText.includes('#0buy');
         
-        // Update wishlist status if #buy tag was added or removed
+        // Update wishlist status if #0buy tag was added or removed
         if (hasBuyTag !== hadBuyTag) {
             await updateDoc(taskDoc, { 
                 text: newText,
@@ -968,7 +968,7 @@ function renderTasks(filteredTasks = tasks) {
         contentDiv.classList.add('hashtag-content');
         
         // Set initial state based on openToggles or wishlist filter
-        const shouldExpand = openToggles.has(tag) || (currentFilter === 'wishlist' && tag === '#buy');
+        const shouldExpand = openToggles.has(tag) || (currentFilter === 'wishlist' && tag === '#0buy');
         
         if (shouldExpand) {
             toggleHeader.classList.add('expanded');
@@ -1188,11 +1188,11 @@ function createTaskElement(task, isCompleted) {
                 const newWishlistStatus = !task.isWishlist;
                 let newText = task.text;
 
-                // Add or remove #buy tag based on wishlist status
-                if (newWishlistStatus && !task.text.includes('#buy')) {
-                    newText = `${task.text} #buy`;
-                } else if (!newWishlistStatus && task.text.includes('#buy')) {
-                    newText = task.text.replace(/#buy\b/g, '').trim();
+                // Add or remove #0buy tag based on wishlist status
+                if (newWishlistStatus && !task.text.includes('#0buy')) {
+                    newText = `${task.text} #0buy`;
+                } else if (!newWishlistStatus && task.text.includes('#0buy')) {
+                    newText = task.text.replace(/#0buy\b/g, '').trim();
                 }
 
                 await updateDoc(taskDoc, { 
@@ -1485,14 +1485,14 @@ function filterTasks(searchTerm = '') {
 async function syncShoppingTags() {
     const updates = [];
     tasks.forEach(task => {
-        if (task.isWishlist && !task.text.includes('#buy')) {
-            // Task is in shopping list but missing #buy tag
+        if (task.isWishlist && !task.text.includes('#0buy')) {
+            // Task is in shopping list but missing #0buy tag
             updates.push({
                 id: task.id,
-                newText: `${task.text} #buy`
+                newText: `${task.text} #0buy`
             });
-        } else if (!task.isWishlist && task.text.includes('#buy')) {
-            // Task has #buy tag but not in shopping list
+        } else if (!task.isWishlist && task.text.includes('#0buy')) {
+            // Task has #0buy tag but not in shopping list
             updates.push({
                 id: task.id,
                 isWishlist: true
@@ -1527,24 +1527,24 @@ async function syncShoppingTags() {
     }
 }
 
-// Add new migration function to convert #shop to #buy
+// Add new migration function to convert #shop to #0buy
 async function migrateShopToBuyTags() {
     const updates = [];
     tasks.forEach(task => {
         const text = task.text;
         // Check for both old and new tags to ensure complete migration
-        if (text.includes('#shop') || text.includes('#buy')) {
+        if (text.includes('#shop') || text.includes('#0buy')) {
             // Replace all variations and clean up
             const newText = text
-                .replace(/#shop\b/g, '#buy')
-                .replace(/(#buy\s*)+/g, '#buy ') // Remove duplicate #buy tags
+                .replace(/#shop\b/g, '#0buy')
+                .replace(/(#0buy\s*)+/g, '#0buy ') // Remove duplicate #0buy tags
                 .trim();
             
             if (newText !== text) {
                 updates.push({
                     id: task.id,
                     newText: newText,
-                    isWishlist: true // Ensure wishlist status is set for any task with #buy
+                    isWishlist: true // Ensure wishlist status is set for any task with #0buy
                 });
             }
         }
