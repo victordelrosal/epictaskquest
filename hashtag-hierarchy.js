@@ -11,6 +11,24 @@ let hashtagGroups = {
     excludedTags: new Set()
 };
 
+// Function to initialize hashtag hierarchy
+export function initializeHashtagHierarchy() {
+    // Initialize hashtag hierarchy
+    console.log("Initializing hashtag hierarchy with parent tag:", hashtagGroups.parent);
+    
+    // Apply CSS for hashtag hierarchy
+    applyHashtagHierarchyStyles();
+    
+    // Add event listener for DOM changes that might add new hashtags
+    document.addEventListener('taskAdded', () => {
+        console.log("Task added, reorganizing hashtags");
+    });
+    
+    document.addEventListener('taskDeleted', () => {
+        console.log("Task deleted, reorganizing hashtags");
+    });
+}
+
 // Export this function to be called from scripts.js
 export function organizeHashtags(allTags) {
     if (!allTags || !Array.isArray(allTags)) return [];
