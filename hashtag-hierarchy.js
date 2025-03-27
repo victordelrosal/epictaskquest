@@ -4,124 +4,100 @@
  * except those starting with '0' or '_'
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize hashtag hierarchy after tasks are loaded
-    initializeHashtagHierarchy();
-});
+let hashtagGroups = {
+    parent: "#non0",
+    excludePatterns: ["#0", "#_"],
+    nestedTags: new Set(),
+    excludedTags: new Set()
+};
 
-function initializeHashtagHierarchy() {
-    // Get all hashtags from tasks and organize them
-    reorganizeHashtags();
+// Export this function to be called from scripts.js
+export function organizeHashtags(allTags) {
+    if (!allTags || !Array.isArray(allTags)) return [];
     
-    // Listen for new task additions to update hierarchy
-    document.addEventListener('taskAdded', () => {
-        reorganizeHashtags();
-    });
+    // Clear previous groupings
+    hashtagGroups.nestedTags.clear();
+    hashtagGroups.excludedTags.clear();
     
-    // Listen for task deletions to update hierarchy
-    document.addEventListener('taskDeleted', () => {
-        reorganizeHashtags();
-    });
-}
-
-function reorganizeHashtags() {
-    // Find all hashtags in the task lists
-    const allHashtags = findAllHashtagsInTasks();
-    
-    // Create the #non0 parent toggle if it doesn't exist
-    createParentToggle();
-    
-    // Group hashtags under #non0 except those starting with '0' or '_'
-    groupHashtagsUnderParent(allHashtags);
-}
-
-function findAllHashtagsInTasks() {
-    // This would need to scan all tasks for hashtags
-    // For now we'll return a placeholder
-    const hashtagElements = document.querySelectorAll('.hashtag');
-    return Array.from(hashtagElements).map(el => el.textContent);
-}
-
-function createParentToggle() {
-    // Check if #non0 toggle already exists
-    if (!document.querySelector('.hashtag[data-tag="#non0"]')) {
-        // Create the parent toggle element
-        const parentToggle = document.createElement('span');
-        parentToggle.className = 'hashtag parent-hashtag';
-        parentToggle.setAttribute('data-tag', '#non0');
-        parentToggle.textContent = '#non0';
-        parentToggle.style.fontSize = '22px';
-        parentToggle.style.fontFamily = 'Arial';
+    // Sort tags into appropriate groups
+    allTags.forEach(tag => {
+        // Skip the parent tag itself
+        if (tag === hashtagGroups.parent) return;
         
-        // Add to the appropriate container (this would depend on your task structure)
-        const taskLists = document.querySelectorAll('.task-list');
-        taskLists.forEach(list => {
-            const toggleContainer = list.querySelector('.hashtag-container') || 
-                                   createHashtagContainer(list);
-            toggleContainer.appendChild(parentToggle.cloneNode(true));
-        });
+        // Check if tag should be excluded from nesting
+        const shouldExclude = hashtagGroups.excludePatterns.some(pattern => 
+            tag.startsWith(pattern)
+        );
         
-        // Add event listener for parent toggle
-        addParentToggleEventListener();
-    }
-}
-
-function createHashtagContainer(taskList) {
-    const container = document.createElement('div');
-    container.className = 'hashtag-container';
-    taskList.appendChild(container);
-    return container;
-}
-
-function groupHashtagsUnderParent(allHashtags) {
-    // For each hashtag, determine if it should be nested
-    document.querySelectorAll('.hashtag').forEach(hashtagEl => {
-        const tagText = hashtagEl.getAttribute('data-tag');
-        
-        // Skip the parent toggle itself
-        if (tagText === '#non0') return;
-        
-        // If tag doesn't start with '0' or '_', nest under #non0
-        if (!tagText.startsWith('#0') && !tagText.startsWith('#_')) {
-            hashtagEl.classList.add('nested-hashtag');
-            hashtagEl.setAttribute('data-parent', '#non0');
-            
-            // Initially hide nested hashtags
-            if (!document.querySelector('.hashtag[data-tag="#non0"]').classList.contains('active')) {
-                hashtagEl.style.display = 'none';
-            }
+        if (shouldExclude) {
+            hashtagGroups.excludedTags.add(tag);
         } else {
-            // Remove nesting from excluded tags
-            hashtagEl.classList.remove('nested-hashtag');
-            hashtagEl.removeAttribute('data-parent');
+            hashtagGroups.nestedTags.add(tag);
         }
     });
+    
+    return {
+        parentTag: hashtagGroups.parent,
+        nestedTags: Array.from(hashtagGroups.nestedTags),
+        excludedTags: Array.from(hashtagGroups.excludedTags)
+    };
 }
 
-function addParentToggleEventListener() {
-    document.querySelectorAll('.hashtag[data-tag="#non0"]').forEach(parentEl => {
-        parentEl.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Toggle active state
-            parentEl.classList.toggle('active');
-            const isActive = parentEl.classList.contains('active');
-            
-            // Show/hide all nested hashtags
-            document.querySelectorAll('.hashtag[data-parent="#non0"]').forEach(child => {
-                child.style.display = isActive ? 'inline-block' : 'none';
-            });
-            
-            // Update task visibility based on filters
-            updateTaskVisibility();
-        });
-    });
+// Export a function to check if a tag should be nested
+export function shouldBeNested(tag) {
+    if (!tag) return false;
+    if (tag === hashtagGroups.parent) return false;
+    
+    return !hashtagGroups.excludePatterns.some(pattern => tag.startsWith(pattern));
 }
 
-function updateTaskVisibility() {
-    // This function would update which tasks are visible based on active filters
-    // Implementation depends on your existing filtering logic
-}
+// Initialize when document is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Apply CSS for hashtag hierarchy
+    applyHashtagHierarchyStyles();
+});
 
-// Export functions for use in main scripts.js
-export { initializeHashtagHierarchy };
+// Apply CSS styles programmatically
+function applyHashtagHierarchyStyles() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .parent-hashtag {
+            font-weight: bold;
+            position: relative;
+            cursor: pointer;
+            padding-right: 20px;
+        }
+        
+        .parent-hashtag:after {
+            content: '▶';
+            font-size: 0.7em;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.2s ease;
+        }
+        
+        .parent-hashtag.expanded:after {
+            transform: translateY(-50%) rotate(90deg);
+        }
+        
+        .nested-hashtag {
+            margin-left: 15px;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            display: none;
+        }
+        
+        .nested-hashtag.visible {
+            display: inline-block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 0.9; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(styleElement);
+}

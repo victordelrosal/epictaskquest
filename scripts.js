@@ -17,7 +17,7 @@ import {
     GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { AlarmService } from './js/AlarmService.js';
-import { initializeHashtagHierarchy } from './hashtag-hierarchy.js';
+import { initializeHashtagHierarchy, organizeHashtags, shouldBeNested } from './hashtag-hierarchy.js';
 
 // Add Starfield initialization at the beginning of the file
 function initStarfield() {
@@ -893,6 +893,7 @@ function groupTasksByHashtags(tasks) {
     return { sortedGroups, noHashtagGroup };
 }
 
+// Modify the renderTasks function to use our hashtag hierarchy
 function renderTasks(filteredTasks = tasks) {
     // Save current toggle states before clearing the lists
     saveToggleStates();
@@ -904,52 +905,205 @@ function renderTasks(filteredTasks = tasks) {
     const activeTasks = filteredTasks.filter(task => !task.completed);
     const completedTasksArr = filteredTasks.filter(task => task.completed);
 
+    // Extract all hashtags from all tasks
+    const allHashtags = new Set();
+    activeTasks.forEach(task => {
+        const hashtags = extractHashtags(task.text);
+        hashtags.forEach(tag => allHashtags.add(tag));
+    });
+    
+    // Add parent toggle to the set
+    allHashtags.add("#non0");
+    
+    // Organize hashtags using the hierarchy manager
+    const { parentTag, nestedTags, excludedTags } = organizeHashtags(Array.from(allHashtags));
+    
+    // Group tasks by hashtags
     const { sortedGroups, noHashtagGroup } = groupTasksByHashtags(activeTasks);
-
-    // Render hashtag groups
+    
+    // First, render the parent toggle
+    let parentToggleRendered = false;
+    
+    // Then render excluded hashtags (those starting with #0 or #_)
+    const processedGroups = new Set(); // Keep track of which hashtag groups we've rendered
+    
+    // First, render excluded hashtags (those starting with #0 or #_)
     sortedGroups.forEach(([tag, tasks]) => {
-        const groupDiv = document.createElement('div');
-        groupDiv.classList.add('hashtag-group');
+        if (excludedTags.includes(tag)) {
+            renderHashtagGroup(tag, tasks, false);
+            processedGroups.add(tag);
+        }
+    });
+    
+    // Now render the parent toggle and its nested tags
+    if (nestedTags.length > 0) {
+        // Create the parent toggle group
+        const parentGroupDiv = document.createElement('div');
+        parentGroupDiv.classList.add('hashtag-group');
         
+        // Create the parent toggle header
+        const parentToggleHeader = createToggleHeader(parentTag, nestedTags.length);
+        parentGroupDiv.appendChild(parentToggleHeader);
+        
+        // Create the container for nested content
+        const parentContentDiv = document.createElement('div');
+        parentContentDiv.classList.add('hashtag-content', 'parent-content');
+        
+        // Set initial state for parent toggle
+        const shouldExpandParent = openToggles.has(parentTag);
+        
+        if (shouldExpandParent) {
+            parentToggleHeader.classList.add('expanded');
+            parentToggleHeader.querySelector('.toggle-icon').textContent = '▼';
+            parentContentDiv.style.display = 'block';
+            parentContentDiv.style.maxHeight = 'none'; // Allow nested content to expand
+        } else {
+            parentContentDiv.style.display = 'none';
+            parentContentDiv.style.maxHeight = '0';
+        }
+        
+        // Add click behavior to parent toggle
+        parentToggleHeader.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isExpanded = parentToggleHeader.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse
+                parentToggleHeader.classList.remove('expanded');
+                parentToggleHeader.querySelector('.toggle-icon').textContent = '▶';
+                parentContentDiv.style.maxHeight = '0';
+                setTimeout(() => {
+                    parentContentDiv.style.display = 'none';
+                }, 300);
+                openToggles.delete(parentTag);
+            } else {
+                // Expand
+                parentToggleHeader.classList.add('expanded');
+                parentToggleHeader.querySelector('.toggle-icon').textContent = '▼';
+                parentContentDiv.style.display = 'block';
+                parentContentDiv.style.maxHeight = 'none';
+                openToggles.add(parentTag);
+            }
+        });
+        
+        // Now add all nested hashtags under the parent
+        nestedTags.forEach(nestedTag => {
+            // Find the tasks for this tag
+            const nestedGroupData = sortedGroups.find(([tag]) => tag === nestedTag);
+            if (nestedGroupData) {
+                const [tag, tagTasks] = nestedGroupData;
+                
+                // Create nested toggle
+                const nestedGroupDiv = document.createElement('div');
+                nestedGroupDiv.classList.add('hashtag-group', 'nested-group');
+                
+                // Create toggle header with appropriate styling for nested tag
+                const nestedToggleHeader = createToggleHeader(tag, tagTasks.length, true);
+                nestedGroupDiv.appendChild(nestedToggleHeader);
+                
+                // Create content div for this nested toggle
+                const nestedContentDiv = document.createElement('div');
+                nestedContentDiv.classList.add('hashtag-content', 'nested-content');
+                
+                // Handle initial state
+                const shouldExpandNested = openToggles.has(tag);
+                
+                if (shouldExpandNested && shouldExpandParent) {
+                    nestedToggleHeader.classList.add('expanded');
+                    nestedToggleHeader.querySelector('.toggle-icon').textContent = '▼';
+                    nestedContentDiv.style.display = 'block';
+                    setTimeout(() => {
+                        nestedContentDiv.style.maxHeight = `${nestedContentDiv.scrollHeight}px`;
+                    }, 0);
+                } else {
+                    nestedContentDiv.style.display = 'none';
+                    nestedContentDiv.style.maxHeight = '0';
+                }
+                
+                // Add click behavior
+                nestedToggleHeader.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isExpanded = nestedToggleHeader.classList.contains('expanded');
+                    
+                    if (isExpanded) {
+                        // Collapse
+                        nestedToggleHeader.classList.remove('expanded');
+                        nestedToggleHeader.querySelector('.toggle-icon').textContent = '▶';
+                        nestedContentDiv.style.maxHeight = '0';
+                        setTimeout(() => {
+                            nestedContentDiv.style.display = 'none';
+                        }, 300);
+                        openToggles.delete(tag);
+                    } else {
+                        // Expand
+                        nestedToggleHeader.classList.add('expanded');
+                        nestedToggleHeader.querySelector('.toggle-icon').textContent = '▼';
+                        nestedContentDiv.style.display = 'block';
+                        setTimeout(() => {
+                            nestedContentDiv.style.maxHeight = `${nestedContentDiv.scrollHeight}px`;
+                        }, 0);
+                        openToggles.add(tag);
+                    }
+                });
+                
+                // Add tasks to content container
+                tagTasks.forEach(task => {
+                    const taskItem = createTaskElement(task, false);
+                    nestedContentDiv.appendChild(taskItem);
+                });
+                
+                nestedGroupDiv.appendChild(nestedContentDiv);
+                parentContentDiv.appendChild(nestedGroupDiv);
+                
+                // Mark this tag as processed
+                processedGroups.add(tag);
+            }
+        });
+        
+        parentGroupDiv.appendChild(parentContentDiv);
+        activeTasksList.appendChild(parentGroupDiv);
+        parentToggleRendered = true;
+    }
+    
+    // Helper function to create a toggle header with consistent styling
+    function createToggleHeader(tag, taskCount, isNested = false) {
         const toggleHeader = document.createElement('div');
         toggleHeader.classList.add('hashtag-toggle');
+        if (isNested) toggleHeader.classList.add('nested-toggle');
         
-        // Apply default styling
+        // Apply styling
         const config = hashtagToggleConfig.customConfig[tag] || hashtagToggleConfig.default;
         
-        // Style the toggle header
         toggleHeader.style.fontSize = config.fontSize;
         toggleHeader.style.fontFamily = config.fontFamily;
         toggleHeader.style.height = config.height;
         toggleHeader.style.display = 'flex';
         toggleHeader.style.alignItems = 'center';
         
+        if (isNested) {
+            toggleHeader.style.marginLeft = '15px';
+        }
+        
         // Create elements with specific styling
         const toggleIcon = document.createElement('span');
         toggleIcon.className = 'toggle-icon';
         toggleIcon.textContent = '▶';
-        toggleIcon.style.fontSize = `calc(${config.fontSize} * 0.8)`; // Scale icon with text
+        toggleIcon.style.fontSize = `calc(${config.fontSize} * 0.8)`;
         toggleIcon.style.marginRight = `calc(${config.fontSize} * 0.5)`;
-
+        
         const label = document.createElement('span');
         label.className = 'hashtag-label';
         label.textContent = tag;
-        label.style.fontSize = config.fontSize; // Explicitly set font size on label
-        label.style.lineHeight = config.height; // Match line height to container height
-
+        label.style.fontSize = config.fontSize;
+        label.style.lineHeight = config.height;
+        
         const count = document.createElement('span');
         count.className = 'task-count';
-        count.textContent = tasks.length;
-        count.style.fontSize = `calc(${config.fontSize} * 0.8)`; // Scale count with text
+        count.textContent = taskCount;
+        count.style.fontSize = `calc(${config.fontSize} * 0.8)`;
         count.style.padding = `calc(${config.fontSize} * 0.2) calc(${config.fontSize} * 0.4)`;
-
-        // Clear any existing content and append new elements
-        toggleHeader.innerHTML = '';
-        toggleHeader.appendChild(toggleIcon);
-        toggleHeader.appendChild(label);
-        toggleHeader.appendChild(count);
         
-        // Add hover effect handlers
+        // Add hover effects
         toggleHeader.addEventListener('mouseenter', () => {
             toggleHeader.style.backgroundColor = config.hoverBgColor;
             if (config.easterEgg) {
@@ -964,18 +1118,46 @@ function renderTasks(filteredTasks = tasks) {
                 label.textContent = label.dataset.originalText;
             }
         });
-
+        
+        // Add the (+) button for adding tasks with this hashtag
+        const addButton = document.createElement('button');
+        addButton.classList.add('add-task-button');
+        addButton.innerHTML = '+';
+        addButton.title = `Add task with ${tag}`;
+        addButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const hashtagWithSpace = ` ${tag}`;
+            taskInput.value = hashtagWithSpace;
+            taskInput.focus();
+            taskInput.setSelectionRange(0, 0);
+        });
+        
+        // Assemble the toggle header
+        toggleHeader.appendChild(toggleIcon);
+        toggleHeader.appendChild(label);
+        toggleHeader.appendChild(count);
+        toggleHeader.appendChild(addButton);
+        
+        return toggleHeader;
+    }
+    
+    // Render a hashtag group directly to the active tasks list
+    function renderHashtagGroup(tag, tasks, isNested = false) {
+        const groupDiv = document.createElement('div');
+        groupDiv.classList.add('hashtag-group');
+        if (isNested) groupDiv.classList.add('nested-group');
+        
+        const toggleHeader = createToggleHeader(tag, tasks.length, isNested);
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('hashtag-content');
         
-        // Set initial state based on openToggles or wishlist filter
-        const shouldExpand = openToggles.has(tag) || (currentFilter === 'wishlist' && tag === '#0buy');
+        // Set initial state based on openToggles
+        const shouldExpand = openToggles.has(tag);
         
         if (shouldExpand) {
             toggleHeader.classList.add('expanded');
             toggleHeader.querySelector('.toggle-icon').textContent = '▼';
             contentDiv.style.display = 'block';
-            // Set maxHeight after content is added
             setTimeout(() => {
                 contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
             }, 0);
@@ -984,128 +1166,113 @@ function renderTasks(filteredTasks = tasks) {
             contentDiv.style.maxHeight = '0';
         }
         
-        // Rest of toggle functionality
+        // Toggle behavior
         toggleHeader.addEventListener('click', (e) => {
             e.stopPropagation();
-            const isExpanded = contentDiv.style.display !== 'none';
-            toggleHeader.querySelector('.toggle-icon').textContent = isExpanded ? '▶' : '▼';
+            const isExpanded = toggleHeader.classList.contains('expanded');
             
             if (isExpanded) {
+                toggleHeader.classList.remove('expanded');
+                toggleHeader.querySelector('.toggle-icon').textContent = '▶';
                 contentDiv.style.maxHeight = '0';
                 setTimeout(() => {
                     contentDiv.style.display = 'none';
                 }, 300);
-                toggleHeader.classList.remove('expanded');
-                openToggles.delete(toggleHeader.querySelector('.hashtag-label').textContent);
+                openToggles.delete(tag);
             } else {
-                contentDiv.style.display = 'block';
-                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
                 toggleHeader.classList.add('expanded');
-                openToggles.add(toggleHeader.querySelector('.hashtag-label').textContent);
+                toggleHeader.querySelector('.toggle-icon').textContent = '▼';
+                contentDiv.style.display = 'block';
+                setTimeout(() => {
+                    contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
+                }, 0);
+                openToggles.add(tag);
             }
         });
-
+        
         // Add tasks to content container
         tasks.forEach(task => {
             const taskItem = createTaskElement(task, false);
             contentDiv.appendChild(taskItem);
         });
-
-        // Add (+) button to the toggle header
-        const addButton = document.createElement('button');
-        addButton.classList.add('add-task-button');
-        addButton.innerHTML = '+';
-        addButton.title = `Add task with ${tag}`;
-        addButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const hashtagWithSpace = ` ${tag}`;
-            taskInput.value = hashtagWithSpace; // Pre-populate the task input with the hashtag and a space
-            taskInput.focus(); // Focus the task input
-            taskInput.setSelectionRange(0, 0); // Place the cursor at the beginning
-        });
-
-        toggleHeader.appendChild(addButton);
-
+        
         groupDiv.appendChild(toggleHeader);
         groupDiv.appendChild(contentDiv);
         activeTasksList.appendChild(groupDiv);
-    });
-
-    // Handle non-hashtag tasks
+    }
+    
+    // Handle tasks without hashtags
     if (noHashtagGroup.length > 0) {
         const groupDiv = document.createElement('div');
         groupDiv.classList.add('hashtag-group');
         
-        // Create toggle header for other tasks
-        const toggleHeader = document.createElement('div');
-        toggleHeader.classList.add('hashtag-toggle');
-        
-        // Apply default styling
-        const config = hashtagToggleConfig.default;
-        toggleHeader.style.fontSize = config.fontSize;
-        toggleHeader.style.fontFamily = config.fontFamily;
-        toggleHeader.style.height = config.height;
-        toggleHeader.style.display = 'flex';
-        toggleHeader.style.alignItems = 'center';
-        
-        // Add hover handlers
-        toggleHeader.addEventListener('mouseenter', () => {
-            toggleHeader.style.backgroundColor = config.hoverBgColor;
-        });
-        
-        toggleHeader.addEventListener('mouseleave', () => {
-            toggleHeader.style.backgroundColor = '';
-        });
-        
-        toggleHeader.innerHTML = `
-            <span class="toggle-icon">▶</span>
-            <span class="hashtag-label">Other Tasks</span>
-            <span class="task-count">${noHashtagGroup.length}</span>
-        `;
+        const toggleHeader = createToggleHeader('Other Tasks', noHashtagGroup.length);
+        toggleHeader.querySelector('.hashtag-label').textContent = 'Other Tasks';
         
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('hashtag-content');
-        contentDiv.style.display = 'none';
         
+        // Set initial state
+        const shouldExpand = openToggles.has('Other Tasks');
+        
+        if (shouldExpand) {
+            toggleHeader.classList.add('expanded');
+            toggleHeader.querySelector('.toggle-icon').textContent = '▼';
+            contentDiv.style.display = 'block';
+            setTimeout(() => {
+                contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
+            }, 0);
+        } else {
+            contentDiv.style.display = 'none';
+            contentDiv.style.maxHeight = '0';
+        }
+        
+        // Toggle behavior
         toggleHeader.addEventListener('click', (e) => {
             e.stopPropagation();
-            const isExpanded = contentDiv.style.display !== 'none';
-            toggleHeader.querySelector('.toggle-icon').textContent = isExpanded ? '▶' : '▼';
+            const isExpanded = toggleHeader.classList.contains('expanded');
             
             if (isExpanded) {
+                toggleHeader.classList.remove('expanded');
+                toggleHeader.querySelector('.toggle-icon').textContent = '▶';
                 contentDiv.style.maxHeight = '0';
                 setTimeout(() => {
                     contentDiv.style.display = 'none';
                 }, 300);
+                openToggles.delete('Other Tasks');
             } else {
+                toggleHeader.classList.add('expanded');
+                toggleHeader.querySelector('.toggle-icon').textContent = '▼';
                 contentDiv.style.display = 'block';
-                contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+                setTimeout(() => {
+                    contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
+                }, 0);
+                openToggles.add('Other Tasks');
             }
-            
-            toggleHeader.classList.toggle('expanded');
         });
-
+        
+        // Add tasks sorted by points
         noHashtagGroup
             .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
             .forEach(task => {
                 const taskItem = createTaskElement(task, false);
                 contentDiv.appendChild(taskItem);
             });
-
+        
         groupDiv.appendChild(toggleHeader);
         groupDiv.appendChild(contentDiv);
         activeTasksList.appendChild(groupDiv);
     }
-
-    // Render Completed Tasks (unchanged)
+    
+    // Render completed tasks (unchanged)
     completedTasksArr
         .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints))
         .forEach(task => {
             const taskItem = createTaskElement(task, true);
             completedTasksList.appendChild(taskItem);
         });
-
-    // At the end of renderTasks, restore states
+        
+    // Restore toggle states at the end
     restoreToggleStates();
 }
 

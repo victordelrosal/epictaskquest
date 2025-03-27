@@ -2353,3 +2353,47 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
         background-color: rgba(255, 0, 0, 0.3);
     }
 }
+
+/* Add these styles to the end of your style.css file */
+
+/* Hashtag hierarchy styles */
+.parent-content {
+    padding-left: 15px;
+    border-left: 2px solid rgba(77, 77, 255, 0.2);
+}
+
+.nested-group {
+    margin-left: 15px;
+    position: relative;
+}
+
+.nested-group:before {
+    content: '';
+    position: absolute;
+    left: -15px;
+    top: 0;
+    height: 100%;
+    border-left: 1px dotted rgba(77, 77, 255, 0.3);
+}
+
+.hashtag-toggle.nested-toggle {
+    font-size: 0.95em;
+    opacity: 0.9;
+}
+
+/* Special styling for the parent #non0 toggle */
+.hashtag-toggle .hashtag-label:contains("#non0") {
+    color: #4d4dff;
+    font-weight: bold;
+}
+
+/* Animation for expanding/collapsing */
+.hashtag-content {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+}
+
+/* Ensure parent toggle is always visible */
+#non0-parent-toggle {
+    display: block !important;
+}
