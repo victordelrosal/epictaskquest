@@ -1,0 +1,46 @@
+/* Styles for hashtag hierarchy */
+
+.parent-hashtag {
+    font-weight: bold;
+    position: relative;
+    cursor: pointer;
+    padding-right: 15px;
+}
+
+.parent-hashtag:after {
+    content: '▶';
+    font-size: 0.7em;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s ease;
+}
+
+.parent-hashtag.active:after {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.nested-hashtag {
+    margin-left: 15px;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+/* Add indentation for better visual hierarchy */
+.hashtag-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Animation for showing/hiding nested tags */
+.nested-hashtag {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 0.9; transform: translateY(0); }
+}

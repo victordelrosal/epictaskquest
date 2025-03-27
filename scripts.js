@@ -17,6 +17,7 @@ import {
     GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { AlarmService } from './js/AlarmService.js';
+import { initializeHashtagHierarchy } from './hashtag-hierarchy.js';
 
 // Add Starfield initialization at the beginning of the file
 function initStarfield() {
@@ -2064,3 +2065,6 @@ tasks = tasks || [];
 const myMapped = tasks?.map(task => {
     // ...process each task...
 });
+
+// Initialize hashtag hierarchy
+initializeHashtagHierarchy();
