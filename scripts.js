@@ -18,6 +18,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { AlarmService } from './js/AlarmService.js';
 import { initializeHashtagHierarchy, organizeHashtags, shouldBeNested } from './hashtag-hierarchy.js';
+import { audioService } from './js/AudioService.js';
 
 // Add Starfield initialization at the beginning of the file
 function initStarfield() {
@@ -115,12 +116,93 @@ function initStarfield() {
     window.addEventListener('resize', handleResize);
 }
 
+// Update the audio initialization function
+function initAudio() {
+    // Initialize the audio service once the user has interacted with the page
+    audioService.initialize();
+    
+    // Add audio controls to the UI
+    createAudioControls();
+    
+    // Add a small delay before starting playback to ensure initialization is complete
+    setTimeout(() => {
+        // Start audio playback
+        audioService.playAll();
+        
+        // Set up auto-restart mechanism to ensure looping continues
+        setInterval(() => {
+            audioService.tracks.forEach(track => {
+                // Check if track is not playing or has ended
+                if (track.paused || track.ended) {
+                    console.log(`Track ${track.id} is paused or ended, restarting...`);
+                    track.currentTime = 0;
+                    track.play().catch(err => console.warn(`Error restarting track: ${err}`));
+                }
+            });
+        }, 5000); // Check every 5 seconds
+    }, 500);
+    
+    // Add event listener for visibility change (tab switching)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            // When tab becomes visible again, check if tracks are playing
+            console.log('Tab is now visible, checking audio playback');
+            if (!audioService.isAudioActive()) {
+                console.log('Audio not active, resuming all tracks');
+                audioService.resumeAll();
+            }
+        }
+    });
+    
+    console.log('Audio system initialized');
+}
+
+// Update the audio controls function to handle all audio uniformly
+function createAudioControls() {
+    // Create audio controls container
+    const audioControls = document.createElement('div');
+    audioControls.className = 'audio-controls';
+    audioControls.innerHTML = `
+        <button id="toggleAudio" class="audio-toggle" title="${audioService.isMuted ? 'Unmute' : 'Mute'} Sound">
+            ${audioService.isMuted ? '🔇' : '🔊'}
+        </button>
+        <div class="volume-slider-container">
+            <input type="range" id="volumeSlider" min="0" max="100" 
+                value="${audioService.volume * 100}" class="volume-slider">
+        </div>
+    `;
+    
+    document.body.appendChild(audioControls);
+    
+    // Add event listeners
+    const toggleButton = document.getElementById('toggleAudio');
+    const volumeSlider = document.getElementById('volumeSlider');
+    
+    toggleButton.addEventListener('click', () => {
+        const muted = audioService.toggleMute();
+        toggleButton.textContent = muted ? '🔇' : '🔊';
+        toggleButton.title = muted ? 'Unmute Sound' : 'Mute Sound';
+    });
+    
+    volumeSlider.addEventListener('input', (e) => {
+        const volume = parseInt(e.target.value) / 100;
+        audioService.setVolume(volume);
+        
+        // If we're adjusting volume while muted, unmute
+        if (audioService.isMuted && volume > 0) {
+            audioService.toggleMute(false);
+            toggleButton.textContent = '🔊';
+            toggleButton.title = 'Mute Sound';
+        }
+    });
+}
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyASqKkvoIp6qvX2Dvze5s6nfKBghQ41axQ",
     authDomain: "epic-task-quest.firebaseapp.com",
     projectId: "epic-task-quest",
-    storageBucket: "epic-task-quest.appspot.com",
+    storageBucket: "epic-task-quest",
     messagingSenderId: "421446505180",
     appId: "1:421446505180:web:ac2270f8c0b92d16529a19",
     measurementId: "G-35SX22QFBS",
@@ -240,7 +322,7 @@ googleLoginButton.addEventListener('click', async () => {
     }
 });
 
-// Add handler for redirect result
+// Modify the onAuthStateChanged handler to ensure consistent audio initialization
 onAuthStateChanged(auth, async (user) => {
     try {
         // Handle redirect result first
@@ -255,7 +337,36 @@ onAuthStateChanged(auth, async (user) => {
         if (user) {
             if (user.email === authorizedEmail) {
                 initStarfield(); // Initialize starfield
-                initConfigPanel(); // Add this line
+                
+                // Initialize audio via two methods:
+                // 1. Try to initialize immediately (might work if autoplay is allowed)
+                initAudio();
+                
+                // 2. Also initialize on first user interaction to satisfy browsers that require it
+                const initializeAudioOnInteraction = () => {
+                    console.log('User interaction detected, initializing audio');
+                    // Initialize audio system if not already done
+                    if (!audioService.isInitialized) {
+                        initAudio();
+                    } else {
+                        // If already initialized but not playing, start playback
+                        if (!audioService.isAudioActive()) {
+                            audioService.playAll();
+                        }
+                    }
+                    
+                    // Remove all event listeners after first interaction
+                    document.removeEventListener('click', initializeAudioOnInteraction);
+                    document.removeEventListener('touchstart', initializeAudioOnInteraction);
+                    document.removeEventListener('keydown', initializeAudioOnInteraction);
+                };
+                
+                // Add multiple event listeners for different types of interaction
+                document.addEventListener('click', initializeAudioOnInteraction);
+                document.addEventListener('touchstart', initializeAudioOnInteraction);
+                document.addEventListener('keydown', initializeAudioOnInteraction);
+                
+                initConfigPanel();
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
                 loadTasks();
@@ -512,23 +623,6 @@ function updateStats() {
 
     // Update progress bar
     const progress = totalPoints % pointsToNextLevel;
-    const progressPercentage = (progress / pointsToNextLevel) * 100;
-    progressFill.style.width = `${progressPercentage}%`;
-    progressText.textContent = `${progress}/${pointsToNextLevel}`;
-
-    // Trigger Completed Tasks Animation if increased
-    if (completedTasks > prevCompletedTasks) {
-        animateCompletedTasks(completedTasksSpan);
-    }
-
-    // Trigger Points Counting Animation if increased
-    if (totalPoints > prevTotalPoints) {
-        animatePointsCount(totalPointsSpan, prevTotalPoints, totalPoints);
-    }
-
-    // Trigger Level Up Animation if level increased
-    if (level > prevLevel) {
-        animateLevelUp(levelSpan);
     }
 
     // Handle achievement image display
@@ -1596,9 +1690,16 @@ function animateTaskDeletion(taskId) {
 // Confetti Animation
 // ===========================
 
+// Modify the triggerConfetti function to use the audioService for the completion sound
 function triggerConfetti() {
-    const confettiColors = ['#FFD700', '#FFC300', '#FFEA00', '#FFF700', '#FFDD00', '#FFC100', '#FFB700']; // Various shades of gold
-    const numberOfConfetti = 200; // Increased number for more generous effect
+    // Play task completion sound using the audio service
+    audioService.playSound('complete').catch(err => 
+        console.warn('Could not play completion sound:', err)
+    );
+    
+    // Original confetti logic
+    const confettiColors = ['#FFD700', '#FFC300', '#FFEA00', '#FFF700', '#FFC100', '#FFB700']; 
+    const numberOfConfetti = 200;
 
     for (let i = 0; i < numberOfConfetti; i++) {
         const confetti = document.createElement('div');
@@ -1724,7 +1825,7 @@ async function migrateShopToBuyTags() {
         updates.forEach(update => {
             const taskRef = doc(db, "tasks", update.id);
             batch.update(taskRef, { 
-                text: update.newText,
+                text: newText,
                 isWishlist: update.isWishlist
             });
         });
