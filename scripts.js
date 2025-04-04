@@ -623,6 +623,23 @@ function updateStats() {
 
     // Update progress bar
     const progress = totalPoints % pointsToNextLevel;
+    const progressPercentage = (progress / pointsToNextLevel) * 100;
+    progressFill.style.width = `${progressPercentage}%`;
+    progressText.textContent = `${progress}/${pointsToNextLevel}`;
+
+    // Trigger Completed Tasks Animation if increased
+    if (completedTasks > prevCompletedTasks) {
+        animateCompletedTasks(completedTasksSpan);
+    }
+
+    // Trigger Points Counting Animation if increased
+    if (totalPoints > prevTotalPoints) {
+        animatePointsCount(totalPointsSpan, prevTotalPoints, totalPoints);
+    }
+
+    // Trigger Level Up Animation if level increased
+    if (level > prevLevel) {
+        animateLevelUp(levelSpan);
     }
 
     // Handle achievement image display
