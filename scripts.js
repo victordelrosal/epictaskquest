@@ -373,6 +373,7 @@ onAuthStateChanged(auth, async (user) => {
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
                 loadTasks();
+                syncOfflineTasks();
             } else {
                 handleUnauthorizedUser(user);
             }
@@ -469,6 +470,9 @@ let totalPoints = 0;
 let level = 1;
 let completedTasks = 0;
 const pointsToNextLevel = 100;
+
+// Store tasks created while offline
+let offlineTasks = JSON.parse(localStorage.getItem('offlineTasks') || '[]');
 
 // Add at the top with other global variables
 let openToggles = new Set();
@@ -657,6 +661,36 @@ function updateStats() {
 // Firestore Operations
 // ===========================
 
+// Save a task to localStorage when offline
+function storeOfflineTask(task) {
+    offlineTasks.push(task);
+    localStorage.setItem('offlineTasks', JSON.stringify(offlineTasks));
+}
+
+// Sync any offline tasks when back online
+async function syncOfflineTasks() {
+    if (!offlineTasks.length) return;
+
+    for (const task of [...offlineTasks]) {
+        try {
+            const { id, offlineId, ...taskData } = task;
+            const docRef = await addDoc(collection(db, "tasks"), {
+                ...taskData,
+                timestamp: serverTimestamp()
+            });
+            console.log("Offline task synced with ID:", docRef.id);
+        } catch (e) {
+            console.error("Error syncing offline task", e);
+            return; // Exit if sync fails
+        }
+        offlineTasks.shift();
+    }
+    localStorage.removeItem('offlineTasks');
+}
+
+// Attempt to sync when connectivity is restored
+window.addEventListener('online', syncOfflineTasks);
+
 // Load tasks from Firestore
 async function loadTasks() {
     try {
@@ -733,7 +767,7 @@ async function addTask() {
 
     // Check for alarm pattern and schedule if found
     const alarmDate = alarmService.parseAlarmPattern(text);
-    
+
     const task = {
         text,
         difficulty,
@@ -747,6 +781,24 @@ async function addTask() {
             text: text
         } : null
     };
+
+    // Handle offline mode
+    if (!navigator.onLine) {
+        const offlineTask = { ...task, offlineId: Date.now() };
+        storeOfflineTask(offlineTask);
+        tasks.unshift(offlineTask);
+        renderTasks();
+        restoreToggleStates();
+        showSuccessNotification();
+
+        // Reset form
+        taskInput.value = "";
+        difficultySelect.value = "1";
+        document.getElementById('customPoints').style.display = 'none';
+        document.getElementById('customPoints').value = '';
+        wishlistCheckbox.checked = false;
+        return;
+    }
 
     try {
         const docRef = await addDoc(collection(db, "tasks"), task);
@@ -778,6 +830,21 @@ async function addTask() {
         wishlistCheckbox.checked = false;
     } catch (error) {
         console.error("Error adding task: ", error);
+        if (!navigator.onLine) {
+            const offlineTask = { ...task, offlineId: Date.now() };
+            storeOfflineTask(offlineTask);
+            tasks.unshift(offlineTask);
+            renderTasks();
+            restoreToggleStates();
+            showSuccessNotification();
+
+            // Reset form
+            taskInput.value = "";
+            difficultySelect.value = "1";
+            document.getElementById('customPoints').style.display = 'none';
+            document.getElementById('customPoints').value = '';
+            wishlistCheckbox.checked = false;
+        }
     }
 }
 
