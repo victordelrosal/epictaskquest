@@ -1807,6 +1807,10 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+.hashtag-toggle .add-task-button:active {
+    transform: scale(1.3);
+}
+
 .hashtag-toggle .add-task-button:hover {
     background: var(--secondary-gradient);
     transform: scale(1.1);
@@ -1829,6 +1833,9 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     /* Ensure the (+) button is visible on mobile */
     .hashtag-toggle .add-task-button {
         display: flex;
+        width: 60px;
+        height: 60px;
+        font-size: 2.4rem;
     }
 }
 

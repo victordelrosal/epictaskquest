@@ -1311,6 +1311,10 @@ function renderTasks(filteredTasks = tasks) {
             taskInput.value = hashtagWithSpace;
             taskInput.focus();
             taskInput.setSelectionRange(0, 0);
+
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
         });
         
         // Assemble the toggle header
