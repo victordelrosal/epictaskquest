@@ -1979,13 +1979,13 @@ function showSuccessNotification() {
                 background: linear-gradient(145deg, #0066ff, #0033ff, #001aff, #0000ff);
                 background-size: 300% 300%;
                 border: none;
-                border-radius: 50px;
+                border-radius: 40px;
                 box-shadow: 
                     0 0 15px rgba(0, 89, 255, 0.5),
                     0 0 30px rgba(0, 89, 255, 0.3),
                     0 0 45px rgba(0, 89, 255, 0.1),
                     inset 0 0 15px rgba(255, 255, 255, 0.4);
-                padding: 15px 40px;
+                padding: 8px 32px;
                 text-transform: uppercase;
                 text-shadow: 0 0 10px rgba(0, 89, 255, 0.8);
                 cursor: pointer;
