@@ -1303,7 +1303,7 @@ function renderTasks(filteredTasks = tasks) {
         // Add the (+) button for adding tasks with this hashtag
         const addButton = document.createElement('button');
         addButton.classList.add('add-task-button');
-        addButton.innerHTML = '+';
+        addButton.innerHTML = '<i class="fas fa-plus"></i>';
         addButton.title = `Add task with ${tag}`;
         addButton.addEventListener('click', (e) => {
             e.stopPropagation();
