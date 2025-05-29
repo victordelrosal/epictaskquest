@@ -1067,7 +1067,18 @@ async function moveTaskUp(taskId) {
     const sorted = getActiveTasksSorted();
     const index = sorted.findIndex(t => t.id === taskId);
     if (index > 0) {
-        await swapTaskPoints(sorted[index], sorted[index - 1]);
+        const currentTask = sorted[index];
+        const aboveTask = sorted[index - 1];
+        let newPoints = getPoints(aboveTask.difficulty, aboveTask.customPoints) + 1;
+
+        // Ensure tasks using custom points
+        const taskDoc = doc(db, "tasks", currentTask.id);
+        await updateDoc(taskDoc, { difficulty: 6, customPoints: newPoints });
+        currentTask.difficulty = 6;
+        currentTask.customPoints = newPoints;
+
+        await loadTasks();
+        restoreToggleStates();
     }
 }
 
@@ -1075,7 +1086,18 @@ async function moveTaskDown(taskId) {
     const sorted = getActiveTasksSorted();
     const index = sorted.findIndex(t => t.id === taskId);
     if (index !== -1 && index < sorted.length - 1) {
-        await swapTaskPoints(sorted[index], sorted[index + 1]);
+        const currentTask = sorted[index];
+        const belowTask = sorted[index + 1];
+        let newPoints = getPoints(belowTask.difficulty, belowTask.customPoints) - 1;
+        if (newPoints < 1) newPoints = 1;
+
+        const taskDoc = doc(db, "tasks", currentTask.id);
+        await updateDoc(taskDoc, { difficulty: 6, customPoints: newPoints });
+        currentTask.difficulty = 6;
+        currentTask.customPoints = newPoints;
+
+        await loadTasks();
+        restoreToggleStates();
     }
 }
 
