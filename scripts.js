@@ -3,7 +3,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-import { enableIndexedDbPersistence, getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { enableIndexedDbPersistence, getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { 
     getAuth, 
     onAuthStateChanged, 
@@ -1029,6 +1029,68 @@ async function updateTaskCustomPoints(taskId, newCustomPoints) {
 }
 
 // ===========================
+// Task Reordering
+// ===========================
+
+function getActiveTasksSorted() {
+    return tasks
+        .filter(t => !t.completed)
+        .sort((a, b) => getPoints(b.difficulty, b.customPoints) - getPoints(a.difficulty, a.customPoints));
+}
+
+async function swapTaskPoints(taskA, taskB) {
+    saveToggleStates();
+    try {
+        const docA = doc(db, "tasks", taskA.id);
+        const docB = doc(db, "tasks", taskB.id);
+
+        const updatesA = { difficulty: taskB.difficulty };
+        const updatesB = { difficulty: taskA.difficulty };
+
+        updatesA.customPoints = (taskB.hasOwnProperty('customPoints') && taskB.customPoints !== undefined)
+            ? taskB.customPoints
+            : deleteField();
+
+        updatesB.customPoints = (taskA.hasOwnProperty('customPoints') && taskA.customPoints !== undefined)
+            ? taskA.customPoints
+            : deleteField();
+
+        await Promise.all([
+            updateDoc(docA, updatesA),
+            updateDoc(docB, updatesB)
+        ]);
+
+        const tempDiff = taskA.difficulty;
+        const tempCustom = taskA.customPoints;
+        taskA.difficulty = taskB.difficulty;
+        taskA.customPoints = taskB.customPoints;
+        taskB.difficulty = tempDiff;
+        taskB.customPoints = tempCustom;
+
+        await loadTasks();
+        restoreToggleStates();
+    } catch (error) {
+        console.error('Error swapping task points:', error);
+    }
+}
+
+async function moveTaskUp(taskId) {
+    const sorted = getActiveTasksSorted();
+    const index = sorted.findIndex(t => t.id === taskId);
+    if (index > 0) {
+        await swapTaskPoints(sorted[index], sorted[index - 1]);
+    }
+}
+
+async function moveTaskDown(taskId) {
+    const sorted = getActiveTasksSorted();
+    const index = sorted.findIndex(t => t.id === taskId);
+    if (index !== -1 && index < sorted.length - 1) {
+        await swapTaskPoints(sorted[index], sorted[index + 1]);
+    }
+}
+
+// ===========================
 // Render Tasks to the DOM
 // ===========================
 
@@ -1600,9 +1662,23 @@ function createTaskElement(task, isCompleted) {
         deleteTask(task.id);
     });
 
+    // Move Up Button
+    const upButton = document.createElement('button');
+    upButton.textContent = '⬆️';
+    upButton.title = 'Move Up';
+    upButton.addEventListener('click', () => moveTaskUp(task.id));
+
+    // Move Down Button
+    const downButton = document.createElement('button');
+    downButton.textContent = '⬇️';
+    downButton.title = 'Move Down';
+    downButton.addEventListener('click', () => moveTaskDown(task.id));
+
     // Append actions
     taskActions.appendChild(difficultySelectElement);
     if (!isCompleted) {
+        taskActions.appendChild(upButton);
+        taskActions.appendChild(downButton);
         taskActions.appendChild(deleteButton);
     }
 
