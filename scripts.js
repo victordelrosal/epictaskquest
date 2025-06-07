@@ -1064,18 +1064,23 @@ async function swapTaskPoints(taskA, taskB) {
 }
 
 async function moveTaskUp(taskId) {
-    const sorted = getActiveTasksSorted();
-    const index = sorted.findIndex(t => t.id === taskId);
-    if (index > 0) {
-        const currentTask = sorted[index];
-        const aboveTask = sorted[index - 1];
-        let newPoints = getPoints(aboveTask.difficulty, aboveTask.customPoints) + 1;
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+        const task = tasks[taskIndex];
+        let newDifficulty = task.difficulty + 1;
+        if (newDifficulty > 6) newDifficulty = 6;
 
-        // Ensure tasks using custom points
-        const taskDoc = doc(db, "tasks", currentTask.id);
-        await updateDoc(taskDoc, { difficulty: 6, customPoints: newPoints });
-        currentTask.difficulty = 6;
-        currentTask.customPoints = newPoints;
+        const updates = { difficulty: newDifficulty };
+        if (newDifficulty === 6) {
+            updates.customPoints = 50;
+        } else {
+            updates.customPoints = null;
+        }
+
+        const taskDoc = doc(db, "tasks", task.id);
+        await updateDoc(taskDoc, updates);
+        task.difficulty = newDifficulty;
+        task.customPoints = updates.customPoints;
 
         await loadTasks();
         restoreToggleStates();
@@ -1083,18 +1088,23 @@ async function moveTaskUp(taskId) {
 }
 
 async function moveTaskDown(taskId) {
-    const sorted = getActiveTasksSorted();
-    const index = sorted.findIndex(t => t.id === taskId);
-    if (index !== -1 && index < sorted.length - 1) {
-        const currentTask = sorted[index];
-        const belowTask = sorted[index + 1];
-        let newPoints = getPoints(belowTask.difficulty, belowTask.customPoints) - 1;
-        if (newPoints < 1) newPoints = 1;
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+        const task = tasks[taskIndex];
+        let newDifficulty = task.difficulty - 1;
+        if (newDifficulty < 1) newDifficulty = 1;
 
-        const taskDoc = doc(db, "tasks", currentTask.id);
-        await updateDoc(taskDoc, { difficulty: 6, customPoints: newPoints });
-        currentTask.difficulty = 6;
-        currentTask.customPoints = newPoints;
+        const updates = { difficulty: newDifficulty };
+        if (newDifficulty === 6) {
+            updates.customPoints = 50;
+        } else {
+            updates.customPoints = null;
+        }
+
+        const taskDoc = doc(db, "tasks", task.id);
+        await updateDoc(taskDoc, updates);
+        task.difficulty = newDifficulty;
+        task.customPoints = updates.customPoints;
 
         await loadTasks();
         restoreToggleStates();
