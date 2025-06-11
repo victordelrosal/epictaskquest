@@ -1251,6 +1251,11 @@ body {
     accent-color: #ADD8E6; /* Light blue */
 }
 
+/* Provide stronger contrast when shop/buy is toggled */
+.wishlist-checkbox:checked {
+    accent-color: #FFD700; /* Gold */
+}
+
 /* Filter Button - Updated size and styling */
 .filter-button {
     background: rgba(255, 255, 255, 0.1);
@@ -1297,7 +1302,7 @@ body {
 
 .cart-toggle.active {
     opacity: 1;
-    color: #87CEFA; /* Lighter shade of blue */
+    color: #FFD700; /* Gold for better contrast */
 }
 
 .cart-toggle:hover {
