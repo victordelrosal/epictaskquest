@@ -290,7 +290,7 @@ body {
 }
 
 .task-form .points-controls select {
-    min-width: 120px;
+    min-width: 100px;
     padding: 0.75rem 1rem;
     border: none;
     border-radius: 8px;
@@ -298,16 +298,18 @@ body {
     color: var (--text-color);
     font-size: 1.3rem;
     cursor: pointer;
+    text-align: center;
 }
 
 .task-form .points-controls input[type="number"] {
-    width: 120px;
+    width: 100px;
     padding: 0.75rem 1rem;
     border: none;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     font-size: 1.3rem;
+    text-align: center;
 }
 
 .task-form .button-row {
@@ -440,11 +442,12 @@ body {
     color: var(--text-color);
     font-size: 1.3rem;
     cursor: pointer;
-    min-width: 120px;
+    min-width: 100px;
+    text-align: center;
 }
 
 .task-controls #customPoints {
-    width: 120px;
+    width: 100px;
     padding: 0.75rem;
     border: none;
     border-radius: 8px;
@@ -494,11 +497,11 @@ body {
 
     .task-controls select {
         flex: 1;
-        min-width: 100px;
+        min-width: 80px;
     }
 
     .task-controls #customPoints {
-        width: 80px;
+        width: 70px;
     }
 
     .wishlist-checkbox-wrapper,
@@ -689,7 +692,8 @@ body {
     cursor: pointer;
     transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
     outline: none;
-    min-width: 120px;
+    min-width: 100px;
+    text-align: center;
 }
 
 .task-actions select:hover {
@@ -1638,7 +1642,7 @@ input[type="number"].custom-points,
     font-size: 1.3rem !important; /* Match the size of other form elements */
     font-weight: 500;
     padding: 0.75rem 1rem;
-    width: 120px; /* Increased width for better visibility */
+    width: 100px; /* Comfortable width */
     text-align: center;
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
