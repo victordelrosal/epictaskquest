@@ -2256,7 +2256,8 @@ function updateDefaultToggleStyle(newConfig) {
 // Hashtag Configuration Panel
 const configToggle = document.getElementById('configToggle');
 const configPanel = document.getElementById('configPanel');
-const applyCustom = document.getElementById('applyCustom');
+const customTagsContainer = document.getElementById('customTagsContainer');
+const addCustomTagBtn = document.getElementById('addCustomTag');
 
 // Show/hide configuration panel
 configToggle.addEventListener('click', () => {
@@ -2298,56 +2299,83 @@ document.getElementById('defaultEasterEgg').addEventListener('change', (e) => {
     });
 });
 
-// Apply custom style
-applyCustom.addEventListener('click', () => {
-    const hashtag = document.getElementById('customTag').value;
-    if (!hashtag.startsWith('#')) {
-        alert('Please enter a valid hashtag starting with #');
-        return;
-    }
+// Create a custom tag configuration row
+function createCustomTagRow(tag = '', settings = {}) {
+    const row = document.createElement('div');
+    row.className = 'custom-tag-row';
 
-    const config = {
-        fontSize: `${document.getElementById('customFontSize').value}px`,
-        fontFamily: document.getElementById('customFontFamily').value,
-        hoverBgColor: `${document.getElementById('customHoverColor').value}33`,
-        easterEgg: document.getElementById('customEasterEgg').value
-    };
+    row.innerHTML = `
+        <input type="text" class="customTag" placeholder="Enter hashtag (e.g., #0)" value="${tag}">
+        <input type="number" class="customFontSize" placeholder="Font size (px)" value="${settings.fontSize ? settings.fontSize.replace('px','') : ''}">
+        <input type="text" class="customFontFamily" placeholder="Font family" value="${settings.fontFamily || ''}">
+        <input type="color" class="customHoverColor" value="${settings.hoverBgColor ? settings.hoverBgColor.replace('33','') : '#ffffff'}">
+        <input type="text" class="customEasterEgg" placeholder="Easter egg (emoji)" value="${settings.easterEgg || ''}">
+        <button class="applyCustom">Apply</button>
+        <button class="removeCustom">✕</button>
+    `;
 
-    // Remove empty values
-    Object.keys(config).forEach(key => {
-        if (!config[key] || config[key] === 'px') {
-            delete config[key];
+    customTagsContainer.appendChild(row);
+}
+
+// Add new custom tag row
+addCustomTagBtn.addEventListener('click', () => {
+    createCustomTagRow();
+});
+
+// Handle apply/remove actions for custom tags
+customTagsContainer.addEventListener('click', (e) => {
+    const row = e.target.closest('.custom-tag-row');
+    if (!row) return;
+
+    if (e.target.classList.contains('applyCustom')) {
+        const hashtag = row.querySelector('.customTag').value;
+        if (!hashtag.startsWith('#')) {
+            alert('Please enter a valid hashtag starting with #');
+            return;
         }
-    });
 
-    updateHashtagToggleStyle(hashtag, config);
+        const config = {
+            fontSize: row.querySelector('.customFontSize').value ? `${row.querySelector('.customFontSize').value}px` : undefined,
+            fontFamily: row.querySelector('.customFontFamily').value || undefined,
+            hoverBgColor: row.querySelector('.customHoverColor').value ? `${row.querySelector('.customHoverColor').value}33` : undefined,
+            easterEgg: row.querySelector('.customEasterEgg').value || undefined,
+            height: '50px'
+        };
+
+        Object.keys(config).forEach(key => {
+            if (!config[key] || config[key] === 'px') {
+                delete config[key];
+            }
+        });
+
+        updateHashtagToggleStyle(hashtag, config);
+        saveHashtagConfig();
+    } else if (e.target.classList.contains('removeCustom')) {
+        const tag = row.querySelector('.customTag').value;
+        if (tag) {
+            delete hashtagToggleConfig.customConfig[tag];
+        }
+        row.remove();
+        saveHashtagConfig();
+    }
 });
 
 // Store configurations in localStorage
 function saveConfigurations() {
-    const configs = {
-        default: hashtagToggleConfig.default,
-        custom: hashtagToggleConfig.customConfig
-    };
-    localStorage.setItem('hashtagConfigs', JSON.stringify(configs));
+    // Backwards compatibility wrapper
+    saveHashtagConfig();
 }
 
 // Load configurations from localStorage
 function loadConfigurations() {
-    const saved = localStorage.getItem('hashtagConfigs');
-    if (saved) {
-        const configs = JSON.parse(saved);
-        hashtagToggleConfig.default = { ...hashtagToggleConfig.default, ...configs.default };
-        hashtagToggleConfig.customConfig = { ...hashtagToggleConfig.customConfig, ...configs.custom };
-        renderTasks(tasks);
-    }
+    loadHashtagConfig();
 }
 
 // Save configurations when changed
 ['defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg'].forEach(id => {
     document.getElementById(id).addEventListener('change', saveConfigurations);
 });
-applyCustom.addEventListener('click', saveConfigurations);
+
 
 // Load configurations on startup
 loadConfigurations();
@@ -2406,17 +2434,19 @@ function saveHashtagConfig() {
         customConfig: {}
     };
 
-    // Save custom hashtag configurations
-    const customTag = document.getElementById('customTag').value;
-    if (customTag && customTag.startsWith('#')) {
-        config.customConfig[customTag] = {
-            fontSize: document.getElementById('customFontSize').value,
-            fontFamily: document.getElementById('customFontFamily').value,
-            hoverBgColor: document.getElementById('customHoverColor').value + '33',
-            easterEgg: document.getElementById('customEasterEgg').value,
-            height: '50px'
-        };
-    }
+    // Save custom hashtag configurations from all rows
+    customTagsContainer.querySelectorAll('.custom-tag-row').forEach(row => {
+        const tag = row.querySelector('.customTag').value;
+        if (tag && tag.startsWith('#')) {
+            config.customConfig[tag] = {
+                fontSize: row.querySelector('.customFontSize').value,
+                fontFamily: row.querySelector('.customFontFamily').value,
+                hoverBgColor: row.querySelector('.customHoverColor').value + '33',
+                easterEgg: row.querySelector('.customEasterEgg').value,
+                height: '50px'
+            };
+        }
+    });
 
     // Save to localStorage and update global config
     localStorage.setItem('hashtagConfig', JSON.stringify(config));
@@ -2442,15 +2472,16 @@ function loadHashtagConfig() {
             document.getElementById('defaultEasterEgg').value = config.default.easterEgg || '';
         }
 
-        // Update custom inputs if there's a saved custom config
+        // Populate custom tag rows
+        customTagsContainer.innerHTML = '';
         const customConfigs = Object.entries(config.customConfig || {});
         if (customConfigs.length > 0) {
-            const [tag, settings] = customConfigs[0];
-            document.getElementById('customTag').value = tag;
-            document.getElementById('customFontSize').value = settings.fontSize?.replace('px', '') || '';
-            document.getElementById('customFontFamily').value = settings.fontFamily || '';
-            document.getElementById('customHoverColor').value = settings.hoverBgColor?.replace('33', '') || '';
-            document.getElementById('customEasterEgg').value = settings.easterEgg || '';
+            customConfigs.forEach(([tag, settings]) => {
+                createCustomTagRow(tag, settings);
+            });
+        } else {
+            // Ensure at least one empty row exists
+            createCustomTagRow();
         }
 
         renderTasks(tasks); // Re-render with new styles
@@ -2462,8 +2493,7 @@ function loadHashtagConfig() {
 // Update event listeners for real-time syncing
 function initConfigSync() {
     const configInputs = [
-        'defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg',
-        'customTag', 'customFontSize', 'customFontFamily', 'customHoverColor', 'customEasterEgg'
+        'defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg'
     ];
 
     configInputs.forEach(id => {
@@ -2477,6 +2507,11 @@ function initConfigSync() {
         }
     });
 
+    // Save when any custom tag input changes
+    customTagsContainer.addEventListener('input', () => {
+        saveHashtagConfig();
+    });
+
     // Listen for storage changes from other tabs/windows
     window.addEventListener('storage', (e) => {
         if (e.key === 'hashtagConfig') {
@@ -2487,8 +2522,7 @@ function initConfigSync() {
 
 // Add event listeners to configuration inputs
 const configInputs = [
-    'defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg',
-    'customTag', 'customFontSize', 'customFontFamily', 'customHoverColor', 'customEasterEgg'
+    'defaultFontSize', 'defaultFontFamily', 'defaultHoverColor', 'defaultEasterEgg'
 ];
 
 configInputs.forEach(inputId => {
@@ -2496,7 +2530,6 @@ configInputs.forEach(inputId => {
     if (element) {
         element.addEventListener('change', () => {
             saveHashtagConfig();
-            // Apply changes immediately if needed
             applyHashtagStyles();
         });
     }
