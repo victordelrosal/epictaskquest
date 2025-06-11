@@ -2316,6 +2316,18 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
     cursor: pointer;
 }
 
+.custom-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.custom-tag-row input,
+.custom-tag-row button {
+    flex: 1 1 100px;
+}
+
 /* Mobile-specific adjustments */
 @media (max-width: 768px) {
     .hashtag-config-panel {
