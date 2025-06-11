@@ -1685,13 +1685,13 @@ function createTaskElement(task, isCompleted) {
 
     // Move Up Button
     const upButton = document.createElement('button');
-    upButton.textContent = '⬆️';
+    upButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
     upButton.title = 'Move Up';
     upButton.addEventListener('click', () => moveTaskUp(task.id));
 
     // Move Down Button
     const downButton = document.createElement('button');
-    downButton.textContent = '⬇️';
+    downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
     downButton.title = 'Move Down';
     downButton.addEventListener('click', () => moveTaskDown(task.id));
 
