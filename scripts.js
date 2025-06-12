@@ -3,7 +3,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-import { enableIndexedDbPersistence, getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { enableIndexedDbPersistence, getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 import { 
     getAuth, 
     onAuthStateChanged, 
@@ -216,6 +216,7 @@ const db = getFirestore(app);
 enableIndexedDbPersistence(db).catch(e => {
     console.warn("Offline persistence not available", e);
 });
+const configDocRef = doc(db, 'config', 'hashtagConfig');
 const auth = getAuth(app);
 
 // Initialize AlarmService
@@ -369,7 +370,7 @@ onAuthStateChanged(auth, async (user) => {
                 document.addEventListener('touchstart', initializeAudioOnInteraction);
                 document.addEventListener('keydown', initializeAudioOnInteraction);
                 
-                initConfigPanel();
+                await initConfigPanel();
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
                 loadTasks();
@@ -2361,14 +2362,14 @@ customTagsContainer.addEventListener('click', (e) => {
 });
 
 // Store configurations in localStorage
-function saveConfigurations() {
+async function saveConfigurations() {
     // Backwards compatibility wrapper
-    saveHashtagConfig();
+    await saveHashtagConfig();
 }
 
 // Load configurations from localStorage
-function loadConfigurations() {
-    loadHashtagConfig();
+async function loadConfigurations() {
+    await loadHashtagConfig();
 }
 
 // Save configurations when changed
@@ -2381,7 +2382,7 @@ function loadConfigurations() {
 loadConfigurations();
 
 // Add initialization for panel visibility
-function initConfigPanel() {
+async function initConfigPanel() {
     // Check if panel was visible before
     const wasVisible = localStorage.getItem('configPanelVisible') === 'true';
     if (wasVisible) {
@@ -2416,13 +2417,34 @@ function initConfigPanel() {
 
     // Initialize configuration sync
     initConfigSync();
-    
+
     // Load saved configurations
-    loadHashtagConfig();
+    await loadHashtagConfig();
+}
+
+// Firestore helpers for hashtag configuration
+async function saveConfigToFirestore(config) {
+    try {
+        await setDoc(configDocRef, config);
+    } catch (error) {
+        console.error('Error saving config to Firestore:', error);
+    }
+}
+
+async function loadConfigFromFirestore() {
+    try {
+        const snap = await getDoc(configDocRef);
+        if (snap.exists()) {
+            return snap.data();
+        }
+    } catch (error) {
+        console.error('Error loading config from Firestore:', error);
+    }
+    return null;
 }
 
 // Hashtag Configuration Sync Functions
-function saveHashtagConfig() {
+async function saveHashtagConfig() {
     const config = {
         default: {
             fontSize: document.getElementById('defaultFontSize').value,
@@ -2452,14 +2474,19 @@ function saveHashtagConfig() {
     localStorage.setItem('hashtagConfig', JSON.stringify(config));
     Object.assign(hashtagToggleConfig, config);
     renderTasks(tasks); // Re-render to apply changes
+    await saveConfigToFirestore(config);
 }
 
-function loadHashtagConfig() {
+async function loadHashtagConfig() {
     try {
-        const saved = localStorage.getItem('hashtagConfig');
-        if (!saved) return;
-
-        const config = JSON.parse(saved);
+        let config = await loadConfigFromFirestore();
+        if (config) {
+            localStorage.setItem('hashtagConfig', JSON.stringify(config));
+        } else {
+            const saved = localStorage.getItem('hashtagConfig');
+            if (!saved) return;
+            config = JSON.parse(saved);
+        }
 
         // Update global config
         Object.assign(hashtagToggleConfig, config);
@@ -2515,6 +2542,15 @@ function initConfigSync() {
     // Listen for storage changes from other tabs/windows
     window.addEventListener('storage', (e) => {
         if (e.key === 'hashtagConfig') {
+            loadHashtagConfig();
+        }
+    });
+
+    // Listen for remote updates via Firestore
+    onSnapshot(configDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            localStorage.setItem('hashtagConfig', JSON.stringify(data));
             loadHashtagConfig();
         }
     });
