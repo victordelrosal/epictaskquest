@@ -216,7 +216,7 @@ const db = getFirestore(app);
 enableIndexedDbPersistence(db).catch(e => {
     console.warn("Offline persistence not available", e);
 });
-const configDocRef = doc(db, 'config', 'hashtagConfig');
+let configDocRef; // Initialized after login for user-specific sync
 const auth = getAuth(app);
 
 // Initialize AlarmService
@@ -370,6 +370,9 @@ onAuthStateChanged(auth, async (user) => {
                 document.addEventListener('touchstart', initializeAudioOnInteraction);
                 document.addEventListener('keydown', initializeAudioOnInteraction);
                 
+                // Set Firestore document reference for this user
+                configDocRef = doc(db, 'users', user.uid, 'config', 'hashtagConfig');
+
                 await initConfigPanel();
                 loginContainer.style.display = "none";
                 appContainer.style.display = "flex";
@@ -379,6 +382,7 @@ onAuthStateChanged(auth, async (user) => {
                 handleUnauthorizedUser(user);
             }
         } else {
+            configDocRef = null;
             showLoginScreen();
         }
     } catch (error) {
@@ -418,6 +422,7 @@ const logoutButton = document.getElementById('logoutButton');
 logoutButton.addEventListener('click', () => {
     signOut(auth).then(() => {
         console.log("User signed out.");
+        configDocRef = null;
     }).catch((error) => {
         console.error("Error signing out:", error);
     });
@@ -430,6 +435,7 @@ function handleUnauthorizedUser(user) {
         loginContainer.innerHTML = `<h2 style="color: var(--error-color);">Unauthorized Access</h2>`;
         loginError.textContent = "Unauthorized email address";
         loginError.style.display = "block";
+        configDocRef = null;
     });
 }
 
@@ -2424,6 +2430,7 @@ async function initConfigPanel() {
 
 // Firestore helpers for hashtag configuration
 async function saveConfigToFirestore(config) {
+    if (!configDocRef) return;
     try {
         await setDoc(configDocRef, config);
     } catch (error) {
@@ -2432,6 +2439,7 @@ async function saveConfigToFirestore(config) {
 }
 
 async function loadConfigFromFirestore() {
+    if (!configDocRef) return null;
     try {
         const snap = await getDoc(configDocRef);
         if (snap.exists()) {
@@ -2547,13 +2555,15 @@ function initConfigSync() {
     });
 
     // Listen for remote updates via Firestore
-    onSnapshot(configDocRef, (docSnap) => {
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            localStorage.setItem('hashtagConfig', JSON.stringify(data));
-            loadHashtagConfig();
-        }
-    });
+    if (configDocRef) {
+        onSnapshot(configDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                localStorage.setItem('hashtagConfig', JSON.stringify(data));
+                loadHashtagConfig();
+            }
+        });
+    }
 }
 
 // Add event listeners to configuration inputs
