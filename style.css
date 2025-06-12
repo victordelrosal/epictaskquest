@@ -39,6 +39,14 @@
         var(--blue-3) 50%,
         var(--blue-7) 100%
     );
+
+    /* Reverse of primary gradient for hover effects */
+    --primary-gradient-reverse: linear-gradient(
+        to bottom,
+        var(--blue-7) 0%,
+        var(--blue-4) 50%,
+        var(--blue-1) 100%
+    );
     
     --task-form-gradient: linear-gradient(
         to bottom,
@@ -1820,12 +1828,12 @@ input[type="number"].custom-points::-webkit-outer-spin-button {
 }
 
 .hashtag-toggle .add-task-button:active {
-    transform: scale(1.2);
+    transform: translateX(50%) scale(1.2);
 }
 
 .hashtag-toggle .add-task-button:hover {
-    background: var(--secondary-gradient);
-    transform: scale(1.05);
+    background: var(--primary-gradient-reverse);
+    transform: translateX(50%) scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
