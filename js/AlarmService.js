@@ -14,7 +14,7 @@ export class AlarmService {
 
     parseAlarmPattern(text) {
         const standardMatch = text.match(/!(\d{2})(\d{2})(\d{2})(\d{2})/);
-        const simpleMatch = text.match(/!(\d{2})(\d{2})/);
+        const simpleMatch = text.match(/!(\d{2}):?(\d{2})/);
 
         if (standardMatch) {
             const [_, day, month, hours, minutes] = standardMatch;
@@ -76,7 +76,7 @@ export class AlarmService {
 
         if (delay > 0) {
             const timeoutId = setTimeout(() => {
-                this.triggerAlarm(taskId, taskText);
+                this.triggerAlarm(taskText);
             }, delay);
 
             this.alarms.set(taskId, { timeoutId, alarmTime });
