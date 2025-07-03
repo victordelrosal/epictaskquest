@@ -1771,7 +1771,15 @@ window.addEventListener('click', (event) => {
 wishlistFilter.addEventListener('click', () => {
     currentFilter = currentFilter === 'wishlist' ? 'all' : 'wishlist';
     wishlistFilter.classList.toggle('active', currentFilter === 'wishlist');
-    
+
+    // When switching to wishlist view, close all open tabs and open the #0buy tab
+    if (currentFilter === 'wishlist') {
+        openToggles.clear();
+        openToggles.add('#0buy');
+    } else {
+        openToggles.clear();
+    }
+
     // Refresh the task list with current search term
     filterTasks(taskSearchInput.value);
 });
